@@ -87,9 +87,19 @@ function lessonCardTarget(services: QardServices, lesson: Lesson): CardTarget {
     .cards.filter((c) => lesson.notes.includes(c.sourceFile));
   const topic = lesson.map?.title ?? lesson.topic;
   const provenance = { generatedFrom: lesson.notes, sourceSnapshots: lesson.sourceSnapshots };
-  return noteCards.length
-    ? { ...provenance, deck: noteCards[0]!.deck, topic, sourceFile: noteCards[0]!.sourceFile }
-    : { ...provenance, deck: lesson.course ?? lesson.topic, topic };
+  const first = noteCards[0];
+  if (first) {
+    const fixed: unknown = services.app.metadataCache.getCache(first.sourceFile)?.frontmatter?.[
+      'qard-topic'
+    ];
+    return {
+      ...provenance,
+      deck: first.deck,
+      topic: typeof fixed === 'string' && fixed.trim() ? fixed.trim() : topic,
+      sourceFile: first.sourceFile,
+    };
+  }
+  return { ...provenance, deck: lesson.course ?? lesson.topic, topic };
 }
 
 export function LessonView({
