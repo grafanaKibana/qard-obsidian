@@ -892,6 +892,11 @@ describe('learning service', () => {
     // Revising the plan while steps are being written: the old steps are dropped and the new plan's are written.
     t.reply(mapSchema, () => plan('Second'));
     await t.learn.reviseMap(lesson, 'change it');
+    // A revision keeps the planning rules for everything the student did not ask to change.
+    const revise = t.calls.find((c) => c.task.schema === mapSchema)!.task.prompt;
+    expect(revise).toContain('Each step teaches one idea');
+    // The student's request outranks the rules it conflicts with.
+    expect(revise).toContain("Apply the student's change first");
     release.splice(0).forEach((r) => r());
     await vi.waitFor(() => expect(running).toBe(3));
     release.splice(0).forEach((r) => r());
@@ -1216,6 +1221,10 @@ describe('learning service', () => {
       },
     }));
     await t.learn.submitProbe(lesson);
+    // One idea per planned step: each step is written from its title and why alone.
+    expect(t.calls.find((c) => c.task.schema === probeMapSchema)!.task.prompt).toContain(
+      'Each step teaches one idea',
+    );
     let l = t.learn.lessonAt(lesson)!;
     expect(l.probe!.marks).toMatchObject({ p1: { score: 0 }, p2: { mistake: 'unknown' } });
     expect(l.map!.steps).toHaveLength(2);

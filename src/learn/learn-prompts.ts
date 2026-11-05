@@ -111,6 +111,14 @@ Return no questions if the evidence already shows where to start. note says in o
 ${MCQ_RULES}`;
 }
 
+const MAP_RULES = `Rules for the map:
+- Three to five steps. Each step teaches one idea, and its title names only that idea ("Longest-prefix match", not "Routing, forwarding and NAT"). A title never joins two ideas with "and", "&", "/", "vs", "with", a comma or a colon. If the goal needs more ideas than five steps hold, keep the ones the goal depends on most and say in plan what was left out.
+- The first step starts at the edge: the first idea the student has not yet shown they know. What they already know is recalled inside it in a sentence; no step reviews it.
+- Each step needs only the steps before it. The last step reaches the goal.
+- why: one sentence on why the step is needed now: what it adds that earlier steps don't, and what it leaves to later steps. Each step is written separately, from the plan's titles and whys, so the why fixes its scope.
+- plan says in prose where the lesson starts and why. mermaid is a small graph TD from the starting facts to the goal.
+Before answering, reread each title. If one names two ideas, split it; within five steps, drop the lesser idea only if no later step needs it.`;
+
 function answersBlock(questions: Question[], answers: Record<string, AnswerState>) {
   return questions.map((q) => questionBlock(q, answers[q.id])).join('\n\n');
 }
@@ -126,11 +134,13 @@ ${sourcesBlock(sources)}${courseBlock(m)}
 ${probe?.questions.length ? `Their probe answers (multiple choice is already marked; mark the others):\n${answersBlock(probe.questions, probe.answers)}\n${MARKING}\nReturn marks only for: ${typed.map((q) => q.id).join(', ') || '(none)'}.\n` : 'There was no probe. Return an empty marks list.\n'}
 Then plan the lesson from the edge you found:
 - findings: what the answers show, in one or two sentences (at most 50 words; don't repeat the plan). Name a wrong answer as a slip, an isolated gap or a misconception.
-- map: three to five steps. The first starts at the edge: the first idea the student has not yet shown they know. Recall what they already know inside that step, in a sentence; never spend a step reviewing it. The last reaches the goal. plan says in prose where you will start and why. mermaid is a small graph TD from the starting facts to the goal. Each step has a one-sentence why.${m ? '\n- objective: the mastery id this lesson teaches, if one fits.' : ''}`;
+- map: the lesson plan, following the rules below.${m ? '\n- objective: the mastery id this lesson teaches, if one fits.' : ''}
+
+${MAP_RULES}`;
 }
 
 export function reviseMapPrompt(lesson: Lesson, change: string) {
-  return `${TEACHING}\n\nA lesson plan the student is reviewing:\n<map>\n${JSON.stringify(lesson.map, null, 2)}\n</map>\nProbe findings: ${lesson.probe?.findings ?? 'none'}\n\nThe student asks:\n<change>\n${change.trim()}\n</change>\n\nReturn the whole map with the change applied.`;
+  return `${TEACHING}\n\nA lesson plan the student is reviewing:\n<map>\n${JSON.stringify(lesson.map, null, 2)}\n</map>\nProbe findings: ${lesson.probe?.findings ?? 'none'}\n\nThe student asks:\n<change>\n${change.trim()}\n</change>\n\nReturn the whole map with the change applied. Apply the student's change first; the rules below cover everything it does not ask for, and where it conflicts with them (the number of steps, merging steps, a review step), follow the change.\n${MAP_RULES}`;
 }
 
 export function stepPrompt(lesson: Lesson, map: LessonMap, index: number) {
