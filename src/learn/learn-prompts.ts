@@ -126,7 +126,7 @@ ${sourcesBlock(sources)}${courseBlock(m)}
 ${probe?.questions.length ? `Their probe answers (multiple choice is already marked; mark the others):\n${answersBlock(probe.questions, probe.answers)}\n${MARKING}\nReturn marks only for: ${typed.map((q) => q.id).join(', ') || '(none)'}.\n` : 'There was no probe. Return an empty marks list.\n'}
 Then plan the lesson from the edge you found:
 - findings: what the answers show, in one or two sentences (at most 50 words; don't repeat the plan). Name a wrong answer as a slip, an isolated gap or a misconception.
-- map: three to five steps. The first builds on something the student has shown they know; the last reaches the goal. plan says in prose where you will start and why. mermaid is a small graph TD from the starting facts to the goal. Each step has a one-sentence why.${m ? '\n- objective: the mastery id this lesson teaches, if one fits.' : ''}`;
+- map: three to five steps. The first starts at the edge: the first idea the student has not yet shown they know. Recall what they already know inside that step, in a sentence; never spend a step reviewing it. The last reaches the goal. plan says in prose where you will start and why. mermaid is a small graph TD from the starting facts to the goal. Each step has a one-sentence why.${m ? '\n- objective: the mastery id this lesson teaches, if one fits.' : ''}`;
 }
 
 export function reviseMapPrompt(lesson: Lesson, change: string) {
@@ -134,9 +134,11 @@ export function reviseMapPrompt(lesson: Lesson, change: string) {
 }
 
 export function stepPrompt(lesson: Lesson, map: LessonMap, index: number) {
-  const done = map.steps
-    .slice(0, index)
-    .map((s, i) => `${i + 1}. ${s.title}`)
+  const steps = map.steps
+    .map(
+      (s, i) =>
+        `${i + 1}. ${s.title}: ${s.why}${i < index ? ' (taught before this step)' : i === index ? ' (this step)' : ''}`,
+    )
     .join('\n');
   const step = map.steps[index]!;
   return `${TEACHING}
@@ -146,14 +148,14 @@ Notes to teach from (read them):
 ${notesList(lesson.notes)}
 The plan: ${map.plan}
 Probe findings: ${lesson.probe?.findings ?? 'none'}
-Steps already taught:
-${done || '(none: this is the first step)'}
+The lesson's steps, written at the same time by other writers:
+${steps}
 
 Write step ${index + 1} of ${map.steps.length}: "${step.title}". Why it is needed now: ${step.why}
-- explain: establish the idea from what the student already accepts. 80 to 250 words.
+- explain: establish the idea from what the student already accepts, recalling a known foundation in a sentence rather than re-teaching it. 80 to 250 words.
 - connect: how it links to the previous step and the goal.
-- checkFirst: true when the student can plausibly work the idea out before reading the explanation; the check is then asked first.
-- check: one question (id "k${index + 1}") that shows whether the step landed, worth 1–4 marks.${lesson.objective ? ` Set objective to "${lesson.objective}".` : ''}
+- checkFirst: true only when the check can be answered from earlier steps or what the student has already shown, without any fact this step's explanation introduces. The check is then asked first, as a prediction. Otherwise false.
+- check: one question (id "k${index + 1}") that shows whether this step's idea landed, worth 1–4 marks. It asks for one thing: a prediction, a verdict, a piece of code or one explanation. Its rubric points are parts of that one answer, never separate tasks chained with "then" or "and". The prompt states every fact, type and condition the answer depends on and says what form the answer takes. Leave the other steps' ideas to their own checks.${lesson.objective ? ` Set objective to "${lesson.objective}".` : ''}
 - misconceptions: the two or three likely wrong answers to the check, each with a short re-explanation aimed at that mistake.
 - figure: "" unless the step needs a figure drawn (see Visuals).
 ${QUESTION_FORMAT}
@@ -178,7 +180,8 @@ Anticipated misconceptions:
 ${step.misconceptions.map((m, i) => `${i}. ${m.signs}`).join('\n') || '(none)'}
 
 ${MARKING}
-reply: speak to the student in at most 80 words. If they are right, confirm the key idea and move on. If not, point at the exact error and give a nudge, not the whole answer.
+A point stated in other words is clearly made. One exception to strict marking: if the prompt allows another reasonable reading and the answer is correct under it, set awarded for the rubric points that reading satisfies and say in feedback that the question was ambiguous.
+${step.checkFirst && !retryOf ? 'This check was asked before the explanation, as a prediction. In reply, treat a wrong answer as a prediction to correct, not a failure.\n' : ''}reply: speak to the student in at most 80 words. If they are right, confirm the key idea and move on. If not, point at the exact error and give a nudge, not the whole answer.
 misconception: the index of the anticipated misconception the answer shows, or -1.`;
 }
 

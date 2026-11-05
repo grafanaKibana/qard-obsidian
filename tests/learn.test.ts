@@ -1237,6 +1237,11 @@ describe('learning service', () => {
     expect(
       t.calls.filter((c) => c.task.schema === stepSchema).every((c) => c.role === 'writer'),
     ).toBe(true);
+    // Steps are written in parallel, so each writer sees the whole plan to keep its check to its own idea.
+    const first = t.calls.find(
+      (c) => c.task.schema === stepSchema && c.task.prompt.includes('step 1 of'),
+    )!;
+    expect(first.task.prompt).toContain('2. The full story: The goal.');
     l = t.learn.lessonAt(lesson)!;
     expect(l.steps[0]!.check).toMatchObject({ id: 'k1', objective: 'lda-generative' });
 
@@ -1258,11 +1263,17 @@ describe('learning service', () => {
       reteach: 'It is a whole vector.',
     });
     expect(t.calls.at(-1)).toMatchObject({ role: 'tutor', task: { vault: false } });
+    // A check asked before the explanation is marked as a prediction.
+    expect(t.calls.at(-1)!.task.prompt).toContain('asked before the explanation, as a prediction');
 
     await t.learn.go(lesson, 1);
     t.learn.answerStep(lesson, { unknown: true });
     await t.learn.checkStep(lesson);
     expect(t.learn.lessonAt(lesson)!.state[1]!.mark!.mistake).toBe('unknown');
+    // A second attempt follows the explanation, so it is no longer a prediction.
+    await t.learn.retryStep(lesson, 'A point on the simplex');
+    expect(t.calls.at(-1)!.task.prompt).toContain('This is a second attempt.');
+    expect(t.calls.at(-1)!.task.prompt).not.toContain('as a prediction');
 
     t.reply(closeSchema, () => ({
       summary: 'We built LDA from Dirichlet draws.',
