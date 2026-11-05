@@ -121,7 +121,14 @@ export class CardWriter {
     let notes = this.candidates(deck, topic);
     if (sourceFile && exists(sourceFile)) {
       const own = this.index.getSnapshot().cards.filter((c) => c.sourceFile === sourceFile);
-      if (this.noteDeck(sourceFile, own) === deck) {
+      const fixed = this.frontmatter(sourceFile)?.['qard-topic'];
+      const fixedTopic = typeof fixed === 'string' ? fixed.trim() : '';
+      if (
+        this.noteDeck(sourceFile, own) === deck &&
+        (!fixedTopic ||
+          fixedTopic === topic ||
+          own.some((card) => card.deck === deck && card.topic === topic))
+      ) {
         return { path: sourceFile, exists: true };
       }
       folder = parentFolder(sourceFile);

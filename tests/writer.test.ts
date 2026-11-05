@@ -6,6 +6,7 @@ import type { VaultIndexer } from '../src/cards/indexer';
 import { parseCards } from '../src/cards/parser';
 import { serializeCard } from '../src/cards/source-patch';
 import { clozeFront, FORMAT_BACK } from '../src/cards/card-format';
+import { locationComment } from '../src/cards/card-location';
 function setup(source: string, cachedDeck = 'Networks') {
   const file = new (TFile as unknown as new (path: string) => TFile)('a.md');
   let text = source;
@@ -50,6 +51,12 @@ it('does not write to a different deck when cached metadata is stale', async () 
   const source = '---\nqard-deck: Changed\n---\n';
   const { writer, read } = setup(source);
   await expect(writer.create(draft)).rejects.toThrow('changed');
+  expect(read()).toBe(source);
+});
+it('does not mutate a fixed-topic note when cached metadata omits its new topic', async () => {
+  const source = '---\nqard-deck: Networks\nqard-topic: Changed\n---\n\nOriginal prose.\n';
+  const { writer, read } = setup(source);
+  await expect(writer.create(draft)).rejects.toThrow(/fixes its topic/);
   expect(read()).toBe(source);
 });
 
@@ -146,13 +153,83 @@ function vault(initial: Record<string, string> = {}) {
     metadataCache: {
       getFileCache: (f: TFile) => {
         const deck = texts[f.path]?.match(/^---\nqard-deck: "?([^"\n]+)"?\n/)?.[1];
-        return deck ? { frontmatter: { 'qard-deck': deck } } : null;
+        const topic = texts[f.path]?.match(/^qard-topic: "?([^"\n]*)"?$/m)?.[1];
+        return deck ? { frontmatter: { 'qard-deck': deck, 'qard-topic': topic } } : null;
       },
     },
   } as unknown as App;
   return { writer: new CardWriter(app, index as VaultIndexer), texts, index };
 }
 const fresh = { deck: 'Bio', topic: 'Cells', front: 'Q?', back: 'A', folder: 'Qard' };
+
+it('uses a compatible sibling when the explicit source fixes another topic', async () => {
+  const notes = {
+    'Notes/Fixed.md': '---\nqard-deck: Bio\nqard-topic: Genes\n---\n\nOriginal prose.\n',
+    'Notes/Cells.md': '---\nqard-deck: Bio\nqard-topic: Cells\n---\n\nSibling prose.\n',
+    'Qard/Bio.md': '---\nqard-deck: Bio\n---\n# Cells\n\n' + serializeCard('old', 'Old?', 'Old'),
+  };
+  const { writer, texts } = vault(notes);
+  const card = await writer.create({ ...fresh, sourceFile: 'Notes/Fixed.md' });
+  expect(card).toMatchObject({ sourceFile: 'Notes/Cells.md', deck: 'Bio', topic: 'Cells' });
+  expect(texts['Notes/Fixed.md']).toBe(notes['Notes/Fixed.md']);
+  expect(texts['Qard/Bio.md']).toBe(notes['Qard/Bio.md']);
+  expect(Object.keys(texts)).toEqual(Object.keys(notes));
+});
+it('creates a sibling deck note when an incompatible explicit source has no compatible sibling', async () => {
+  const notes = {
+    'Notes/Fixed.md': '---\nqard-deck: Bio\nqard-topic: Genes\n---\n\nOriginal prose.\n',
+    'Qard/Bio.md': '---\nqard-deck: Bio\n---\n# Cells\n\n' + serializeCard('old', 'Old?', 'Old'),
+  };
+  const { writer, texts } = vault(notes);
+  const card = await writer.create({ ...fresh, sourceFile: 'Notes/Fixed.md' });
+  expect(card).toMatchObject({ sourceFile: 'Notes/Bio.md', deck: 'Bio', topic: 'Cells' });
+  expect(texts['Notes/Fixed.md']).toBe(notes['Notes/Fixed.md']);
+  expect(texts['Qard/Bio.md']).toBe(notes['Qard/Bio.md']);
+  expect(parseCards(texts['Notes/Bio.md']!, 'Notes/Bio.md').cards).toHaveLength(1);
+});
+it.each([false, true])(
+  'adds to a matching fixed-topic note with existing cards: %s',
+  async (hasCard) => {
+    const source =
+      '---\nqard-deck: Bio\nqard-topic: " Cells "\n---\n\nOriginal prose.\n\n' +
+      (hasCard ? serializeCard('old', 'Old?', 'Old') : '');
+    const { writer, texts } = vault({ 'Notes/Fixed.md': source });
+    const card = await writer.create({ ...fresh, sourceFile: 'Notes/Fixed.md' });
+    expect(card).toMatchObject({ sourceFile: 'Notes/Fixed.md', deck: 'Bio', topic: 'Cells' });
+    expect(texts['Notes/Fixed.md']!.startsWith(source)).toBe(true);
+    expect(Object.keys(texts)).toEqual(['Notes/Fixed.md']);
+    if (hasCard) {
+      expect(parseCards(texts['Notes/Fixed.md']!, 'Notes/Fixed.md').cards[0]).toMatchObject({
+        id: 'old',
+        frontMarkdown: 'Old?',
+        backMarkdown: 'Old',
+      });
+    }
+  },
+);
+it('inherits a matching moved-card topic inside a note fixed to another topic', async () => {
+  const source =
+    '---\nqard-deck: Bio\nqard-topic: Genes\n---\n\nOriginal prose.\n\n' +
+    locationComment({ deck: 'Bio', topic: 'Cells' }) +
+    '\n' +
+    serializeCard('moved', 'Old?', 'Old');
+  const { writer, texts } = vault({ 'Notes/Fixed.md': source });
+  const card = await writer.create({ ...fresh, sourceFile: 'Notes/Fixed.md' });
+  expect(card).toMatchObject({
+    sourceFile: 'Notes/Fixed.md',
+    deck: 'Bio',
+    topic: 'Cells',
+    location: { deck: 'Bio', topic: 'Cells' },
+  });
+  expect(texts['Notes/Fixed.md']!.startsWith(source)).toBe(true);
+  expect(Object.keys(texts)).toEqual(['Notes/Fixed.md']);
+  expect(parseCards(texts['Notes/Fixed.md']!, 'Notes/Fixed.md').cards[0]).toMatchObject({
+    id: 'moved',
+    frontMarkdown: 'Old?',
+    backMarkdown: 'Old',
+    location: { deck: 'Bio', topic: 'Cells' },
+  });
+});
 
 it('keeps adding dashboard cards to one deck note, under the existing topic heading', async () => {
   const { writer, texts } = vault();
