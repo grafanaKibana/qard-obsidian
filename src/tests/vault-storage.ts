@@ -20,9 +20,18 @@ export class VaultTestStorage implements TestStorage {
       )
       .map((f) => f.path);
   }
+  /**
+   * Before layout is ready, Obsidian may not have listed every file yet. Reading straight from
+   * disk then keeps an unlisted file from looking missing, and from being replaced on the next save.
+   */
   async read(path: string) {
-    const file = this.app.vault.getAbstractFileByPath(normalizePath(path));
-    return file instanceof TFile ? this.app.vault.read(file) : null;
+    const target = normalizePath(path),
+      file = this.app.vault.getAbstractFileByPath(target);
+    if (file instanceof TFile) {
+      return this.app.vault.read(file);
+    }
+    const adapter = this.app.vault.adapter;
+    return !file && adapter && (await adapter.exists(target)) ? adapter.read(target) : null;
   }
   modified(path: string) {
     const file = this.app.vault.getAbstractFileByPath(normalizePath(path));
@@ -56,6 +65,8 @@ export class VaultTestStorage implements TestStorage {
     const file = this.app.vault.getAbstractFileByPath(target);
     if (file instanceof TFile) {
       await this.app.vault.modify(file, text);
+    } else if (!file && this.app.vault.adapter && (await this.app.vault.adapter.exists(target))) {
+      await this.app.vault.adapter.write(target, text);
     } else {
       await this.app.vault.create(target, text);
     }

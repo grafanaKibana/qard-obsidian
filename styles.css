@@ -5636,6 +5636,15 @@ div.qard-ask-q {
   margin-top: 20px;
 }
 
+.qard-rename-dialog label {
+  display: grid;
+  gap: 6px;
+}
+
+.qard-rename-dialog input {
+  width: 100%;
+}
+
 .qard-rating-meta {
   display: inline-flex;
   align-items: center;
@@ -5862,6 +5871,21 @@ div.qard-ask-q {
 .qard-source-search {
   position: relative;
   flex-shrink: 0;
+}
+
+.qard-source-batch {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.qard-source-batch p {
+  margin: 0;
+}
+
+.qard-source-batch .qard-actions {
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 /* The button sits at the right edge, so its search opens leftwards. */

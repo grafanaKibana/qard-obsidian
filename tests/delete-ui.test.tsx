@@ -144,3 +144,40 @@ it('filters topics, expands real cards and keeps opening a card separate from st
   expect(host.querySelectorAll('.qard-topic')).toHaveLength(2);
   expect(host.querySelector('[aria-expanded="true"]')).not.toBeNull();
 });
+it('renames a deck and a topic through a dialog, without navigating', async () => {
+  const renameDeck = vi.fn().mockResolvedValue(undefined),
+    renameTopic = vi.fn().mockResolvedValue(undefined),
+    study = vi.fn();
+  await act(async () =>
+    root.render(
+      <TopicBrowser
+        deck={deck}
+        select={vi.fn()}
+        study={study}
+        create={vi.fn()}
+        renameDeck={renameDeck}
+        renameTopic={renameTopic}
+      />,
+    ),
+  );
+  const type = async (value: string) =>
+    act(async () => {
+      const input = host.querySelector('dialog input') as HTMLInputElement;
+      input.value = value;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  await click(host.querySelector('[aria-label="Rename topic UDP"]'));
+  expect((host.querySelector('dialog input') as HTMLInputElement).value).toBe('UDP');
+  expect(button('Rename').disabled).toBe(true);
+  await type('Datagrams');
+  await click(button('Rename'));
+  expect(renameTopic).toHaveBeenCalledExactlyOnceWith('UDP', 'Datagrams');
+  expect(host.querySelector('dialog')).toBeNull();
+  renameDeck.mockRejectedValueOnce(new Error('Could not rename.'));
+  await click(host.querySelector('[aria-label="Rename deck Networks"]'));
+  await type('Networking');
+  await click(button('Rename'));
+  expect(renameDeck).toHaveBeenCalledExactlyOnceWith('Networking');
+  expect(host.querySelector('dialog [role="alert"]')?.textContent).toBe('Could not rename.');
+  expect(study).not.toHaveBeenCalled();
+});

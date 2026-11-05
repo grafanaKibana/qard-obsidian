@@ -1,4 +1,4 @@
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { ChevronRight, RefreshCw } from 'lucide-react';
 import type { SourceChange, SourceSyncService } from '../cards/source-sync-service';
 import type { QardServices } from '../views/services';
@@ -82,136 +82,310 @@ export function SourceUpdates({ services, back }: { services: QardServices; back
           </p>
         </div>
       ) : (
-        <div className="qard-source-workspace">
-          <nav className="qard-source-list" aria-label="Affected cards">
-            {state.changes.map((change) => (
-              <button
-                key={`${change.card.id}:${change.card.sourceFile}`}
-                className={change === current ? 'is-selected' : ''}
-                aria-current={change === current ? 'true' : undefined}
-                onClick={() => {
-                  setSelected(change.card.id);
-                  setError('');
-                }}
-              >
-                <strong>
-                  <InlineMarkdown
-                    text={change.card.frontMarkdown.split('\n')[0] ?? ''}
-                    path={change.card.sourceFile}
-                    services={services}
-                  />
-                </strong>
-                <small>
-                  {change.card.deck} › {change.card.topic}
-                </small>
-                <small>
-                  {change.applying
-                    ? 'Update needs finishing'
-                    : change.sources.some((s) => s.after === null)
-                      ? 'Source missing'
-                      : `${change.sources.length} changed ${change.sources.length === 1 ? 'note' : 'notes'}`}
-                </small>
-              </button>
-            ))}
-          </nav>
-          <section className="qard-source-detail" aria-label="Card update">
-            <div className="qard-panel">
-              <span className="qard-eyebrow">Current card</span>
-              <Markdown
-                text={current.card.frontMarkdown}
-                path={current.card.sourceFile}
-                services={services}
-              />
-              <hr />
-              <Markdown
-                text={current.card.backMarkdown}
-                path={current.card.sourceFile}
-                services={services}
-              />
-              <button
-                className="qard-text-button"
-                onClick={() => void run(() => services.openSource(current.card))}
-              >
-                Open card note
-              </button>
-            </div>
-            {current.card.duplicateId && (
-              <p className="qard-error">
-                This ID is shared by multiple cards. Fix the copied ID in the card note before
-                updating it.
-              </p>
-            )}
-            {current.sources.map((source) => (
-              <SourceDifference key={source.path} source={source} services={services} />
-            ))}
-            {current.applying ? (
-              <div className="qard-panel">
-                <h2>Finish this update</h2>
-                <p>
-                  The update was interrupted. Qard will finish saving its source link and review
-                  flag without adding another card.
-                </p>
-                <div className="qard-actions">
-                  <button
-                    disabled={state.busy.includes(current.card.id) || current.card.duplicateId}
-                    className="qard-primary"
-                    onClick={() => void run(() => service.accept(current.card.id, '', '', false))}
-                  >
-                    Finish update
-                  </button>
-                  <button
-                    disabled={state.busy.includes(current.card.id)}
-                    onClick={() => void run(() => service.discardUpdate(current.card.id))}
-                  >
-                    Cancel unsaved update
-                  </button>
-                </div>
-              </div>
-            ) : current.proposal ? (
-              <Suggestion
-                key={JSON.stringify(current.proposal)}
-                change={current}
-                services={services}
-                busy={state.busy.includes(current.card.id)}
-                run={run}
-              />
-            ) : (
-              <div className="qard-actions">
-                {ai && (
-                  <button
-                    className="qard-primary"
-                    disabled={
-                      state.busy.includes(current.card.id) ||
-                      current.card.duplicateId ||
-                      current.sources.some((s) => s.after === null)
-                    }
-                    onClick={() => void run(() => service.suggest(current.card.id))}
-                  >
-                    {state.busy.includes(current.card.id)
-                      ? 'Preparing suggestion…'
-                      : 'Suggest an update'}
-                  </button>
-                )}
-                {state.busy.includes(current.card.id) && (
-                  <button onClick={() => service.cancel(current.card.id)}>Cancel</button>
-                )}
+        <>
+          {state.changes.length > 1 && (
+            <BatchUpdates
+              changes={state.changes}
+              service={service}
+              ai={ai}
+              busy={state.busy}
+              report={setError}
+            />
+          )}
+          <div className="qard-source-workspace">
+            <nav className="qard-source-list" aria-label="Affected cards">
+              {state.changes.map((change) => (
                 <button
-                  disabled={state.busy.includes(current.card.id) || current.card.duplicateId}
-                  onClick={() => void run(() => service.keep(current.card.id))}
+                  key={`${change.card.id}:${change.card.sourceFile}`}
+                  className={change === current ? 'is-selected' : ''}
+                  aria-current={change === current ? 'true' : undefined}
+                  onClick={() => {
+                    setSelected(change.card.id);
+                    setError('');
+                  }}
                 >
-                  Keep card as is
+                  <strong>
+                    <InlineMarkdown
+                      text={change.card.frontMarkdown.split('\n')[0] ?? ''}
+                      path={change.card.sourceFile}
+                      services={services}
+                    />
+                  </strong>
+                  <small>
+                    {change.card.deck} › {change.card.topic}
+                  </small>
+                  <small>
+                    {change.applying
+                      ? 'Update needs finishing'
+                      : change.sources.some((s) => s.after === null)
+                        ? 'Source missing'
+                        : `${change.sources.length} changed ${change.sources.length === 1 ? 'note' : 'notes'}`}
+                  </small>
+                </button>
+              ))}
+            </nav>
+            <section className="qard-source-detail" aria-label="Card update">
+              <div className="qard-panel">
+                <span className="qard-eyebrow">Current card</span>
+                <Markdown
+                  text={current.card.frontMarkdown}
+                  path={current.card.sourceFile}
+                  services={services}
+                />
+                <hr />
+                <Markdown
+                  text={current.card.backMarkdown}
+                  path={current.card.sourceFile}
+                  services={services}
+                />
+                <button
+                  className="qard-text-button"
+                  onClick={() => void run(() => services.openSource(current.card))}
+                >
+                  Open card note
                 </button>
               </div>
-            )}
-            <p className="qard-muted qard-small">
-              {ai
-                ? 'Suggestions use your Writer connection. Note changes are detected locally; an AI request runs only when you choose Suggest an update.'
-                : 'Note changes are detected locally. Edit the card from the library, or keep it as is.'}
-            </p>
-          </section>
-        </div>
+              {current.card.duplicateId && (
+                <p className="qard-error">
+                  This ID is shared by multiple cards. Fix the copied ID in the card note before
+                  updating it.
+                </p>
+              )}
+              {current.sources.map((source) => (
+                <SourceDifference key={source.path} source={source} services={services} />
+              ))}
+              {current.applying ? (
+                <div className="qard-panel">
+                  <h2>Finish this update</h2>
+                  <p>
+                    The update was interrupted. Qard will finish saving its source link and review
+                    flag without adding another card.
+                  </p>
+                  <div className="qard-actions">
+                    <button
+                      disabled={state.busy.includes(current.card.id) || current.card.duplicateId}
+                      className="qard-primary"
+                      onClick={() => void run(() => service.accept(current.card.id, '', '', false))}
+                    >
+                      Finish update
+                    </button>
+                    <button
+                      disabled={state.busy.includes(current.card.id)}
+                      onClick={() => void run(() => service.discardUpdate(current.card.id))}
+                    >
+                      Cancel unsaved update
+                    </button>
+                  </div>
+                </div>
+              ) : current.proposal ? (
+                <Suggestion
+                  key={JSON.stringify(current.proposal)}
+                  change={current}
+                  services={services}
+                  busy={state.busy.includes(current.card.id)}
+                  run={run}
+                />
+              ) : (
+                <div className="qard-actions">
+                  {ai && (
+                    <button
+                      className="qard-primary"
+                      disabled={
+                        state.busy.includes(current.card.id) ||
+                        current.card.duplicateId ||
+                        current.sources.some((s) => s.after === null)
+                      }
+                      onClick={() => void run(() => service.suggest(current.card.id))}
+                    >
+                      {state.busy.includes(current.card.id)
+                        ? 'Preparing suggestion…'
+                        : 'Suggest an update'}
+                    </button>
+                  )}
+                  {state.busy.includes(current.card.id) && (
+                    <button onClick={() => service.cancel(current.card.id)}>Cancel</button>
+                  )}
+                  <button
+                    disabled={state.busy.includes(current.card.id) || current.card.duplicateId}
+                    onClick={() => void run(() => service.keep(current.card.id))}
+                  >
+                    Keep card as is
+                  </button>
+                </div>
+              )}
+              <p className="qard-muted qard-small">
+                {ai
+                  ? 'Suggestions use your Writer connection. Note changes are detected locally; an AI request runs only when you choose Suggest an update.'
+                  : 'Note changes are detected locally. Edit the card from the library, or keep it as is.'}
+              </p>
+            </section>
+          </div>
+        </>
       )}
     </>
+  );
+}
+
+/**
+ * Act on every affected card at once: acknowledge them all, prepare every suggestion, or apply the
+ * suggestions already prepared. Each card still goes through the same checks as a single update.
+ */
+function BatchUpdates({
+  changes,
+  service,
+  ai,
+  busy,
+  report,
+}: {
+  changes: SourceChange[];
+  service: SourceSyncService;
+  ai: boolean;
+  busy: string[];
+  report: (message: string) => void;
+}) {
+  const [confirm, setConfirm] = useState<'keep' | 'apply'>(),
+    [progress, setProgress] = useState<{ label: string; done: number; total: number }>(),
+    [status, setStatus] = useState('');
+  const stopped = useRef(false),
+    current = useRef<string | undefined>(undefined);
+  const open = changes.filter((c) => !c.applying && !c.card.duplicateId);
+  const ready = open.filter((c) => c.proposal);
+  const waiting = open.filter((c) => !c.proposal && !c.sources.some((s) => s.after === null));
+  const working = !!progress || busy.length > 0;
+  const count = (n: number) => `${n} ${n === 1 ? 'card' : 'cards'}`;
+  async function each(
+    label: string,
+    list: SourceChange[],
+    work: (c: SourceChange) => Promise<unknown>,
+  ) {
+    stopped.current = false;
+    setConfirm(undefined);
+    setStatus('');
+    report('');
+    let done = 0;
+    const failed: string[] = [];
+    for (const change of list) {
+      if (stopped.current) {
+        break;
+      }
+      setProgress({ label, done, total: list.length });
+      current.current = change.card.id;
+      try {
+        await work(change);
+        done++;
+      } catch (e) {
+        if (!stopped.current) {
+          failed.push((e as Error).message);
+        }
+      }
+    }
+    current.current = undefined;
+    setProgress(undefined);
+    return { done, failed };
+  }
+  const summary = (verb: string, done: number, failed: string[]) => {
+    setStatus(
+      `${verb} ${count(done)}.` +
+        (stopped.current ? ' Stopped before the rest.' : '') +
+        (failed.length ? ` ${count(failed.length)} could not be updated: ${failed[0]}` : ''),
+    );
+  };
+  async function keepAll() {
+    setConfirm(undefined);
+    setStatus('');
+    report('');
+    setProgress({ label: 'Keeping cards', done: 0, total: open.length });
+    try {
+      const kept = await service.keepMany(open.map((c) => c.card.id));
+      setStatus(`Kept ${count(kept)} as they are.`);
+    } catch (e) {
+      report((e as Error).message);
+    } finally {
+      setProgress(undefined);
+    }
+  }
+  async function suggestAll() {
+    const { done, failed } = await each('Preparing suggestions', waiting, (c) =>
+      service.suggest(c.card.id),
+    );
+    summary('Prepared suggestions for', done, failed);
+  }
+  async function applyAll() {
+    const { done, failed } = await each('Applying suggestions', ready, (c) => {
+      const p = c.proposal!;
+      return p.change === 'none' ||
+        (p.front.trim() === c.card.frontMarkdown && p.back.trim() === c.card.backMarkdown)
+        ? service.keep(c.card.id)
+        : service.accept(c.card.id, p.front, p.back, p.change === 'meaning');
+    });
+    summary('Applied suggestions to', done, failed);
+  }
+  return (
+    <section className="qard-panel qard-source-batch" aria-label="Update all cards">
+      <p>
+        <strong>{count(changes.length)}</strong> to review
+        {ready.length
+          ? ` · ${ready.length} ${ready.length === 1 ? 'suggestion' : 'suggestions'} ready`
+          : ''}
+      </p>
+      {progress ? (
+        <div className="qard-actions">
+          <span role="status">
+            {progress.label}… {progress.done} of {progress.total}
+          </span>
+          {progress.label !== 'Keeping cards' && (
+            <button
+              onClick={() => {
+                stopped.current = true;
+                if (current.current) {
+                  service.cancel(current.current);
+                }
+              }}
+            >
+              Stop
+            </button>
+          )}
+        </div>
+      ) : confirm ? (
+        <div className="qard-actions">
+          <span>
+            {confirm === 'keep'
+              ? `Keep ${count(open.length)} as they are and accept the note changes?`
+              : `Apply ${ready.length} prepared ${ready.length === 1 ? 'suggestion' : 'suggestions'}? Cards whose answer changed become due for a fresh review.`}
+          </span>
+          <button
+            className="qard-primary"
+            onClick={() => void (confirm === 'keep' ? keepAll() : applyAll())}
+          >
+            {confirm === 'keep' ? 'Keep all' : 'Apply all'}
+          </button>
+          <button onClick={() => setConfirm(undefined)}>Cancel</button>
+        </div>
+      ) : (
+        <div className="qard-actions">
+          {ai && waiting.length > 0 && (
+            <button disabled={working} onClick={() => void suggestAll()}>
+              Suggest updates for {count(waiting.length)}
+            </button>
+          )}
+          {ready.length > 0 && (
+            <button className="qard-primary" disabled={working} onClick={() => setConfirm('apply')}>
+              Apply {ready.length} {ready.length === 1 ? 'suggestion' : 'suggestions'}
+            </button>
+          )}
+          {open.length > 0 && (
+            <button disabled={working} onClick={() => setConfirm('keep')}>
+              Keep all as they are
+            </button>
+          )}
+        </div>
+      )}
+      {status && (
+        <p className="qard-muted" role="status">
+          {status}
+        </p>
+      )}
+    </section>
   );
 }
 
