@@ -1,8 +1,9 @@
 import { useState, useSyncExternalStore } from 'react';
-import { FileText, Link2, X } from 'lucide-react';
+import { FileText, X } from 'lucide-react';
 import type { QardCard } from '../cards/card-types';
 import type { QardServices } from '../views/services';
-import { isPdf, studySources } from '../vault-access';
+import { studySources } from '../vault-access';
+import { NotePicker } from './NotePicker';
 import { useAi } from '../views/use-ai';
 export function CardSourceLinks({
   card,
@@ -16,24 +17,10 @@ export function CardSourceLinks({
   const service = services.sourceSync!;
   const state = useSyncExternalStore(service.subscribe, service.getSnapshot);
   const ai = useAi(services);
-  const [open, setOpen] = useState(false),
-    [query, setQuery] = useState(''),
-    [busy, setBusy] = useState(false),
+  const [busy, setBusy] = useState(false),
     [error, setError] = useState('');
   const link = state.links[card.id],
     pending = state.changes.some((c) => c.card.id === card.id);
-  // The same search as attaching a note to a practice test: recent notes first, filtered as you type.
-  const q = query.toLowerCase().trim();
-  const matches = open
-    ? studySources(services.app, [services.reviews.getSnapshot().settings.tests.folder])
-        .filter(
-          (f) =>
-            !link?.sources.some((s) => s.path === f.path) &&
-            (!q || f.path.toLowerCase().includes(q)),
-        )
-        .sort((a, b) => b.stat.mtime - a.stat.mtime)
-        .slice(0, 6)
-    : [];
   async function add(path: string) {
     setBusy(true);
     setError('');
@@ -55,10 +42,10 @@ export function CardSourceLinks({
       await service.track(stable.id, [...(current?.sources ?? []), ...versions], true);
       await service.refresh();
       changed(stable);
-      setOpen(false);
-      setQuery('');
+      return true;
     } catch (e) {
       setError((e as Error).message);
+      return false;
     } finally {
       setBusy(false);
     }
@@ -88,57 +75,18 @@ export function CardSourceLinks({
               : 'Link a note to track changes to the material this card is based on.'}
           </p>
         </div>
-        <div className="qard-source-search">
-          <button
-            className="qard-source-add"
-            aria-expanded={open}
-            disabled={locked || card.duplicateId}
-            onClick={() => {
-              setOpen(!open);
-              setQuery('');
-            }}
-          >
-            <Link2 size={14} />
-            Link a source note
-          </button>
-          {open && (
-            <div className="qard-popover">
-              <input
-                type="search"
-                autoFocus
-                aria-label="Find a note to link"
-                placeholder="Find a note…"
-                value={query}
-                disabled={busy}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Escape') {
-                    e.stopPropagation();
-                    setOpen(false);
-                  } else if (e.key === 'Enter' && matches[0] && !busy) {
-                    void add(matches[0].path);
-                  }
-                }}
-              />
-              {matches.map((f) => (
-                <button
-                  key={f.path}
-                  className="qard-popover-item"
-                  title={f.path}
-                  disabled={busy}
-                  onClick={() => void add(f.path)}
-                >
-                  <span>{isPdf(f.path) ? f.path.split('/').pop() : f.basename}</span>
-                  <small>{f.parent?.path === '/' ? '' : f.parent?.path}</small>
-                </button>
-              ))}
-              {!matches.length && <p className="qard-muted">No matching notes.</p>}
-              <p className="qard-muted qard-source-caveat">
-                Tracking starts from the note as it is now.
-              </p>
-            </div>
-          )}
-        </div>
+        <NotePicker
+          label="Link a source note"
+          disabled={locked || card.duplicateId}
+          busy={busy}
+          notes={() =>
+            studySources(services.app, [
+              services.reviews.getSnapshot().settings.tests.folder,
+            ]).filter((f) => !link?.sources.some((s) => s.path === f.path))
+          }
+          choose={add}
+          caveat="Tracking starts from the note as it is now."
+        />
       </header>
       {link && (
         <ul>

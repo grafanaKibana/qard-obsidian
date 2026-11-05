@@ -1,4 +1,5 @@
-import { locationComment, type CardLocation } from './card-location';
+import { locationComment, readCardLocation, type CardLocation } from './card-location';
+import { renamedDeck } from '../decks/deck-index';
 import type { QardCard } from './card-types';
 import { parseCards, sameContent, sourceLines, topicSections } from './parser';
 import { siblingGroup } from './siblings';
@@ -220,7 +221,10 @@ export function placeCardInSource(
   location: CardLocation,
   parsed?: QardCard[],
 ): string {
-  const current = locateCard(source, card, parsed);
+  return placeParsedCard(source, locateCard(source, card, parsed), location);
+}
+/** `current` must come from parsing this exact source. */
+function placeParsedCard(source: string, current: QardCard, location: CardLocation): string {
   const eol = source.includes('\r\n') ? '\r\n' : '\n';
   const prefix = source
     .slice(current.sourcePosition.start, current.sourcePosition.calloutStart)
@@ -405,4 +409,154 @@ export function cardAtLine(source: string, cards: QardCard[], line: number): Qar
   return at === undefined
     ? undefined
     : cards.find((card) => card.sourcePosition.start <= at && at < card.sourcePosition.end);
+}
+
+/** The line holding a top-level frontmatter key, with the frontmatter's closing line. */
+function frontmatterEntry(source: string, key: string) {
+  const lines = sourceLines(source);
+  if (lines[0]?.text.replace(/^\uFEFF/, '') !== '---') {
+    return undefined;
+  }
+  const end = lines.findIndex((line, i) => i > 0 && /^(---|\.\.\.)\s*$/.test(line.text));
+  if (end < 0) {
+    return undefined;
+  }
+  const at = lines.findIndex(
+    (line, i) =>
+      i > 0 && i < end && line.text.startsWith(key) && /^\s*:/.test(line.text.slice(key.length)),
+  );
+  return { lines, end, at };
+}
+/** Set one frontmatter string, adding frontmatter when the note has none. Other lines stay as written. */
+export function setFrontmatterValue(source: string, key: string, value: string): string {
+  const eol = source.includes('\r\n') ? '\r\n' : '\n',
+    entry = `${key}: ${JSON.stringify(value)}`;
+  const found = frontmatterEntry(source, key);
+  if (!found) {
+    const bom = source.startsWith('\uFEFF') ? '\uFEFF' : '';
+    return `${bom}---${eol}${entry}${eol}---${eol}` + source.slice(bom.length);
+  }
+  const { lines, end, at } = found;
+  if (at < 0) {
+    return source.slice(0, lines[end]!.start) + entry + eol + source.slice(lines[end]!.start);
+  }
+  // An indented continuation belongs to the old value.
+  let last = at;
+  while (last + 1 < end && /^[ \t]/.test(lines[last + 1]!.text)) {
+    last++;
+  }
+  return source.slice(0, lines[at]!.start) + entry + eol + source.slice(lines[last]!.end);
+}
+
+export type GroupRename = { deck: string; topic?: string; to: string };
+/** Where a card belongs after the rename, or undefined when the rename leaves it alone. */
+export function renamedLocation(card: QardCard, rename: GroupRename): CardLocation | undefined {
+  if (rename.topic === undefined) {
+    const deck = renamedDeck(card.deck, rename.deck, rename.to);
+    return deck === undefined ? undefined : { deck, topic: card.topic };
+  }
+  return card.deck === rename.deck && card.topic === rename.topic
+    ? { deck: card.deck, topic: rename.to }
+    : undefined;
+}
+/**
+ * Rename a deck (with its subdecks) or one topic of a deck within one note. Where the name comes
+ * from the note itself, that is what changes: `qard-deck` or `qard-topic` in frontmatter, or the
+ * topic's heading. Cards whose placement can't be renamed that way, such as cards with their own
+ * `qard-location` or cards before the first heading, get a location comment. Callouts and IDs stay
+ * byte-for-byte intact, and the result is verified against the original cards.
+ */
+export function renameGroupInSource(source: string, path: string, rename: GroupRename): string {
+  const to = readCardLocation(
+    rename.topic === undefined
+      ? { deck: rename.to, topic: 'General' }
+      : { deck: rename.deck, topic: rename.to },
+  );
+  rename = { ...rename, to: rename.topic === undefined ? to.deck : to.topic };
+  const before = parseCards(source, path).cards,
+    expected = before.map((card) => renamedLocation(card, rename) ?? card);
+  if (!before.some((card) => renamedLocation(card, rename))) {
+    return source;
+  }
+  const finish = (start: string) => {
+    let next = start;
+    const parsed = parseCards(next, path).cards;
+    if (
+      parsed.length !== before.length ||
+      parsed.some((card, i) => card.id !== before[i]!.id || !sameContent(card, before[i]!))
+    ) {
+      throw new Error('The note changed shape while renaming.');
+    }
+    for (let i = parsed.length - 1; i >= 0; i--) {
+      const card = parsed[i]!,
+        want = expected[i]!;
+      if (card.deck !== want.deck || card.topic !== want.topic) {
+        next = placeParsedCard(next, card, { deck: want.deck, topic: want.topic });
+      }
+    }
+    const saved = parseCards(next, path).cards;
+    if (
+      saved.length !== before.length ||
+      saved.some(
+        (card, i) =>
+          card.id !== before[i]!.id ||
+          !sameContent(card, before[i]!) ||
+          card.deck !== expected[i]!.deck ||
+          card.topic !== expected[i]!.topic,
+      )
+    ) {
+      throw new Error('The cards in this note could not be renamed safely.');
+    }
+    return next;
+  };
+  try {
+    return finish(renameNoteNames(source, path, rename, before));
+  } catch {
+    // The note's own names could not be changed cleanly; give each card its own location instead.
+    return finish(source);
+  }
+}
+/** Change the names the note itself defines, when every card that uses them is being renamed. */
+function renameNoteNames(source: string, path: string, rename: GroupRename, cards: QardCard[]) {
+  const note = topicSections(source, path);
+  if (!note) {
+    return source;
+  }
+  const natural = cards.filter((card) => !card.location);
+  if (rename.topic === undefined) {
+    const deck = renamedDeck(note.deck, rename.deck, rename.to);
+    const named = (frontmatterEntry(source, 'qard-deck')?.at ?? -1) >= 0;
+    return deck !== undefined && (natural.length || named)
+      ? setFrontmatterValue(source, 'qard-deck', deck)
+      : source;
+  }
+  if (note.deck !== rename.deck) {
+    return source;
+  }
+  if (note.fixedTopic !== undefined) {
+    return note.fixedTopic === rename.topic
+      ? setFrontmatterValue(source, 'qard-topic', rename.to)
+      : source;
+  }
+  // The first section is the note body before any heading; it has no heading to rename.
+  const lines = sourceLines(source);
+  const headings = note.sections
+    .slice(1)
+    .filter(
+      (section) =>
+        section.topic === rename.topic &&
+        natural.some(
+          (card) =>
+            card.sourcePosition.line >= section.line && card.sourcePosition.line < section.end,
+        ),
+    )
+    .sort((a, b) => b.line - a.line);
+  for (const section of headings) {
+    const line = lines[section.line]!,
+      atx = line.text.match(/^( {0,3}#{1,6}[ \t]+)(.+?)((?:[ \t]+#+)?[ \t]*)$/),
+      setext = line.text.match(/^(\s*)(.*?)(\s*)$/)!;
+    const text = atx ? atx[1]! + rename.to + atx[3]! : setext[1]! + rename.to + setext[3]!;
+    source = source.slice(0, line.start) + text + source.slice(line.start + line.text.length);
+  }
+  return source;
 }

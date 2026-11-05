@@ -104,6 +104,49 @@ export function readSourceSnapshots(value: unknown): SourceSnapshot[] {
 }
 export const sourceSyncPath = (folder: string) =>
   [folder, 'Source links.json'].filter(Boolean).join('/');
+function parseLinks(text: string): Record<string, SourceLink> {
+  const data = JSON.parse(text) as {
+    version: number;
+    notes: Record<string, SourceSnapshot>;
+    links: Record<string, { sources: string[]; proposal?: Proposal; applying?: Applying }>;
+  };
+  if (data?.version !== 1 || !data.notes || !data.links || typeof data.links !== 'object') {
+    throw new Error('Invalid saved source links.');
+  }
+  const links: Record<string, SourceLink> = Object.create(null) as Record<string, SourceLink>;
+  for (const [id, link] of Object.entries(data.links)) {
+    if (!/^[A-Za-z0-9_-]+$/.test(id) || !link || !Array.isArray(link.sources)) {
+      throw new Error('Invalid saved card link.');
+    }
+    const sources = readSourceSnapshots(link.sources.map((key) => data.notes[key]));
+    if (link.proposal) {
+      readSourceSuggestion(link.proposal);
+      readSourceSnapshots(link.proposal.sources);
+      if (
+        typeof link.proposal.originalFront !== 'string' ||
+        typeof link.proposal.originalBack !== 'string'
+      ) {
+        throw new Error('Invalid saved suggestion.');
+      }
+    }
+    if (link.applying) {
+      const a = link.applying;
+      readSourceSnapshots(a.sources);
+      if (
+        [a.front, a.back, a.originalFront, a.originalBack].some((v) => typeof v !== 'string') ||
+        typeof a.substantive !== 'boolean'
+      ) {
+        throw new Error('Invalid saved update.');
+      }
+    }
+    links[id] = {
+      sources,
+      ...(link.proposal ? { proposal: link.proposal } : {}),
+      ...(link.applying ? { applying: link.applying } : {}),
+    };
+  }
+  return links;
+}
 
 /** Detects changes locally. AI runs only when the learner asks for a suggestion; every edit is approved. */
 export class SourceSyncService {
@@ -121,6 +164,10 @@ export class SourceSyncService {
   private disposed = false;
   private loaded?: Promise<void>;
   private loadError?: string;
+  /** The file as this copy last read or wrote it; anything else on disk came from elsewhere. */
+  private persisted: string | null = null;
+  /** Cards unlinked here, so a stale copy from sync does not bring their links back. */
+  private removed = new Set<string>();
   constructor(
     private storage: Storage,
     private metadataPath: string,
@@ -148,56 +195,47 @@ export class SourceSyncService {
   private async restore() {
     try {
       const text = await this.storage.read(this.metadataPath);
-      if (!text) {
-        return;
+      this.persisted = text;
+      if (text) {
+        this.publish({ links: parseLinks(text) });
       }
-      const data = JSON.parse(text) as {
-        version: number;
-        notes: Record<string, SourceSnapshot>;
-        links: Record<string, { sources: string[]; proposal?: Proposal; applying?: Applying }>;
-      };
-      if (data?.version !== 1 || !data.notes || !data.links || typeof data.links !== 'object') {
-        throw new Error('Invalid saved source links.');
-      }
-      const links: Record<string, SourceLink> = Object.create(null) as Record<string, SourceLink>;
-      for (const [id, link] of Object.entries(data.links)) {
-        if (!/^[A-Za-z0-9_-]+$/.test(id) || !link || !Array.isArray(link.sources)) {
-          throw new Error('Invalid saved card link.');
-        }
-        const sources = readSourceSnapshots(link.sources.map((key) => data.notes[key]));
-        if (link.proposal) {
-          readSourceSuggestion(link.proposal);
-          readSourceSnapshots(link.proposal.sources);
-          if (
-            typeof link.proposal.originalFront !== 'string' ||
-            typeof link.proposal.originalBack !== 'string'
-          ) {
-            throw new Error('Invalid saved suggestion.');
-          }
-        }
-        if (link.applying) {
-          const a = link.applying;
-          readSourceSnapshots(a.sources);
-          if (
-            [a.front, a.back, a.originalFront, a.originalBack].some((v) => typeof v !== 'string') ||
-            typeof a.substantive !== 'boolean'
-          ) {
-            throw new Error('Invalid saved update.');
-          }
-        }
-        links[id] = {
-          sources,
-          ...(link.proposal ? { proposal: link.proposal } : {}),
-          ...(link.applying ? { applying: link.applying } : {}),
-        };
-      }
-      this.publish({ links });
     } catch (e) {
       this.loadError = `Could not load source links: ${message(e)}`;
       this.publish({ error: this.loadError });
     } finally {
       this.publish({ loading: false });
     }
+  }
+  /**
+   * Links saved by something else since this copy was read: another device through sync, or a file
+   * Obsidian had not listed yet when Qard started. Absence never means deletion, so links only this
+   * copy holds are kept, unless they were removed here.
+   */
+  private merge(links: Record<string, SourceLink>, disk: Record<string, SourceLink>) {
+    const merged = Object.assign(Object.create(null) as Record<string, SourceLink>, disk);
+    for (const id of this.removed) {
+      delete merged[id];
+    }
+    for (const [id, link] of Object.entries(links)) {
+      if (!(id in merged)) {
+        merged[id] = link;
+      }
+    }
+    return merged;
+  }
+  /** Pick up links another device saved. Writes back only links this copy alone holds. */
+  async syncExternal() {
+    await this.load();
+    // Qard's own saves come back as file events too; those need no merge.
+    if (
+      this.loadError ||
+      this.disposed ||
+      (await this.storage.read(this.metadataPath)) === this.persisted
+    ) {
+      return;
+    }
+    await this.commit((links) => links);
+    await this.refresh();
   }
   /** Persist before publishing. Deduplicate note versions across cards to keep large batches small. */
   private commit(transform: (links: Record<string, SourceLink>) => Record<string, SourceLink>) {
@@ -210,9 +248,21 @@ export class SourceSyncService {
         if (this.loadError) {
           throw new Error(this.loadError);
         }
+        // Never write over links this copy has not seen.
+        const disk = await this.storage.read(this.metadataPath);
+        let base = this.snapshot.links;
+        if (disk && disk !== this.persisted) {
+          try {
+            base = this.merge(base, parseLinks(disk));
+          } catch (e) {
+            throw new Error(
+              `Source links.json changed and could not be read, so it was left as it is: ${message(e)}`,
+            );
+          }
+        }
         const links = Object.assign(
             Object.create(null) as Record<string, SourceLink>,
-            transform(this.snapshot.links),
+            transform(base),
           ),
           notes: Record<string, SourceSnapshot> = {},
           keys = new Map<string, string>();
@@ -234,10 +284,19 @@ export class SourceSyncService {
             },
           ]),
         );
-        await this.storage.write(
-          this.metadataPath,
-          JSON.stringify({ version: 1, notes, links: packed }, null, 2) + '\n',
-        );
+        for (const id of Object.keys(base)) {
+          if (!(id in links)) {
+            this.removed.add(id);
+          }
+        }
+        for (const id of Object.keys(links)) {
+          this.removed.delete(id);
+        }
+        const text = JSON.stringify({ version: 1, notes, links: packed }, null, 2) + '\n';
+        if (text !== disk) {
+          await this.storage.write(this.metadataPath, text);
+        }
+        this.persisted = text;
         this.publish({ links });
       });
     this.writes = work;
@@ -278,6 +337,85 @@ export class SourceSyncService {
       text: s.text === null ? null : sourceNoteText(s.text, s.path, [id]),
     }));
     await this.commit((links) => (!replace && links[id] ? links : { ...links, [id]: { sources } }));
+  }
+  /**
+   * Link one note to many cards with a single save. Tracking starts from the note as it is now.
+   * Cards already linked to it, or in the middle of an update, are skipped.
+   */
+  async linkMany(ids: string[], path: string) {
+    await this.load();
+    const [version] = await this.capture([path]);
+    if (!version || version.text === null) {
+      throw new Error('The note no longer exists. Choose it again.');
+    }
+    const text = version.text,
+      inNote = new Set(isPdf(path) ? [] : parseCards(text, path).cards.map((card) => card.id));
+    let linked = 0,
+      skipped = 0;
+    await this.commit((links) => {
+      const next = { ...links };
+      linked = skipped = 0;
+      for (const id of new Set(ids)) {
+        if (!/^[A-Za-z0-9_-]+$/.test(id)) {
+          throw new Error('A stable card ID is required for source tracking.');
+        }
+        const current = links[id];
+        if (
+          current?.applying ||
+          this.snapshot.busy.includes(id) ||
+          current?.sources.some((s) => s.path === path)
+        ) {
+          skipped++;
+          continue;
+        }
+        // A card that lives in the note is left out of its own source text.
+        const own = inNote.has(id) ? sourceNoteText(text, path, [id]) : text;
+        next[id] = { sources: [...(current?.sources ?? []), { path, text: own }] };
+        linked++;
+      }
+      return next;
+    });
+    await this.refresh();
+    return { linked, skipped };
+  }
+  /** Mark many cards as reviewed against their current notes, with a single save. */
+  async keepMany(ids: string[]) {
+    await this.load();
+    const links = this.snapshot.links,
+      wanted = [...new Set(ids)].filter(
+        (id) => links[id] && !links[id].applying && !this.snapshot.busy.includes(id),
+      );
+    const current = new Map(
+      (
+        await this.capture([
+          ...new Set(wanted.flatMap((id) => links[id]!.sources.map((s) => s.path))),
+        ])
+      ).map((s) => [s.path, s.text]),
+    );
+    let kept = 0;
+    await this.commit((saved) => {
+      const next = { ...saved };
+      kept = 0;
+      for (const id of wanted) {
+        const link = saved[id];
+        if (!link || link.applying) {
+          continue;
+        }
+        next[id] = {
+          sources: link.sources.map((s) => {
+            const text = current.get(s.path) ?? null;
+            return {
+              path: s.path,
+              text: text === null ? null : sourceNoteText(text, s.path, [id]),
+            };
+          }),
+        };
+        kept++;
+      }
+      return next;
+    });
+    await this.refresh();
+    return kept;
   }
   private async captureForCard(paths: string[], id: string) {
     return (await this.capture(paths)).map((s) => ({

@@ -322,3 +322,89 @@ it('rejects hidden and non-vault source paths', async () => {
   ])
     await expect(service.capture([path])).rejects.toThrow('ordinary Markdown');
 });
+it('keeps links already on disk when the file was not listed at startup', async () => {
+  const first = setup();
+  await first.track();
+  const saved = first.files['Qard/Source links.json']!;
+  expect(JSON.parse(saved).links['card-1']).toBeTruthy();
+  // A second start where Obsidian has not listed the links file yet: the first read finds nothing.
+  let hidden = true;
+  const files = first.files;
+  const service = new SourceSyncService(
+    {
+      read: async (p) => {
+        if (hidden && p === 'Qard/Source links.json') {
+          hidden = false;
+          return null;
+        }
+        return files[p] ?? null;
+      },
+      write: async (p, text) => {
+        files[p] = text;
+      },
+    },
+    'Qard/Source links.json',
+    first.cards,
+    { edit: vi.fn() },
+    vi.fn(),
+    () => ({ name: 'Writer', run: vi.fn() }),
+  );
+  await service.track('card-2', await service.capture(['Notes/Limits.md']));
+  const links = JSON.parse(files['Qard/Source links.json']!).links;
+  expect(Object.keys(links).sort()).toEqual(['card-1', 'card-2']);
+  expect(Object.keys(service.getSnapshot().links).sort()).toEqual(['card-1', 'card-2']);
+});
+it('merges a links file that sync replaced instead of overwriting it', async () => {
+  const device = setup();
+  await device.track();
+  await device.service.track('card-3', await device.service.capture(['Notes/Limits.md']));
+  await device.service.unlink('card-3');
+  // Another device saved its own copy, which lacks card-1 but has card-2 and an old card-3.
+  const other = JSON.parse(device.files['Qard/Source links.json']!);
+  other.links = {
+    'card-2': other.links['card-1'],
+    'card-3': other.links['card-1'],
+  };
+  device.files['Qard/Source links.json'] = JSON.stringify(other);
+  await device.service.syncExternal();
+  const links = JSON.parse(device.files['Qard/Source links.json']!).links;
+  expect(Object.keys(links).sort()).toEqual(['card-1', 'card-2']);
+  expect(Object.keys(device.service.getSnapshot().links).sort()).toEqual(['card-1', 'card-2']);
+});
+it('leaves an unreadable links file alone rather than replacing it', async () => {
+  const f = setup();
+  await f.track();
+  f.files['Qard/Source links.json'] = '{ broken';
+  await expect(
+    f.service.track('card-2', await f.service.capture(['Notes/Limits.md'])),
+  ).rejects.toThrow(/left as it is/);
+  expect(f.files['Qard/Source links.json']).toBe('{ broken');
+});
+it('links one note to many cards in a single save and keeps all changed cards at once', async () => {
+  const f = setup(undefined, {
+    'Notes/Limits.md': '# Limits\nThe limit is ten.\n',
+    'Notes/Other.md': 'Other material.\n',
+    'Cards.md': initialCard + '\n<!-- qard-id: card-2 -->\n> [!qard]- What is the floor?\n> One.\n',
+  });
+  await f.track();
+  f.write.mockClear();
+  const result = await f.service.linkMany(['card-1', 'card-2', 'card-2'], 'Notes/Other.md');
+  expect(result).toEqual({ linked: 2, skipped: 0 });
+  expect(f.write).toHaveBeenCalledTimes(1);
+  expect(f.service.getSnapshot().links['card-1']!.sources.map((s) => s.path)).toEqual([
+    'Notes/Limits.md',
+    'Notes/Other.md',
+  ]);
+  expect(await f.service.linkMany(['card-1'], 'Notes/Other.md')).toEqual({ linked: 0, skipped: 1 });
+  f.files['Notes/Other.md'] = 'Other material, revised.\n';
+  await f.service.refresh();
+  expect(
+    f.service
+      .getSnapshot()
+      .changes.map((c) => c.card.id)
+      .sort(),
+  ).toEqual(['card-1', 'card-2']);
+  expect(await f.service.keepMany(['card-1', 'card-2'])).toBe(2);
+  expect(f.service.getSnapshot().changes).toEqual([]);
+  expect(f.run).not.toHaveBeenCalled();
+});

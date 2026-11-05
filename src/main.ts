@@ -4,6 +4,7 @@ import {
   Notice,
   MarkdownView,
   TFile,
+  type TAbstractFile,
   type Editor,
   type EditorPosition,
 } from 'obsidian';
@@ -491,20 +492,27 @@ export default class QardPlugin extends Plugin {
         void this.sourceSync.refresh();
       }, 350);
     };
-    this.registerEvent(
-      this.app.vault.on('modify', (file) => {
-        if (file instanceof TFile && (file.extension === 'md' || isPdf(file.path))) {
-          scanSources();
-        }
-      }),
-    );
-    this.registerEvent(
-      this.app.vault.on('create', (file) => {
-        if (file instanceof TFile && (file.extension === 'md' || isPdf(file.path))) {
-          scanSources();
-        }
-      }),
-    );
+    // Sync can replace the links file; merge it so links made here and on other devices both stay.
+    const linksFile = sourceSyncPath('Qard');
+    let linksTimer: number | undefined;
+    const syncLinks = () => {
+      window.clearTimeout(linksTimer);
+      linksTimer = window.setTimeout(() => {
+        void this.sourceSync.syncExternal().catch(() => {});
+      }, 350);
+    };
+    const changed = (file: TAbstractFile) => {
+      if (!(file instanceof TFile)) {
+        return;
+      }
+      if (file.path === linksFile) {
+        syncLinks();
+      } else if (file.extension === 'md' || isPdf(file.path)) {
+        scanSources();
+      }
+    };
+    this.registerEvent(this.app.vault.on('modify', changed));
+    this.registerEvent(this.app.vault.on('create', changed));
     this.registerEvent(this.app.vault.on('delete', () => scanSources()));
     this.registerEvent(
       this.app.vault.on('rename', (file, oldPath) => {
@@ -514,8 +522,11 @@ export default class QardPlugin extends Plugin {
     const offSourceIndex = this.index.subscribe(scanSources);
     this.register(() => {
       window.clearTimeout(sourceTimer);
+      window.clearTimeout(linksTimer);
       offSourceIndex();
     });
+    // Links read before every file was listed are checked again against the file itself.
+    syncLinks();
     void this.index
       .start()
       .then(() => this.sourceSync.refresh())
