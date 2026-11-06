@@ -1,4 +1,5 @@
 import { DeleteItem } from './DeleteItem';
+import { RenameItem } from './RenameItem';
 import { useState, type ReactNode } from 'react';
 import {
   ArrowRight,
@@ -28,6 +29,7 @@ export function DeckBrowser({
   learn,
   plans,
   remove,
+  rename,
   repairFilter,
   hideNavigation = false,
   dueCount = 0,
@@ -54,6 +56,8 @@ export function DeckBrowser({
   learn?: () => void;
   plans?: () => void;
   remove?: (deck: string) => Promise<void>;
+  /** Rename a deck, or a parent of nested decks, with everything beneath it. */
+  rename?: (deck: string, name: string) => Promise<void>;
   hideNavigation?: boolean;
   dueCount?: number;
   viewToday?: () => void;
@@ -115,6 +119,14 @@ export function DeckBrowser({
               <Play size={15} />
               Study all
             </button>
+          )}
+          {rename && (
+            <RenameItem
+              label={`Rename deck ${deck?.name ?? node.name}`}
+              current={deck?.name ?? node.name}
+              description="Every note holding these cards is updated, and subdecks move with it. Review history, deck options and exam plans are kept. An existing deck's name merges the two."
+              rename={(name) => rename(deck?.name ?? node.name, name)}
+            />
           )}
           {remove && deck && (
             <DeleteItem

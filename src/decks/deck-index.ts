@@ -52,6 +52,21 @@ export function deckLineage(name: string): string[] {
 }
 export const isWithinDeck = (deck: string, ancestor: string) =>
   deckLineage(deck).includes(canonicalDeck(ancestor));
+/**
+ * The new name of `deck` when `from` is renamed to `to`, or undefined if it is unaffected. Subdecks
+ * follow their parent: renaming `Biology` turns `Biology::Cells` into `Bio::Cells`.
+ */
+export function renamedDeck(deck: string, from: string, to: string): string | undefined {
+  const parts = deckPath(deck),
+    old = deckPath(from);
+  if (!old.length) {
+    return deck === from ? to : undefined;
+  }
+  if (parts.length < old.length || old.some((part, i) => parts[i] !== part)) {
+    return undefined;
+  }
+  return [...deckPath(to), ...parts.slice(old.length)].join(DECK_SEPARATOR) || to;
+}
 
 export interface DeckNode {
   /** Full canonical name, such as `Biology::Cells`. */

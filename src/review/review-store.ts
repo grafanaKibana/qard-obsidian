@@ -13,6 +13,7 @@ import type { QardCard } from '../cards/card-types';
 import type { SessionStyle, StudyMode } from './session';
 import { newAllowance, paceCards, type PacingOptions } from './pacing';
 import { deckRetention } from '../decks/deck-options';
+import { renamedDeck, topicKey } from '../decks/deck-index';
 import { addStudy, type StudyLog } from '../time/study-time';
 import { validateProgress } from './progress-backups';
 import { learningReview, pendingLearning } from './learning-queue';
@@ -1034,6 +1035,56 @@ export class ReviewStore {
       ...data,
       exams: [...data.exams.filter((p) => p.id !== plan.id), readExams([plan])[0]!],
     }));
+  }
+  /**
+   * Deck options and exam plans refer to decks and topics by name; a rename carries them across.
+   * Options already set on the new name are kept.
+   */
+  renameGroup(rename: { deck: string; topic?: string; to: string }) {
+    const deckOf = (name: string) =>
+      rename.topic === undefined ? (renamedDeck(name, rename.deck, rename.to) ?? name) : name;
+    const topicOf = (key: string) => {
+      try {
+        const [deck, topic] = JSON.parse(key) as [string, string];
+        if (rename.topic === undefined) {
+          return topicKey(deckOf(deck), topic);
+        }
+        return deck === rename.deck && topic === rename.topic ? topicKey(deck, rename.to) : key;
+      } catch {
+        return key;
+      }
+    };
+    return this.change((data) => {
+      let deckOptions = data.settings.deckOptions;
+      if (rename.topic === undefined) {
+        const moved = Object.entries(deckOptions).map(
+          ([name, options]) => [deckOf(name), options, deckOf(name) !== name] as const,
+        );
+        if (moved.some(([, , renamed]) => renamed)) {
+          deckOptions = {};
+          for (const [name, options, renamed] of [...moved].sort((a, b) => +a[2] - +b[2])) {
+            if (!renamed || !(name in deckOptions)) {
+              deckOptions[name] = options;
+            }
+          }
+        }
+      }
+      const exams = data.exams.map((plan) => {
+        const decks = [...new Set(plan.selection.decks.map(deckOf))],
+          topics = [...new Set(plan.selection.topics.map(topicOf))];
+        return sameValue(decks, plan.selection.decks) && sameValue(topics, plan.selection.topics)
+          ? plan
+          : { ...plan, selection: { ...plan.selection, decks, topics } };
+      });
+      return {
+        ...data,
+        exams,
+        settings:
+          deckOptions === data.settings.deckOptions
+            ? data.settings
+            : { ...data.settings, deckOptions },
+      };
+    });
   }
   deleteExam(id: string) {
     return this.change((data) => ({ ...data, exams: data.exams.filter((p) => p.id !== id) }));

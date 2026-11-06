@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { DeckBadge } from './DeckBadge';
 import { DeleteItem } from './DeleteItem';
+import { RenameItem } from './RenameItem';
 import type { Deck, QardCard } from '../cards/card-types';
 import { cardTitle } from '../cards/card-format';
 export function TopicBrowser({
@@ -26,6 +27,8 @@ export function TopicBrowser({
   generate,
   removeDeck,
   removeTopic,
+  renameDeck,
+  renameTopic,
   states = {},
   repairDays = new Map<string, number>(),
   back,
@@ -44,6 +47,8 @@ export function TopicBrowser({
   generate?: () => void;
   removeDeck?: () => Promise<void>;
   removeTopic?: (topic: string) => Promise<void>;
+  renameDeck?: (name: string) => Promise<void>;
+  renameTopic?: (topic: string, name: string) => Promise<void>;
   back?: () => void;
   options?: () => void;
   resume?: ReactNode;
@@ -130,6 +135,14 @@ export function TopicBrowser({
             >
               <Settings2 size={16} />
             </button>
+          )}
+          {renameDeck && !busy && (
+            <RenameItem
+              label={`Rename deck ${deck.name}`}
+              current={deck.name}
+              description="Every note holding these cards is updated, and subdecks move with it. Review history, deck options and exam plans are kept. An existing deck's name merges the two."
+              rename={renameDeck}
+            />
           )}
           {removeDeck && !busy && (
             <DeleteItem
@@ -273,6 +286,14 @@ export function TopicBrowser({
                 >
                   <Play size={16} />
                 </button>
+                {renameTopic && !busy && (
+                  <RenameItem
+                    label={`Rename topic ${topic.name}`}
+                    current={topic.name}
+                    description="Every note holding these cards is updated: the topic's heading where it has one, otherwise the cards' placement. Review history is kept. An existing topic's name merges the two."
+                    rename={(name) => renameTopic(topic.name, name)}
+                  />
+                )}
                 {removeTopic && !busy && (
                   <DeleteItem
                     label={`Delete topic ${topic.name}`}

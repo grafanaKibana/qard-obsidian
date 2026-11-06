@@ -1985,12 +1985,25 @@
 .qard-study-face {
   grid-area: 1 / 1;
   min-width: 0;
-  border: 1px solid var(--qard-border);
+  border: 1px solid color-mix(in srgb, var(--qard-text) 9%, transparent);
   border-radius: 12px;
-  background: var(--qard-bg);
+
+  /* One shade off the pane, with a soft shadow, so the card reads as lifted. */
+  background: color-mix(in srgb, var(--qard-text) 4.5%, var(--qard-bg));
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 90%) inset,
+    0 16px 36px -18px rgb(30 35 60 / 28%),
+    0 1px 3px rgb(30 35 60 / 8%);
   backface-visibility: hidden;
   overflow: auto;
   max-height: max(280px, 65vh);
+}
+
+.theme-dark .qard-study-face {
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 5%) inset,
+    0 18px 40px -18px rgb(0 0 0 / 70%),
+    0 2px 6px rgb(0 0 0 / 25%);
 }
 
 .qard-study-front {
@@ -5636,6 +5649,15 @@ div.qard-ask-q {
   margin-top: 20px;
 }
 
+.qard-rename-dialog label {
+  display: grid;
+  gap: 6px;
+}
+
+.qard-rename-dialog input {
+  width: 100%;
+}
+
 .qard-rating-meta {
   display: inline-flex;
   align-items: center;
@@ -5862,6 +5884,21 @@ div.qard-ask-q {
 .qard-source-search {
   position: relative;
   flex-shrink: 0;
+}
+
+.qard-source-batch {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.qard-source-batch p {
+  margin: 0;
+}
+
+.qard-source-batch .qard-actions {
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 /* The button sits at the right edge, so its search opens leftwards. */

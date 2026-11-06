@@ -11,7 +11,8 @@ import type { QardCard } from '../cards/card-types';
 import type { CardDraft } from '../cards/card-writer';
 import type { Selection, SessionStyle, StudyMode } from '../review/session';
 import { hasRemainingSession } from '../review/saved-session';
-import { buildDecks, matchesSearch, topicKey } from '../decks/deck-index';
+import { buildDecks, matchesSearch, renamedDeck, topicKey } from '../decks/deck-index';
+import { studySources } from '../vault-access';
 import { DeckBrowser } from '../components/DeckBrowser';
 import { DeckOptions } from '../components/DeckOptions';
 import { TopicBrowser } from '../components/TopicBrowser';
@@ -140,6 +141,12 @@ export function QardApp({ services, request }: { services: QardServices; request
     setScreen({ kind: 'library' });
   };
   const plans = () => setScreen({ kind: 'exams' });
+  /** Notes first, then the deck options and exam plans that refer to the old name. */
+  const renameGroup = async (deck: string, topic: string | undefined, to: string) => {
+    const done = await services.writer.renameGroup(deck, topic, to);
+    await services.reviews.renameGroup(done);
+    return done;
+  };
   const builder = (selection: Selection = { decks: [], topics: [], cards: [] }) =>
     setScreen({ kind: 'builder', selection });
   const [optionsFor, setOptionsFor] = useState<string>();
@@ -573,6 +580,9 @@ export function QardApp({ services, request }: { services: QardServices; request
               dueCount={dueCount}
               viewToday={learnNav.today}
               remove={(name) => services.writer.deleteGroup(name)}
+              rename={async (name, to) => {
+                await renameGroup(name, undefined, to);
+              }}
               decks={filtered}
               repairFilter={{
                 active: repairOnly,
@@ -635,6 +645,22 @@ export function QardApp({ services, request }: { services: QardServices; request
                       setScreen({ kind: 'deck', deck: destination.deck.trim() });
                     },
                     reverse: (cards) => services.writer.addReverses(cards),
+                    linkSource: services.sourceSync
+                      ? {
+                          notes: () =>
+                            studySources(services.app, [
+                              services.reviews.getSnapshot().settings.tests.folder,
+                            ]),
+                          link: async (cards, path) => {
+                            await services.writer.validateSelection(cards);
+                            const ready = await services.writer.ensureStable(cards);
+                            return services.sourceSync!.linkMany(
+                              ready.map((card) => card.id),
+                              path,
+                            );
+                          },
+                        }
+                      : undefined,
                     update: async (cards, action) => {
                       await services.writer.validateSelection(cards);
                       const ready = await services.writer.ensureStable(cards);
@@ -650,6 +676,17 @@ export function QardApp({ services, request }: { services: QardServices; request
                     library();
                   }}
                   removeTopic={(topic) => services.writer.deleteGroup(deck.name, topic)}
+                  renameDeck={async (to) => {
+                    const done = await renameGroup(deck.name, undefined, to);
+                    setSearch('');
+                    setScreen({
+                      kind: 'deck',
+                      deck: renamedDeck(deck.name, done.deck, done.to) ?? done.to,
+                    });
+                  }}
+                  renameTopic={async (topic, to) => {
+                    await renameGroup(deck.name, topic, to);
+                  }}
                   select={(card) => setScreen({ kind: 'card', card })}
                   study={(topic) =>
                     builder(

@@ -18,6 +18,10 @@ import { DeleteLearnItem } from '../src/components/learn/DeleteLearnItem';
 import { RunningJobs } from '../src/components/jobs/RunningJobs';
 import type { QardServices } from '../src/views/services';
 import type { AgentTask } from '../src/agents/runner';
+import { CardIndex } from '../src/cards/card-index';
+import { serializeCard } from '../src/cards/source-patch';
+import type { Lesson } from '../src/learn/learn-types';
+import type { CardDraft } from '../src/cards/card-writer';
 // A constant snapshot: useSyncExternalStore re-renders forever if each call returns a new object.
 const reviewSnapshot = { settings: readSettings({}), study: {} };
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -253,6 +257,153 @@ it('a lesson plan is shown for approval before teaching starts', async () => {
   await click(buttons('Start lesson')[0]);
   await tick();
   expect(host.textContent).toContain('Writing this step…');
+});
+
+async function openRecap(
+  lesson: Partial<Lesson> = {},
+  sources: Record<string, string> = {},
+  topics: Record<string, unknown> = {},
+) {
+  const path = 'Qard/Lessons/2026-09-29 generics.json';
+  files.set(
+    path,
+    JSON.stringify({
+      version: 1,
+      createdAt: 1,
+      topic: 'Generic contracts',
+      course: 'Programming',
+      notes: Object.keys(sources),
+      steps: [],
+      state: [],
+      current: 0,
+      finishedAt: 2,
+      map: { title: 'Build generic contracts', plan: '', mermaid: '', steps: [] },
+      close: {
+        summary: 'Keep the type relationship explicit.',
+        cards: [
+          { front: 'Why use a type parameter?', back: 'It preserves the type relationship.' },
+        ],
+        cardState: {},
+      },
+      ...lesson,
+    }),
+  );
+  const index = new CardIndex();
+  for (const [sourcePath, text] of Object.entries(sources)) {
+    index.update(sourcePath, text);
+  }
+  Object.assign(services.index, { getSnapshot: index.getSnapshot });
+  Object.assign(services.app, {
+    metadataCache: {
+      getCache: (sourcePath: string) => ({ frontmatter: { 'qard-topic': topics[sourcePath] } }),
+    },
+  });
+  const create = vi.fn(async (_draft: CardDraft) => ({ id: 'suggested-card' }));
+  Object.assign(services, { writer: { create } });
+  await act(async () => {
+    root.render(<LessonView services={services} nav={nav} path={path} />);
+  });
+  await tick();
+  await tick();
+  return { path, create };
+}
+
+it('recap cards use the selected source note fixed topic without changing the shared destination', async () => {
+  const selected = 'Notes/Generics.md',
+    other = 'Notes/Constraints.md';
+  const notes = [other, selected];
+  const sourceSnapshots = [{ path: selected, text: 'The historical source version.' }];
+  const { path, create } = await openRecap(
+    { notes, sourceSnapshots },
+    {
+      [selected]:
+        '---\nqard-deck: Programming\nqard-topic: NET/Generics\n---\n' +
+        '<!-- qard-location: {"deck":"Programming","topic":"Moved topic"} -->\n' +
+        serializeCard('existing', 'Existing question?', 'Existing answer.'),
+      [other]: '---\nqard-deck: Reference\n---\n' + serializeCard('other', 'Other?', 'Answer.'),
+    },
+    { [selected]: '  NET/Generics  ', [other]: 'NET/Constraints' },
+  );
+  const record = vi.spyOn(services.learn, 'lessonCard');
+  let finish!: (card: { id: string }) => void;
+  create.mockImplementationOnce(() => new Promise((resolve) => (finish = resolve)));
+  expect(host.querySelector('h1')?.textContent).toBe('Build generic contracts');
+  expect(host.querySelector('.qard-suggestion small')?.textContent).toBe(
+    'Programming › NET/Generics',
+  );
+  await click(buttons('Add')[0]);
+  expect(create).toHaveBeenCalledWith(
+    expect.objectContaining({
+      deck: 'Programming',
+      topic: 'NET/Generics',
+      sourceFile: selected,
+      generatedFrom: notes,
+      sourceSnapshots,
+    }),
+  );
+  expect(record).not.toHaveBeenCalled();
+  expect(host.textContent).not.toContain('✓ Added');
+  await act(async () => finish({ id: 'suggested-card' }));
+  await tick();
+  expect(record).toHaveBeenCalledWith(path, 0, 'added', 'suggested-card');
+  expect(JSON.parse(files.get(path)!).close.cardState).toEqual({ 0: 'added' });
+  expect(host.textContent).toContain('✓ Added');
+});
+
+it.each([undefined, '   ', 42])(
+  'recap cards keep the lesson title when the source has no valid fixed topic (%s)',
+  async (fixedTopic) => {
+    const source = 'Notes/Generics.md';
+    const { create } = await openRecap(
+      {},
+      { [source]: '---\nqard-deck: Programming\n---\n' + serializeCard('old', 'Old?', 'Answer.') },
+      { [source]: fixedTopic },
+    );
+    await click(buttons('Add')[0]);
+    expect(create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        deck: 'Programming',
+        topic: 'Build generic contracts',
+        sourceFile: source,
+      }),
+    );
+  },
+);
+
+it.each(['Programming', undefined])(
+  'recap without indexed source cards keeps its course or lesson deck (%s)',
+  async (course) => {
+    const { create } = await openRecap(
+      { notes: ['Notes/Generics.md'], course },
+      {},
+      { 'Notes/Generics.md': 'NET/Generics' },
+    );
+    await click(buttons('Add')[0]);
+    expect(create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        deck: course ?? 'Generic contracts',
+        topic: 'Build generic contracts',
+      }),
+    );
+    expect(create.mock.calls[0]![0]).not.toHaveProperty('sourceFile');
+  },
+);
+
+it('recap without a lesson map uses the lesson topic', async () => {
+  const { create } = await openRecap({ map: undefined });
+  await click(buttons('Add')[0]);
+  expect(create).toHaveBeenCalledWith(expect.objectContaining({ topic: 'Generic contracts' }));
+});
+
+it('recap leaves a suggested card unadded when its writer rejects the save', async () => {
+  const { path, create } = await openRecap();
+  create.mockRejectedValueOnce(new Error('The source note changed.'));
+  const record = vi.spyOn(services.learn, 'lessonCard');
+  await click(buttons('Add')[0]);
+  expect(host.querySelector('[role="alert"]')?.textContent).toBe('The source note changed.');
+  expect(record).not.toHaveBeenCalled();
+  expect(JSON.parse(files.get(path)!).close.cardState).toEqual({});
+  expect(host.textContent).not.toContain('✓ Added');
 });
 
 it('the course map opens on topics, drills into one, and routes across topics', async () => {

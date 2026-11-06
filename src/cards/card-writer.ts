@@ -10,6 +10,8 @@ import {
   insertIntoTopic,
   locateCard,
   removeReverseInSource,
+  renameGroupInSource,
+  renamedLocation,
   replaceCardInSource,
   serializeCard,
   placeCardInSource,
@@ -119,7 +121,14 @@ export class CardWriter {
     let notes = this.candidates(deck, topic);
     if (sourceFile && exists(sourceFile)) {
       const own = this.index.getSnapshot().cards.filter((c) => c.sourceFile === sourceFile);
-      if (this.noteDeck(sourceFile, own) === deck) {
+      const fixed = this.frontmatter(sourceFile)?.['qard-topic'];
+      const fixedTopic = typeof fixed === 'string' ? fixed.trim() : '';
+      if (
+        this.noteDeck(sourceFile, own) === deck &&
+        (!fixedTopic ||
+          fixedTopic === topic ||
+          own.some((card) => card.deck === deck && card.topic === topic))
+      ) {
         return { path: sourceFile, exists: true };
       }
       folder = parentFolder(sourceFile);
@@ -428,6 +437,41 @@ export class CardWriter {
       );
       await this.index.refresh(file);
     }
+  }
+  /**
+   * Rename a deck, with its subdecks, or one of its topics, across every note that holds its cards.
+   * Each note is patched atomically; review history stays with the unchanged card IDs.
+   * Returns the deck's new name.
+   */
+  async renameGroup(deck: string, topic: string | undefined, name: string) {
+    const location = readCardLocation(
+      topic === undefined ? { deck: name, topic: 'General' } : { deck, topic: name },
+    );
+    const rename = { deck, topic, to: topic === undefined ? location.deck : location.topic };
+    const paths = [
+      ...new Set(
+        this.index
+          .getSnapshot()
+          .cards.filter((card) => renamedLocation(card, rename))
+          .map((card) => card.sourceFile),
+      ),
+    ];
+    let completed = 0;
+    try {
+      for (const path of paths) {
+        const file = this.file(path);
+        await this.app.vault.process(file, (source) => renameGroupInSource(source, path, rename));
+        completed++;
+        await this.index.refresh(file);
+      }
+    } catch (error) {
+      throw new Error(
+        completed
+          ? `${completed} of ${paths.length} notes renamed. ${(error as Error).message} Rename again to finish the rest.`
+          : (error as Error).message,
+      );
+    }
+    return rename;
   }
   /** One atomic note write per generated batch. Stable IDs make retries safe after a save or index failure. */
   async createBatch(

@@ -1,6 +1,8 @@
 import { useId, useRef, useState } from 'react';
 import type { Deck, QardCard } from '../cards/card-types';
 import type { CardLocation } from '../cards/card-location';
+import type { TFile } from 'obsidian';
+import { NotePicker } from './NotePicker';
 export type BulkAction = 'pause' | 'resume' | 'repair';
 export interface CardManagement {
   decks: Deck[];
@@ -8,6 +10,11 @@ export interface CardManagement {
   update: (cards: QardCard[], action: BulkAction) => Promise<void>;
   /** Add an opposite card to each basic card; others are skipped. */
   reverse?: (cards: QardCard[]) => Promise<{ added: QardCard[]; skipped: number }>;
+  /** Link one source note to every selected card. */
+  linkSource?: {
+    notes: () => TFile[];
+    link: (cards: QardCard[], path: string) => Promise<{ linked: number; skipped: number }>;
+  };
 }
 export function BulkCardActions({
   cards,
@@ -68,6 +75,30 @@ export function BulkCardActions({
       setBusy(false);
     }
   }
+  async function link(path: string) {
+    if (locked.current || !cards.length || !management.linkSource) {
+      return false;
+    }
+    locked.current = true;
+    setBusy(true);
+    report('');
+    try {
+      const { linked, skipped } = await management.linkSource.link(cards, path);
+      const name = path.split('/').pop();
+      report(
+        `Linked ${name} to ${linked} ${linked === 1 ? 'card' : 'cards'}.` +
+          (skipped ? ` ${skipped} skipped: already linked to it or mid-update.` : ''),
+      );
+      clear();
+      return true;
+    } catch (error) {
+      report((error as Error).message, true);
+      return false;
+    } finally {
+      locked.current = false;
+      setBusy(false);
+    }
+  }
   return (
     <section className="qard-bulk-actions" aria-label="Selected card actions" aria-busy={busy}>
       <div className="qard-actions">
@@ -88,6 +119,16 @@ export function BulkCardActions({
           <button disabled={busy} onClick={() => void run('reverse')}>
             Add reverse
           </button>
+        )}
+        {management.linkSource && (
+          <NotePicker
+            label="Link source note"
+            disabled={busy}
+            busy={busy}
+            notes={management.linkSource.notes}
+            choose={link}
+            caveat="Tracking starts from the note as it is now. Existing links are kept."
+          />
         )}
         <button disabled={busy} onClick={clear}>
           Clear selection
