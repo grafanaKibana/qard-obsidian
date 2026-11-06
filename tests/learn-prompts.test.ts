@@ -170,4 +170,16 @@ describe('Learn prompt contracts', () => {
     expect(prompt).toMatch(/(?:answer|response) form/i);
     expect(prompt).toMatch(/other steps|later steps/i);
   });
+
+  it('requests minimum sufficient model answers without turning optional detail into required credit', () => {
+    for (const prompt of [
+      stepPrompt(lesson, map, 0),
+      checkPrompt(mastery, objective, 'apply', [check]),
+    ]) {
+      expect(prompt).toContain('shortest model answer that earns full credit');
+      expect(prompt).toContain('preserving the essential mechanism and conditions');
+      expect(prompt).toContain('Optional detail must never become an unstated grading requirement');
+      expect(prompt).toContain(objective.id);
+    }
+  });
 });
