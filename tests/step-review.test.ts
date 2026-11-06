@@ -43,7 +43,7 @@ describe('reviewing lesson steps', () => {
       schema: stepReviewSchema,
       signal: controller.signal,
       effort: 'high',
-      vault: false,
+      vault: undefined,
     });
     const prompt = reviewer.run.mock.calls[0]![0].prompt;
     expect(prompt).toContain(task.prompt);
@@ -122,7 +122,7 @@ describe('reviewing lesson steps', () => {
     },
   );
 
-  it('retains the existing read-only note access when sources are not inlined', async () => {
+  it("preserves the writer's note-access setting with or without source excerpts", async () => {
     const writer = runner(() => step);
     const reviewer = runner(() => ({ issues: [] }));
 
@@ -130,6 +130,36 @@ describe('reviewing lesson steps', () => {
     expect(reviewer.run.mock.calls[0]![0].vault).toBeUndefined();
     await writeReviewedStep(writer, reviewer, { ...task, vault: false });
     expect(reviewer.run.mock.calls[1]![0].vault).toBe(false);
+    await writeReviewedStep(writer, reviewer, { ...task, vault: false }, 'Complete source.');
+    expect(reviewer.run.mock.calls[2]![0].vault).toBe(false);
+  });
+
+  it.each([
+    {
+      name: 'a fifth listed note is omitted',
+      context: 'Notes: one.md, two.md, three.md, four.md, five.md',
+      sources:
+        '<note path="one.md">One.</note>\n<note path="two.md">Two.</note>\n<note path="three.md">Three.</note>\n<note path="four.md">Four.</note>',
+    },
+    {
+      name: 'a listed note has a truncated tail',
+      context: 'Notes: long.md',
+      sources: '<note path="long.md">An excerpt.\n[Truncated.]\n</note>',
+    },
+  ])('keeps read-only source access when $name', async ({ context, sources }) => {
+    const writer = runner(() => step);
+    const reviewer = runner(() => ({ issues: [] }));
+
+    await writeReviewedStep(writer, reviewer, { ...task, prompt: context }, sources);
+    const review = reviewer.run.mock.calls[0]![0];
+    expect(review.vault).toBeUndefined();
+    expect(review.prompt).toContain(context);
+    expect(review.prompt).toContain(sources);
+    expect(review.prompt).toContain(
+      'Inlined source excerpts may omit notes or truncate their text',
+    );
+    expect(review.prompt).toContain('inspect it with the available read-only note tools');
+    expect(review.prompt).toContain('Do not reread content already fully provided');
   });
 
   it.each(['before writing', 'after writing', 'after review'])(

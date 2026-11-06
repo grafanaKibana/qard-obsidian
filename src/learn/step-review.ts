@@ -14,7 +14,7 @@ export function stepReviewPrompt(context: string, step: LessonStep, sources?: st
 - A case-based question must require new reasoning compared with the notes and this step's explanation, even when goal is "explain". Changing only names, literal values or wording is not a new case. A changed dependency, decision or operation order is valid when it changes the reasoning or result. Definition recall may repeat a concept.
 - The question supplies the needed premises and uses only knowledge taught or demonstrated for this step. The expected answer is factually correct and earns every rubric point.
 
-An integrated task or comparison is allowed when its points remain independently checkable. Do not reject style, answer length, or a harmless wording preference. If source text is not inlined, read the listed or cited note when needed to judge the worked examples.
+An integrated task or comparison is allowed when its points remain independently checkable. Do not reject style, answer length, or a harmless wording preference. Inlined source excerpts may omit notes or truncate their text. When listed or cited material needed for the review is missing or truncated, inspect it with the available read-only note tools before approving. Do not reread content already fully provided. If missing evidence prevents a check, report that gap rather than assume approval.
 
 <lesson_context>
 ${context}
@@ -66,7 +66,7 @@ export async function writeReviewedStep(
         prompt: stepReviewPrompt(task.prompt, step, sources),
         schema: stepReviewSchema,
         signal: task.signal,
-        vault: sources ? false : task.vault,
+        vault: task.vault,
         effort: 'high',
       },
       readReview,

@@ -954,7 +954,7 @@ describe('learning service', () => {
       expect.objectContaining({ role: 'marker' }),
     ]);
     expect(t.calls.find((c) => c.task.schema === stepReviewSchema)!.task).toMatchObject({
-      vault: false,
+      vault: undefined,
       effort: 'high',
     });
     expect(t.calls.find((c) => c.task.schema === stepReviewSchema)!.task.prompt).toContain(
