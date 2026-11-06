@@ -162,6 +162,9 @@ describe('Learn prompt contracts', () => {
 
     for (const prompt of prompts) {
       expect(prompt).toContain('Every scored requirement must follow from what the question asks');
+      expect(prompt).toContain(
+        'Ask explicitly for any intermediate value or calculation that earns marks',
+      );
       expect(prompt).toContain('one independently checkable claim');
       expect(prompt).toContain('Otherwise accept technically valid alternatives');
       expect(prompt).toContain(objective.id);
