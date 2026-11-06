@@ -1,14 +1,15 @@
 import type { AnswerState, Goal, Question } from '../tests/test-types';
-import { GOAL_RULES, MARKING, MCQ_RULES, questionBlock } from '../tests/test-prompts';
+import { GOAL_RULES, MCQ_RULES, questionBlock } from '../tests/test-prompts';
 import { objectiveLines, type Mastery, type Objective } from './mastery';
 import type { CheckRecord, Lesson, LessonMap, LessonStep, StepState } from './learn-types';
 
-/** The teaching approach: understanding over recall, built from foundations the student already accepts. */
+/** Teach mechanisms, retrieval and application from demonstrated foundations. */
 export const TEACHING = `How to teach:
-- Aim for understanding, not recall. Each new fact should follow from foundations the student already accepts, so it is held in place by its connections.
-- Start from unconditional truths: definitions and universal statements the student can accept as they are, without caveats.
-- Explain every step, including why it is needed now, as if showing how it could have been discovered.
-- When the student can plausibly work something out, ask before telling.
+- Teach the student to understand the mechanism, retrieve it later, and apply it to a new case.
+- Start from relevant knowledge supported by their answers. Treat a lesson title or taught status as evidence of exposure, not proof of understanding.
+- State the conditions under which a rule holds. Preserve boundaries needed for correctness.
+- Introduce unfamiliar mechanisms with a compact worked example. Ask before explaining only when the answer follows from knowledge the student has already demonstrated.
+- Prefer concrete inputs, state changes, decisions and outputs. Use terminology after establishing what it means.
 - Ground everything in the student's notes and name the note. Where the notes are silent, use standard, correct knowledge.
 - Plain, direct language. Short paragraphs. Markdown, with LaTeX in $…$.`;
 
@@ -23,7 +24,18 @@ const DRAWN = `- A shape or picture Mermaid can't show, with no figure in the no
 
 const QUESTION_FORMAT = `${GOAL_RULES}
 ${MCQ_RULES}
-Every question needs a rubric of separate, checkable points whose marks add up to its marks, and a model answer that earns full marks.`;
+Write the question, rubric and model answer as one aligned task.
+The question states the required action, relevant assumptions and expected answer form. Do not imply the outcome through wording.
+Every scored requirement must follow from what the question asks. If a specific example, failure class or method is required, name it. Otherwise accept technically valid alternatives.
+Each rubric point assesses one independently checkable claim. Separate a correct outcome from its required explanation. Do not combine unrelated claims into one all-or-nothing point.
+Before returning, check whether the question is answerable without guessing its intended meaning; whether every point assesses a requested part; whether another valid solution earns appropriate credit; and whether the explanation establishes the needed knowledge.
+The rubric marks add up to the question marks, and the model answer earns full marks.
+
+Write the shortest model answer that earns full credit while preserving the essential mechanism and conditions. Follow the same answer structure requested from the student. Do not introduce requirements through the model answer. Rubric wording describes concepts, not phrases to reproduce. Account for equivalent terminology and valid alternative solutions. Keep optional explanation visibly separate from the required answer. Optional detail must never become an unstated grading requirement.`;
+/** Learn feedback distinguishes a contradicted claim from an omitted one. */
+const LEARN_MARKING = `Assess each rubric claim independently against the student's answer. awarded[i] is true when the claim is explicitly stated or unambiguously expressed in equivalent words. Accept technically valid alternatives; do not require the model answer's wording or length. Do not infer understanding from a correct prediction alone when an explanation was requested. A blank answer scores 0; score is the sum of existing awarded rubric marks.
+Annotate using exact answer quotes of one to twelve words. Distinguish wrong (an explicit claim contradicts the mechanism), missing (a requested claim is absent), and vague (wording leaves the claim genuinely uncertain). Also use correct for earned points and insight for correct extra ideas. Do not describe the same omission as multiple independent mistakes. Explain what was demonstrated before identifying the remaining gap. Notes address the student. Confidence does not change factual correctness. Ignore language errors unless they change technical meaning. Do not invent requirements or fractional marks. mistake is misconception, careless, imprecise, incomplete, or none; feedback is one sentence. You may read the supplied notes to check facts.`;
+
 /** The lesson's notes, inlined so the live tutor needs no tools. */
 export const sourcesBlock = (sources?: string) =>
   sources ? `\nThe notes' text:\n${sources}\n` : '';
@@ -97,7 +109,7 @@ export function markCheckPrompt(check: CheckRecord, ids: string[]) {
   return `A check on "${check.title}".\n\n${check.questions
     .filter((q) => ids.includes(q.id))
     .map((q) => questionBlock(q, check.answers[q.id]))
-    .join('\n\n')}\n\n${MARKING}\nReturn one entry per question above, using its id.`;
+    .join('\n\n')}\n\n${LEARN_MARKING}\nReturn one entry per question above, using its id.`;
 }
 
 export function probePrompt(lesson: Lesson, m?: Mastery, o?: Objective, sources?: string) {
@@ -111,6 +123,15 @@ Return no questions if the evidence already shows where to start. note says in o
 ${MCQ_RULES}`;
 }
 
+const MAP_RULES = `Rules for the map:
+- Each step develops one assessable capability.
+- A comparison is one capability when distinguishing the alternatives is the learning goal. Do not split it merely because its title names two concepts.
+- For each step, its why states what the student should explain or do, required prerequisite knowledge, what this step introduces, and what belongs to later steps.
+- Briefly retrieve a prerequisite when evidence is uncertain. Do not reteach demonstrated knowledge without a reason.
+- Dependencies precede the steps that need them. The final step exercises the requested goal.
+- Keep the lesson compact. If the objective exceeds one lesson, identify unfinished scope explicitly rather than implying everything is covered.
+- plan explains the starting point and progression. mermaid is a small graph TD from starting facts to the goal.`;
+
 function answersBlock(questions: Question[], answers: Record<string, AnswerState>) {
   return questions.map((q) => questionBlock(q, answers[q.id])).join('\n\n');
 }
@@ -123,14 +144,16 @@ The student wants to learn: ${lesson.topic}
 ${o ? objectiveBlock(o) : ''}Notes to teach from:
 ${notesList(lesson.notes)}
 ${sourcesBlock(sources)}${courseBlock(m)}
-${probe?.questions.length ? `Their probe answers (multiple choice is already marked; mark the others):\n${answersBlock(probe.questions, probe.answers)}\n${MARKING}\nReturn marks only for: ${typed.map((q) => q.id).join(', ') || '(none)'}.\n` : 'There was no probe. Return an empty marks list.\n'}
+${probe?.questions.length ? `Their probe answers (multiple choice is already marked; mark the others):\n${answersBlock(probe.questions, probe.answers)}\n${LEARN_MARKING}\nReturn marks only for: ${typed.map((q) => q.id).join(', ') || '(none)'}.\n` : 'There was no probe. Return an empty marks list.\n'}
 Then plan the lesson from the edge you found:
 - findings: what the answers show, in one or two sentences (at most 50 words; don't repeat the plan). Name a wrong answer as a slip, an isolated gap or a misconception.
-- map: three to five steps. The first builds on something the student has shown they know; the last reaches the goal. plan says in prose where you will start and why. mermaid is a small graph TD from the starting facts to the goal. Each step has a one-sentence why.${m ? '\n- objective: the mastery id this lesson teaches, if one fits.' : ''}`;
+- map: the lesson plan, following the rules below.${m ? '\n- objective: the mastery id this lesson teaches, if one fits.' : ''}
+
+${MAP_RULES}`;
 }
 
 export function reviseMapPrompt(lesson: Lesson, change: string) {
-  return `${TEACHING}\n\nA lesson plan the student is reviewing:\n<map>\n${JSON.stringify(lesson.map, null, 2)}\n</map>\nProbe findings: ${lesson.probe?.findings ?? 'none'}\n\nThe student asks:\n<change>\n${change.trim()}\n</change>\n\nReturn the whole map with the change applied.`;
+  return `${TEACHING}\n\nA lesson plan the student is reviewing:\n<map>\n${JSON.stringify(lesson.map, null, 2)}\n</map>\nProbe findings: ${lesson.probe?.findings ?? 'none'}\n\nThe student asks:\n<change>\n${change.trim()}\n</change>\n\nReturn the whole map with the change applied. Apply the student's change first; the rules below cover everything it does not ask for. Where the request conflicts with them, follow the request.\n${MAP_RULES}`;
 }
 
 export function stepPrompt(lesson: Lesson, map: LessonMap, index: number) {
@@ -146,13 +169,13 @@ Notes to teach from (read them):
 ${notesList(lesson.notes)}
 The plan: ${map.plan}
 Probe findings: ${lesson.probe?.findings ?? 'none'}
-Steps already taught:
+Earlier planned steps (not evidence of what the student has demonstrated):
 ${done || '(none: this is the first step)'}
 
 Write step ${index + 1} of ${map.steps.length}: "${step.title}". Why it is needed now: ${step.why}
 - explain: establish the idea from what the student already accepts. 80 to 250 words.
 - connect: how it links to the previous step and the goal.
-- checkFirst: true when the student can plausibly work the idea out before reading the explanation; the check is then asked first.
+- checkFirst: true only when the check follows from knowledge the student has already demonstrated, without facts introduced by this step's explanation. The check is then asked first, as a prediction. Otherwise false.
 - check: one question (id "k${index + 1}") that shows whether the step landed, worth 1–4 marks.${lesson.objective ? ` Set objective to "${lesson.objective}".` : ''}
 - misconceptions: the two or three likely wrong answers to the check, each with a short re-explanation aimed at that mistake.
 - figure: "" unless the step needs a figure drawn (see Visuals).
@@ -177,7 +200,7 @@ ${retryOf?.mark ? `\nThis is a second attempt. The first scored ${retryOf.mark.s
 Anticipated misconceptions:
 ${step.misconceptions.map((m, i) => `${i}. ${m.signs}`).join('\n') || '(none)'}
 
-${MARKING}
+${LEARN_MARKING}
 reply: speak to the student in at most 80 words. If they are right, confirm the key idea and move on. If not, point at the exact error and give a nudge, not the whole answer.
 misconception: the index of the anticipated misconception the answer shows, or -1.`;
 }
