@@ -111,6 +111,16 @@ Return no questions if the evidence already shows where to start. note says in o
 ${MCQ_RULES}`;
 }
 
+const MAP_RULES = `Rules for the map:
+- Each step develops one assessable capability.
+- A comparison is one capability when distinguishing the alternatives is the learning goal. Do not split it merely because its title names two concepts.
+- For each step, its why states what the student should explain or do, required prerequisite knowledge, what this step introduces, and what belongs to later steps.
+- The first step starts with the first idea the student has not yet demonstrated. Recall known foundations inside it in a sentence rather than allocating a recap step.
+- Briefly retrieve a prerequisite when evidence is uncertain. Do not reteach demonstrated knowledge without a reason.
+- Dependencies precede the steps that need them. The final step exercises the requested goal.
+- Keep the lesson compact. If the objective exceeds one lesson, identify unfinished scope explicitly rather than implying everything is covered.
+- plan explains the starting point and progression. mermaid is a small graph TD from starting facts to the goal.`;
+
 function answersBlock(questions: Question[], answers: Record<string, AnswerState>) {
   return questions.map((q) => questionBlock(q, answers[q.id])).join('\n\n');
 }
@@ -126,11 +136,13 @@ ${sourcesBlock(sources)}${courseBlock(m)}
 ${probe?.questions.length ? `Their probe answers (multiple choice is already marked; mark the others):\n${answersBlock(probe.questions, probe.answers)}\n${MARKING}\nReturn marks only for: ${typed.map((q) => q.id).join(', ') || '(none)'}.\n` : 'There was no probe. Return an empty marks list.\n'}
 Then plan the lesson from the edge you found:
 - findings: what the answers show, in one or two sentences (at most 50 words; don't repeat the plan). Name a wrong answer as a slip, an isolated gap or a misconception.
-- map: three to five steps. The first builds on something the student has shown they know; the last reaches the goal. plan says in prose where you will start and why. mermaid is a small graph TD from the starting facts to the goal. Each step has a one-sentence why.${m ? '\n- objective: the mastery id this lesson teaches, if one fits.' : ''}`;
+- map: the lesson plan, following the rules below.${m ? '\n- objective: the mastery id this lesson teaches, if one fits.' : ''}
+
+${MAP_RULES}`;
 }
 
 export function reviseMapPrompt(lesson: Lesson, change: string) {
-  return `${TEACHING}\n\nA lesson plan the student is reviewing:\n<map>\n${JSON.stringify(lesson.map, null, 2)}\n</map>\nProbe findings: ${lesson.probe?.findings ?? 'none'}\n\nThe student asks:\n<change>\n${change.trim()}\n</change>\n\nReturn the whole map with the change applied.`;
+  return `${TEACHING}\n\nA lesson plan the student is reviewing:\n<map>\n${JSON.stringify(lesson.map, null, 2)}\n</map>\nProbe findings: ${lesson.probe?.findings ?? 'none'}\n\nThe student asks:\n<change>\n${change.trim()}\n</change>\n\nReturn the whole map with the change applied. Apply the student's change first; the rules below cover everything it does not ask for. Where the request conflicts with them, follow the request.\n${MAP_RULES}`;
 }
 
 export function stepPrompt(lesson: Lesson, map: LessonMap, index: number) {
