@@ -28,6 +28,7 @@ Write the question, rubric and model answer as one aligned task.
 The question states the required action, relevant assumptions and expected answer form. Do not imply the outcome through wording.
 Every scored requirement must follow from what the question asks. If a specific example, failure class or method is required, name it. Otherwise accept technically valid alternatives.
 Each rubric point assesses one independently checkable claim. Separate a correct outcome from its required explanation. Do not combine unrelated claims into one all-or-nothing point.
+When several outputs, decisions or labels are requested, give each output, decision or label its own rubric point, even when the correct values happen to be the same. For example, "the first output is 5" and "the second output is 5" are separate points, never one point saying "5 followed by 5". Check an answer with one output correct and another wrong: it must retain credit for the correct output. If separate claims exceed the marks available, reduce the task rather than bundle claims or invent fractional marks.
 Before returning, check whether the question is answerable without guessing its intended meaning; whether every point assesses a requested part; whether another valid solution earns appropriate credit; and whether the explanation establishes the needed knowledge.
 The rubric marks add up to the question marks, and the model answer earns full marks.
 
@@ -180,6 +181,7 @@ Write step ${index + 1} of ${map.steps.length}: "${step.title}". Why it is neede
 - connect: how it links to the previous step and the goal.
 - checkFirst: true only when the check follows from knowledge the student has already demonstrated, without facts introduced by this step's explanation. The check is then asked first, as a prediction. Otherwise false.
 - check: one question (id "k${index + 1}") that shows whether this step's idea landed, worth 1–4 marks. It asks for one coherent task: a prediction, a verdict, a piece of code or one explanation. Its rubric points are parts of that answer, not unrelated tasks chained together. State every fact, type and condition the answer depends on and the expected answer form. Leave the other steps' ideas to their own checks.${lesson.objective ? ` Set objective to "${lesson.objective}".` : ''}
+For a check that traces code, predicts an outcome or applies a mechanism, use a case not already solved in the notes or this explanation. Renaming variables, changing literal values or paraphrasing a worked question is not enough. Change a decision, dependency or operation order so it affects the reasoning or result. Keep the new case within this step's scope and supply every needed premise. Before returning, compare the check with the worked examples: the learner must apply the mechanism rather than copy a displayed answer.
 - misconceptions: the two or three likely wrong answers to the check, each with a short re-explanation aimed at that mistake.
 - figure: "" unless the step needs a figure drawn (see Visuals).
 ${QUESTION_FORMAT}

@@ -180,6 +180,27 @@ describe('Learn prompt contracts', () => {
     expect(prompt).toMatch(/other steps|later steps/i);
   });
 
+  it('preserves credit when only one of several requested outputs is correct', () => {
+    for (const prompt of [
+      stepPrompt(lesson, map, 0),
+      checkPrompt(mastery, objective, 'apply', []),
+    ]) {
+      expect(prompt).toContain('give each output, decision or label its own rubric point');
+      expect(prompt).toContain('even when the correct values happen to be the same');
+      expect(prompt).toContain('one output correct and another wrong');
+      expect(prompt).toContain('reduce the task rather than bundle claims');
+    }
+  });
+
+  it('requires a new reasoning case rather than another copy of a worked example', () => {
+    const prompt = stepPrompt(lesson, map, 1);
+
+    expect(prompt).toContain('not already solved in the notes or this explanation');
+    expect(prompt).toContain('Renaming variables, changing literal values or paraphrasing');
+    expect(prompt).toContain('affects the reasoning or result');
+    expect(prompt).toContain("Keep the new case within this step's scope");
+  });
+
   it('requests minimum sufficient model answers without turning optional detail into required credit', () => {
     for (const prompt of [
       stepPrompt(lesson, map, 0),
