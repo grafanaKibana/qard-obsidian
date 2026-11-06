@@ -24,7 +24,12 @@ const DRAWN = `- A shape or picture Mermaid can't show, with no figure in the no
 
 const QUESTION_FORMAT = `${GOAL_RULES}
 ${MCQ_RULES}
-Every question needs a rubric of separate, checkable points whose marks add up to its marks, and a model answer that earns full marks.`;
+Write the question, rubric and model answer as one aligned task.
+The question states the required action, relevant assumptions and expected answer form. Do not imply the outcome through wording.
+Every scored requirement must follow from what the question asks. If a specific example, failure class or method is required, name it. Otherwise accept technically valid alternatives.
+Each rubric point assesses one independently checkable claim. Separate a correct outcome from its required explanation. Do not combine unrelated claims into one all-or-nothing point.
+Before returning, check whether the question is answerable without guessing its intended meaning; whether every point assesses a requested part; whether another valid solution earns appropriate credit; and whether the explanation establishes the needed knowledge.
+The rubric marks add up to the question marks, and the model answer earns full marks.`;
 /** The lesson's notes, inlined so the live tutor needs no tools. */
 export const sourcesBlock = (sources?: string) =>
   sources ? `\nThe notes' text:\n${sources}\n` : '';
@@ -168,7 +173,7 @@ Write step ${index + 1} of ${map.steps.length}: "${step.title}". Why it is neede
 - explain: establish the idea from what the student already accepts, recalling a known foundation in a sentence rather than re-teaching it. 80 to 250 words.
 - connect: how it links to the previous step and the goal.
 - checkFirst: true only when the check follows from knowledge the student has already demonstrated, without facts introduced by this step's explanation. The check is then asked first, as a prediction. Otherwise false.
-- check: one question (id "k${index + 1}") that shows whether the step landed, worth 1–4 marks.${lesson.objective ? ` Set objective to "${lesson.objective}".` : ''}
+- check: one question (id "k${index + 1}") that shows whether this step's idea landed, worth 1–4 marks. It asks for one coherent task: a prediction, a verdict, a piece of code or one explanation. Its rubric points are parts of that answer, not unrelated tasks chained together. State every fact, type and condition the answer depends on and the expected answer form. Leave the other steps' ideas to their own checks.${lesson.objective ? ` Set objective to "${lesson.objective}".` : ''}
 - misconceptions: the two or three likely wrong answers to the check, each with a short re-explanation aimed at that mistake.
 - figure: "" unless the step needs a figure drawn (see Visuals).
 ${QUESTION_FORMAT}

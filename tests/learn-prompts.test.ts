@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { probeMapPrompt, reviseMapPrompt, stepPrompt } from '../src/learn/learn-prompts';
-import type { Lesson, LessonMap, LessonStep } from '../src/learn/learn-types';
+import {
+  checkPrompt,
+  probeMapPrompt,
+  reviseMapPrompt,
+  stepPrompt,
+} from '../src/learn/learn-prompts';
+import type { CheckRecord, Lesson, LessonMap, LessonStep } from '../src/learn/learn-types';
 import type { Mastery, Objective } from '../src/learn/mastery';
 import type { AnswerState, Question } from '../src/tests/test-types';
 
@@ -74,6 +79,20 @@ const mastery: Mastery = {
   objectives: [objective],
 };
 
+const check: CheckRecord = {
+  version: 1,
+  createdAt: 0,
+  mastery: mastery.path,
+  course: mastery.course,
+  objective: objective.id,
+  title: 'Trace copied references',
+  goal: 'explain',
+  questions: [question, { ...question, id: 'other-check', prompt: 'Unselected question.' }],
+  answers: { [question.id]: answer },
+  marks: {},
+  status: 'ready',
+};
+
 describe('Learn prompt contracts', () => {
   it('uses capability, prerequisite and final-application rules for initial and revised maps', () => {
     const change = 'Keep the comparison and use one worked example.';
@@ -127,5 +146,28 @@ describe('Learn prompt contracts', () => {
     expect(second).toMatch(/earlier planned/i);
     expect(first).toContain('Write step 1 of 2: "Reference assignment"');
     expect(second).toContain('Write step 2 of 2: "Trace the whole example"');
+  });
+
+  it('aligns requested rubric claims in lesson and delayed-check generation', () => {
+    const prompts = [stepPrompt(lesson, map, 0), checkPrompt(mastery, objective, 'apply', [check])];
+
+    for (const prompt of prompts) {
+      expect(prompt).toContain('Every scored requirement must follow from what the question asks');
+      expect(prompt).toContain('one independently checkable claim');
+      expect(prompt).toContain('Otherwise accept technically valid alternatives');
+      expect(prompt).toContain(objective.id);
+    }
+    expect(prompts[1]).toContain('Goal: apply');
+    expect(prompts[1]).toContain('Use fresh wording and new cases');
+    expect(prompts[1]).toContain(question.prompt);
+  });
+
+  it('keeps the lesson check to one coherent task with stated premises and answer form', () => {
+    const prompt = stepPrompt(lesson, map, 0);
+
+    expect(prompt).toMatch(/one coherent task|one thing/);
+    expect(prompt).toMatch(/every (?:fact|premise|condition)/i);
+    expect(prompt).toMatch(/(?:answer|response) form/i);
+    expect(prompt).toMatch(/other steps|later steps/i);
   });
 });
