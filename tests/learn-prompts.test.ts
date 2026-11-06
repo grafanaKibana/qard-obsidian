@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { probeMapPrompt, reviseMapPrompt } from '../src/learn/learn-prompts';
+import { probeMapPrompt, reviseMapPrompt, stepPrompt } from '../src/learn/learn-prompts';
 import type { Lesson, LessonMap, LessonStep } from '../src/learn/learn-types';
 import type { Mastery, Objective } from '../src/learn/mastery';
 import type { AnswerState, Question } from '../src/tests/test-types';
@@ -92,5 +92,40 @@ describe('Learn prompt contracts', () => {
     expect(prompts[1]).toContain(`<change>\n${change}\n</change>`);
     expect(prompts[1]).toContain(JSON.stringify(map, null, 2));
     expect(prompts[1]).toContain("Apply the student's change first");
+  });
+
+  it('keeps the step scope and evidence while requiring a worked example for unfamiliar mechanisms', () => {
+    const prompt = stepPrompt(lesson, map, 0);
+
+    expect(prompt).toContain(lesson.topic);
+    expect(prompt).toContain(lesson.notes[0]);
+    expect(prompt).toContain(lesson.probe!.findings);
+    expect(prompt).toContain(map.steps[0]!.why);
+    expect(prompt).toContain('compact worked example');
+    expect(prompt).toContain('conditions under which a rule holds');
+    expect(prompt).not.toContain('unconditional truths');
+  });
+
+  it('shares the whole parallel plan without treating planned steps as demonstrated knowledge', () => {
+    const first = stepPrompt(lesson, map, 0);
+    const second = stepPrompt(lesson, map, 1);
+
+    for (const prompt of [first, second]) {
+      expect(prompt).toContain(
+        '1. Reference assignment: Identify the copied value before tracing mutations.',
+      );
+      expect(prompt).toContain(
+        '2. Trace the whole example: Apply the distinction to the complete example.',
+      );
+      expect(prompt).toContain('(this step)');
+      expect(prompt).not.toContain('Steps already taught:');
+      expect(prompt).not.toContain('(taught before this step)');
+      expect(prompt).toMatch(/written at the same time/i);
+      expect(prompt).toContain("without facts introduced by this step's explanation");
+      expect(prompt).toContain('recalling a known foundation in a sentence');
+    }
+    expect(second).toMatch(/earlier planned/i);
+    expect(first).toContain('Write step 1 of 2: "Reference assignment"');
+    expect(second).toContain('Write step 2 of 2: "Trace the whole example"');
   });
 });

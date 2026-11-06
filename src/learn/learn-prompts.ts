@@ -3,12 +3,13 @@ import { GOAL_RULES, MARKING, MCQ_RULES, questionBlock } from '../tests/test-pro
 import { objectiveLines, type Mastery, type Objective } from './mastery';
 import type { CheckRecord, Lesson, LessonMap, LessonStep, StepState } from './learn-types';
 
-/** The teaching approach: understanding over recall, built from foundations the student already accepts. */
+/** Teach mechanisms, retrieval and application from demonstrated foundations. */
 export const TEACHING = `How to teach:
-- Aim for understanding, not recall. Each new fact should follow from foundations the student already accepts, so it is held in place by its connections.
-- Start from unconditional truths: definitions and universal statements the student can accept as they are, without caveats.
-- Explain every step, including why it is needed now, as if showing how it could have been discovered.
-- When the student can plausibly work something out, ask before telling.
+- Teach the student to understand the mechanism, retrieve it later, and apply it to a new case.
+- Start from relevant knowledge supported by their answers. Treat a lesson title or taught status as evidence of exposure, not proof of understanding.
+- State the conditions under which a rule holds. Preserve boundaries needed for correctness.
+- Introduce unfamiliar mechanisms with a compact worked example. Ask before explaining only when the answer follows from knowledge the student has already demonstrated.
+- Prefer concrete inputs, state changes, decisions and outputs. Use terminology after establishing what it means.
 - Ground everything in the student's notes and name the note. Where the notes are silent, use standard, correct knowledge.
 - Plain, direct language. Short paragraphs. Markdown, with LaTeX in $…$.`;
 
@@ -146,9 +147,11 @@ export function reviseMapPrompt(lesson: Lesson, change: string) {
 }
 
 export function stepPrompt(lesson: Lesson, map: LessonMap, index: number) {
-  const done = map.steps
-    .slice(0, index)
-    .map((s, i) => `${i + 1}. ${s.title}`)
+  const steps = map.steps
+    .map(
+      (s, i) =>
+        `${i + 1}. ${s.title}: ${s.why}${i < index ? ' (earlier planned step)' : i === index ? ' (this step)' : ''}`,
+    )
     .join('\n');
   const step = map.steps[index]!;
   return `${TEACHING}
@@ -158,13 +161,13 @@ Notes to teach from (read them):
 ${notesList(lesson.notes)}
 The plan: ${map.plan}
 Probe findings: ${lesson.probe?.findings ?? 'none'}
-Steps already taught:
-${done || '(none: this is the first step)'}
+The lesson's steps, written at the same time by other writers (planned scope, not evidence of demonstrated knowledge):
+${steps}
 
 Write step ${index + 1} of ${map.steps.length}: "${step.title}". Why it is needed now: ${step.why}
-- explain: establish the idea from what the student already accepts. 80 to 250 words.
+- explain: establish the idea from what the student already accepts, recalling a known foundation in a sentence rather than re-teaching it. 80 to 250 words.
 - connect: how it links to the previous step and the goal.
-- checkFirst: true when the student can plausibly work the idea out before reading the explanation; the check is then asked first.
+- checkFirst: true only when the check follows from knowledge the student has already demonstrated, without facts introduced by this step's explanation. The check is then asked first, as a prediction. Otherwise false.
 - check: one question (id "k${index + 1}") that shows whether the step landed, worth 1–4 marks.${lesson.objective ? ` Set objective to "${lesson.objective}".` : ''}
 - misconceptions: the two or three likely wrong answers to the check, each with a short re-explanation aimed at that mistake.
 - figure: "" unless the step needs a figure drawn (see Visuals).
