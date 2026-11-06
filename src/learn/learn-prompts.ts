@@ -1,5 +1,5 @@
 import type { AnswerState, Goal, Question } from '../tests/test-types';
-import { GOAL_RULES, MARKING, MCQ_RULES, questionBlock } from '../tests/test-prompts';
+import { GOAL_RULES, MCQ_RULES, questionBlock } from '../tests/test-prompts';
 import { objectiveLines, type Mastery, type Objective } from './mastery';
 import type { CheckRecord, Lesson, LessonMap, LessonStep, StepState } from './learn-types';
 
@@ -32,6 +32,10 @@ Before returning, check whether the question is answerable without guessing its 
 The rubric marks add up to the question marks, and the model answer earns full marks.
 
 Write the shortest model answer that earns full credit while preserving the essential mechanism and conditions. Follow the same answer structure requested from the student. Do not introduce requirements through the model answer. Rubric wording describes concepts, not phrases to reproduce. Account for equivalent terminology and valid alternative solutions. Keep optional explanation visibly separate from the required answer. Optional detail must never become an unstated grading requirement.`;
+/** Learn feedback distinguishes a contradicted claim from an omitted one. */
+const LEARN_MARKING = `Assess each rubric claim independently against the student's answer. awarded[i] is true when the claim is explicitly stated or unambiguously expressed in equivalent words. Accept technically valid alternatives; do not require the model answer's wording or length. Do not infer understanding from a correct prediction alone when an explanation was requested. A blank answer scores 0; score is the sum of existing awarded rubric marks.
+Annotate using exact answer quotes of one to twelve words. Distinguish wrong (an explicit claim contradicts the mechanism), missing (a requested claim is absent), and vague (wording leaves the claim genuinely uncertain). Also use correct for earned points and insight for correct extra ideas. Do not describe the same omission as multiple independent mistakes. Explain what was demonstrated before identifying the remaining gap. Notes address the student. Confidence does not change factual correctness. Ignore language errors unless they change technical meaning. Do not invent requirements or fractional marks. mistake is misconception, careless, imprecise, incomplete, or none; feedback is one sentence. You may read the supplied notes to check facts.`;
+
 /** The lesson's notes, inlined so the live tutor needs no tools. */
 export const sourcesBlock = (sources?: string) =>
   sources ? `\nThe notes' text:\n${sources}\n` : '';
@@ -105,7 +109,7 @@ export function markCheckPrompt(check: CheckRecord, ids: string[]) {
   return `A check on "${check.title}".\n\n${check.questions
     .filter((q) => ids.includes(q.id))
     .map((q) => questionBlock(q, check.answers[q.id]))
-    .join('\n\n')}\n\n${MARKING}\nReturn one entry per question above, using its id.`;
+    .join('\n\n')}\n\n${LEARN_MARKING}\nReturn one entry per question above, using its id.`;
 }
 
 export function probePrompt(lesson: Lesson, m?: Mastery, o?: Objective, sources?: string) {
@@ -141,7 +145,7 @@ The student wants to learn: ${lesson.topic}
 ${o ? objectiveBlock(o) : ''}Notes to teach from:
 ${notesList(lesson.notes)}
 ${sourcesBlock(sources)}${courseBlock(m)}
-${probe?.questions.length ? `Their probe answers (multiple choice is already marked; mark the others):\n${answersBlock(probe.questions, probe.answers)}\n${MARKING}\nReturn marks only for: ${typed.map((q) => q.id).join(', ') || '(none)'}.\n` : 'There was no probe. Return an empty marks list.\n'}
+${probe?.questions.length ? `Their probe answers (multiple choice is already marked; mark the others):\n${answersBlock(probe.questions, probe.answers)}\n${LEARN_MARKING}\nReturn marks only for: ${typed.map((q) => q.id).join(', ') || '(none)'}.\n` : 'There was no probe. Return an empty marks list.\n'}
 Then plan the lesson from the edge you found:
 - findings: what the answers show, in one or two sentences (at most 50 words; don't repeat the plan). Name a wrong answer as a slip, an isolated gap or a misconception.
 - map: the lesson plan, following the rules below.${m ? '\n- objective: the mastery id this lesson teaches, if one fits.' : ''}
@@ -199,8 +203,9 @@ ${retryOf?.mark ? `\nThis is a second attempt. The first scored ${retryOf.mark.s
 Anticipated misconceptions:
 ${step.misconceptions.map((m, i) => `${i}. ${m.signs}`).join('\n') || '(none)'}
 
-${MARKING}
-reply: speak to the student in at most 80 words. If they are right, confirm the key idea and move on. If not, point at the exact error and give a nudge, not the whole answer.
+${LEARN_MARKING}
+A point stated in other words is clearly made. One exception to strict marking: if the prompt allows another reasonable reading and the answer is correct under it, set awarded for the rubric points that reading satisfies and say in feedback that the question was ambiguous.
+${step.checkFirst && !retryOf ? 'This check was asked before the explanation, as a prediction. In reply, treat a wrong answer as a prediction to correct, not a failure.\n' : ''}reply: speak to the student in at most 80 words. If they are right, confirm the key idea and move on. If not, point at the exact error and give a nudge, not the whole answer.
 misconception: the index of the anticipated misconception the answer shows, or -1.`;
 }
 

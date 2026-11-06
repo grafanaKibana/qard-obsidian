@@ -1,13 +1,22 @@
 import { describe, expect, it } from 'vitest';
 import {
   checkPrompt,
+  markCheckPrompt,
   probeMapPrompt,
   reviseMapPrompt,
   stepPrompt,
+  tutorMarkPrompt,
 } from '../src/learn/learn-prompts';
-import type { CheckRecord, Lesson, LessonMap, LessonStep } from '../src/learn/learn-types';
+import type {
+  CheckRecord,
+  Lesson,
+  LessonMap,
+  LessonStep,
+  StepState,
+} from '../src/learn/learn-types';
 import type { Mastery, Objective } from '../src/learn/mastery';
-import type { AnswerState, Question } from '../src/tests/test-types';
+import { MARKING, markPrompt } from '../src/tests/test-prompts';
+import type { AnswerState, Attempt, PracticeTest, Question } from '../src/tests/test-types';
 
 const question: Question = {
   id: 'copy-check',
@@ -181,5 +190,112 @@ describe('Learn prompt contracts', () => {
       expect(prompt).toContain('Optional detail must never become an unstated grading requirement');
       expect(prompt).toContain(objective.id);
     }
+  });
+
+  it.each([
+    ['lesson answer', () => tutorMarkPrompt(lesson, step, answer)],
+    ['standalone check', () => markCheckPrompt(check, [question.id])],
+    [
+      'typed prerequisite probe',
+      () => probeMapPrompt(lesson, mastery, objective, '# Copying\nSource text.'),
+    ],
+  ] as const)(
+    'uses Learn marking without the conflicting missing-comment rule for a %s',
+    (_, makePrompt) => {
+      const prompt = makePrompt();
+
+      expect(prompt).toContain('Assess each rubric claim independently');
+      expect(prompt).toContain(
+        'Do not describe the same omission as multiple independent mistakes',
+      );
+      expect(prompt).not.toContain('For every rubric point not awarded');
+      expect(prompt).toContain(question.prompt);
+      expect(prompt).toContain('1. (1) Assignment copies the reference.');
+      expect(prompt).toContain(`<model_answer>${question.model}</model_answer>`);
+      expect(prompt).toContain(
+        `<student_answer confidence="unsure">${answer.text}</student_answer>`,
+      );
+      expect(prompt).toContain('Notes/Copying.md');
+    },
+  );
+
+  it('keeps the reasonable-reading exception local to live lesson marking', () => {
+    const live = tutorMarkPrompt(lesson, step, answer);
+
+    expect(live).toContain('A point stated in other words is clearly made');
+    expect(live).toContain('another reasonable reading');
+    expect(live).toContain('question was ambiguous');
+    expect(markCheckPrompt(check, [question.id])).not.toContain('One exception to strict marking');
+    expect(probeMapPrompt(lesson, mastery, objective)).not.toContain(
+      'One exception to strict marking',
+    );
+  });
+
+  it('frames a first pre-explanation answer as a prediction but excludes retries', () => {
+    const predictionStep = { ...step, checkFirst: true };
+    const firstState: StepState = {
+      answer,
+      mark: {
+        score: 1,
+        awarded: [true, false],
+        annotations: [],
+        mistake: 'incomplete',
+        feedback: 'Explain the shared object.',
+      },
+      reply: 'Which object does the copied reference identify?',
+      asks: [],
+    };
+    const framing = 'asked before the explanation, as a prediction';
+
+    expect(tutorMarkPrompt(lesson, predictionStep, answer)).toContain(framing);
+    expect(tutorMarkPrompt(lesson, step, answer)).not.toContain(framing);
+    const retry = tutorMarkPrompt(lesson, predictionStep, answer, firstState);
+    expect(retry).toContain('This is a second attempt.');
+    expect(retry).not.toContain(framing);
+  });
+
+  it('still filters selected check questions and typed probe marks', () => {
+    expect(markCheckPrompt(check, [question.id])).not.toContain('Unselected question.');
+    const mcq: Question = {
+      ...question,
+      id: 'probe-choice',
+      type: 'mcq',
+      options: ['A', 'B'],
+      answer: 0,
+    };
+    const prompt = probeMapPrompt({
+      ...lesson,
+      probe: {
+        questions: [mcq, { ...question, id: 'probe-copy' }],
+        answers: { 'probe-choice': { choice: 0 }, 'probe-copy': answer },
+      },
+    });
+
+    expect(prompt).toContain('Return marks only for: probe-copy.');
+    expect(prompt).not.toContain('Return marks only for: probe-choice');
+  });
+
+  it('leaves practice-test marking on its existing policy', () => {
+    const test: PracticeTest = {
+      version: 1,
+      createdAt: 0,
+      title: 'Practice copying',
+      sections: [{ id: 'copying', title: 'Copying', questions: [question] }],
+    };
+    const attempt: Attempt = {
+      version: 1,
+      startedAt: 0,
+      answers: { [question.id]: answer },
+      marks: {},
+      review: {},
+      sections: {},
+    };
+    const prompt = markPrompt(test, attempt, [question.id]);
+
+    expect(prompt).toContain(MARKING);
+    expect(prompt).toContain('For every rubric point not awarded');
+    expect(prompt).not.toContain('Assess each rubric claim independently');
+    expect(prompt).toContain(`<model_answer>${question.model}</model_answer>`);
+    expect(prompt).toContain(answer.text);
   });
 });
