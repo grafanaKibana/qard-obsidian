@@ -31,7 +31,9 @@ Ask explicitly for any intermediate value or calculation that earns marks. Other
 Each rubric point assesses one independently checkable claim. Separate a correct outcome from its required explanation. Do not combine unrelated claims into one all-or-nothing point.
 When several outputs, decisions or labels are requested, give each output, decision or label its own rubric point, even when the correct values happen to be the same. For example, "the first output is 5" and "the second output is 5" are separate points, never one point saying "5 followed by 5". Check an answer with one output correct and another wrong: it must retain credit for the correct output. If separate claims exceed the marks available, reduce the task rather than bundle claims or invent fractional marks.
 Before returning, check whether the question is answerable without guessing its intended meaning; whether every point assesses a requested part; whether another valid solution earns appropriate credit; and whether the explanation establishes the needed knowledge.
-The rubric marks add up to the question marks, and the model answer earns full marks.`;
+The rubric marks add up to the question marks, and the model answer earns full marks.
+
+Write the shortest model answer that earns full credit while preserving the essential mechanism and conditions. Follow the same answer structure requested from the student. Do not introduce requirements through the model answer. Rubric wording describes concepts, not phrases to reproduce. Account for equivalent terminology and valid alternative solutions. Keep optional explanation visibly separate from the required answer. Optional detail must never become an unstated grading requirement.`;
 /** The lesson's notes, inlined so the live tutor needs no tools. */
 export const sourcesBlock = (sources?: string) =>
   sources ? `\nThe notes' text:\n${sources}\n` : '';
