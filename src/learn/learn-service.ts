@@ -1,4 +1,5 @@
 import { formatLessonNote } from './lesson-note';
+import { writeReviewedStep } from './step-review';
 import { insertUnderHeading } from './note-edits';
 import { summarise, scoreQuestion } from './learning-evidence';
 import type {
@@ -73,7 +74,6 @@ import {
   readProbe,
   readProbeMap,
   readQuestions,
-  readStep,
   readTutorMark,
   stepSchema,
   tutorMarkSchema,
@@ -1523,10 +1523,11 @@ export class LearnService {
             return;
           }
           busy.add(`${plan}#${index}`);
-          const step = await runValidated(
+          const step = await writeReviewedStep(
             this.activeRunner('writer', signal),
+            this.activeRunner('marker', signal),
             { signal, prompt: stepPrompt(lesson, lesson.map, index), schema: stepSchema },
-            readStep,
+            await this.sources(lesson.notes),
           );
           const latest = this.lesson(path);
           if (latest.stepsFor !== plan) {

@@ -15,6 +15,7 @@ import {
 import { layoutGraph, layoutTopic, OBJECTIVE, routeTo, topicsOf } from '../src/learn/course-graph';
 import { courseUpdateSchema, firstSentences } from '../src/learn/learn-schema';
 import { LearnService } from '../src/learn/learn-service';
+import { stepReviewSchema } from '../src/learn/step-review';
 import { insertUnderHeading } from '../src/learn/note-edits';
 import { summarise } from '../src/learn/learning-evidence';
 import { type LearnStorage } from '../src/learn/learn-contracts';
@@ -403,6 +404,7 @@ function setup(python?: (script: string) => Promise<string>) {
     run: async (task: AgentTask) => {
       calls.push({ role, task });
       const found = replies.find((r) => r.schema === task.schema);
+      if (!found && task.schema === stepReviewSchema) return { issues: [] };
       if (!found) throw new Error('unexpected task');
       return found.reply(task);
     },
@@ -907,6 +909,61 @@ describe('learning service', () => {
       'Second 2',
       'Second 3',
     ]);
+  });
+
+  it('saves only a repaired lesson step after the marker approves it', async () => {
+    const t = setup();
+    t.reply(probeSchema, () => ({ questions: [], note: 'None needed.' }));
+    t.reply(probeMapSchema, () => ({
+      marks: [],
+      findings: 'Start here.',
+      map: {
+        title: 'One step',
+        plan: 'Teach one idea.',
+        mermaid: 'graph TD; A-->B',
+        steps: [{ title: 'One idea', why: 'Needed now.' }],
+      },
+    }));
+    let writes = 0,
+      reviews = 0;
+    t.reply(stepSchema, () => ({
+      title: `Candidate ${++writes}`,
+      explain: 'An explanation.',
+      connect: 'A connection.',
+      checkFirst: false,
+      check: q('k1'),
+      misconceptions: [],
+    }));
+    let approve: ((value: { issues: string[] }) => void) | undefined;
+    t.reply(stepReviewSchema, () => {
+      if (++reviews === 1) return { issues: ['Split the output and explanation.'] };
+      return new Promise((resolve) => {
+        approve = resolve;
+      });
+    });
+
+    const path = await t.learn.startLesson({
+      topic: 'Review this step',
+      notes: ['Notes/DS346/Topic Models.md'],
+    });
+    await vi.waitFor(() => expect(reviews).toBe(2));
+    expect(t.learn.lessonAt(path)!.steps).toEqual([null]);
+    expect(JSON.parse(t.files.get(path)!).steps).toEqual([null]);
+    expect(t.calls.filter((c) => c.task.schema === stepReviewSchema)).toEqual([
+      expect.objectContaining({ role: 'marker' }),
+      expect.objectContaining({ role: 'marker' }),
+    ]);
+    expect(t.calls.find((c) => c.task.schema === stepReviewSchema)!.task).toMatchObject({
+      vault: undefined,
+      effort: 'high',
+    });
+    expect(t.calls.find((c) => c.task.schema === stepReviewSchema)!.task.prompt).toContain(
+      '# Topic Models',
+    );
+
+    approve!({ issues: [] });
+    await vi.waitFor(() => expect(t.learn.lessonAt(path)!.steps[0]?.title).toBe('Candidate 2'));
+    expect(writes).toBe(2);
   });
 
   it('cancels a stuck job, which can then be tried again', async () => {
