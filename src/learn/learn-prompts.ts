@@ -26,6 +26,7 @@ const QUESTION_FORMAT = `${GOAL_RULES}
 ${MCQ_RULES}
 Write the question, rubric and model answer as one aligned task.
 The question states one substantive task, relevant assumptions and expected answer form. It is self-contained: define its scenario, target, inputs, outputs, units and unfamiliar terms without relying on another question or worked example. State what is predicted, per entity and time period, and what is known when. Do not add irrelevant numbers, length quotas or visible grading instructions. Do not imply the outcome through wording.
+One verdict with its reason is one task. A list of independent errors to repair, several separate predictions, or separate deployment, monitoring and retraining decisions is not one task merely because they share a scenario. Choose one such issue for this question; save the others for separate checks. Do not use "for each practice" to disguise several questions as one.
 Every scored requirement must follow from what the question asks. If a specific example, failure class or method is required, name it. Otherwise accept technically valid alternatives.
 Ask explicitly for any intermediate value or calculation that earns marks. Otherwise do not require it in the rubric. A response that fully answers the question must not lose credit for omitting unrequested intermediate values.
 Each rubric point assesses one independently checkable claim. Separate a correct outcome from its required explanation. Do not combine unrelated claims into one all-or-nothing point.
