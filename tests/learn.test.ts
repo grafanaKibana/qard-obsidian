@@ -1149,6 +1149,7 @@ describe('learning service', () => {
     const t = await mapped();
     t.reply(questionsSchema, () => ({ questions: [cloze('c1')] }));
     const check = (await t.learn.ensureCheck(t.path, 'params'))!;
+    expect(t.learn.checkAt(check)?.questions[0]?.goal).toBe('recall');
     t.learn.answerCheck(check, 'c1', { blanks: { prior: 'dirichlet', purpose: 'wrong' } });
     await t.learn.submitCheck(check);
     expect(t.learn.checkAt(check)?.marks.c1).toMatchObject({ score: 1, awarded: [true, false] });
@@ -1174,12 +1175,14 @@ describe('learning service', () => {
     }));
     const path = await t.learn.startLesson({ topic: 'Priors', notes: [] });
     await vi.waitFor(() => expect(t.learn.lessonAt(path)?.probe).toBeDefined());
+    expect(t.learn.lessonAt(path)?.probe?.questions[0]?.goal).toBe('recall');
     t.learn.answerProbe(path, 'p1', { blanks: { prior: 'Dirichlet', purpose: 'wrong' } });
     await t.learn.submitProbe(path);
     expect(t.learn.lessonAt(path)?.probe).toMatchObject({
       marks: { p1: { score: 1, awarded: [true, false] } },
     });
     await vi.waitFor(() => expect(t.learn.lessonAt(path)?.steps[0]).toBeTruthy());
+    expect(t.learn.lessonAt(path)?.steps[0]?.check.goal).toBe('recall');
     t.learn.answerStep(path, { blanks: { prior: 'dirichlet', purpose: 'smoothing' } });
     await t.learn.checkStep(path);
     const original = structuredClone(t.learn.lessonAt(path)?.state[0]);

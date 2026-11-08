@@ -1005,7 +1005,11 @@ export class LearnService {
         objective,
         title: o.title,
         goal,
-        questions: written.slice(0, 3).map((q) => ({ ...q, objective, goal: q.goal ?? goal })),
+        questions: written.slice(0, 3).map((q) => ({
+          ...q,
+          objective,
+          goal: q.goal ?? (q.type === 'cloze' ? 'recall' : goal),
+        })),
         answers: {},
         marks: {},
         status: 'ready',
@@ -1364,6 +1368,7 @@ export class LearnService {
       const questions = result.questions.slice(0, 4).map((q) => ({
         ...q,
         objective: m?.objectives.some((x) => x.id === q.objective) ? q.objective : undefined,
+        ...(q.type === 'cloze' ? { goal: q.goal ?? ('recall' as const) } : {}),
       }));
       await this.setLesson(path, { ...this.lesson(path), probe: { questions, answers: {} } });
       if (!questions.length) {
@@ -1543,7 +1548,14 @@ export class LearnService {
               i === index
                 ? {
                     ...step,
-                    check: { ...step.check, id: `k${index + 1}`, objective: latest.objective },
+                    check: {
+                      ...step.check,
+                      id: `k${index + 1}`,
+                      objective: latest.objective,
+                      ...(step.check.type === 'cloze'
+                        ? { goal: step.check.goal ?? ('recall' as const) }
+                        : {}),
+                    },
                   }
                 : s,
             ),
