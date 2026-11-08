@@ -32,12 +32,29 @@ export function CheckView({
   onFinish?: () => void;
 }) {
   const { revision, job } = useLearn(services);
-  const [error, setError] = useState(''),
+  const [load, setLoad] = useState<{ path: string; ready: boolean; error?: string }>(),
+    [retry, setRetry] = useState(0),
     [objective, setObjective] = useState<Objective>();
   useEffect(() => {
-    services.learn.loadCheck(path).catch((e) => setError((e as Error).message));
-  }, [services, path]);
-  const record = services.learn.checkAt(path);
+    let live = true;
+    setLoad({ path, ready: false });
+    services.learn.loadCheck(path).then(
+      () => {
+        if (live) {
+          setLoad({ path, ready: true });
+        }
+      },
+      (error: Error) => {
+        if (live) {
+          setLoad({ path, ready: false, error: error.message });
+        }
+      },
+    );
+    return () => {
+      live = false;
+    };
+  }, [services, path, retry]);
+  const record = load?.path === path && load.ready ? services.learn.checkAt(path) : undefined;
   useEffect(() => {
     if (!record?.finishedAt) {
       return;
@@ -55,15 +72,18 @@ export function CheckView({
       live = false;
     };
   }, [services, record?.finishedAt, record?.mastery, record?.objective, revision]);
-  if (error) {
+  if (load?.path === path && load.error) {
     return (
-      <p className="qard-error" role="alert">
-        {error}
-      </p>
+      <div>
+        <p className="qard-error" role="alert">
+          Could not prepare this check: {load.error}
+        </p>
+        <button onClick={() => setRetry((attempt) => attempt + 1)}>Retry check</button>
+      </div>
     );
   }
   if (!record) {
-    return <Waiting text="Loading…" />;
+    return <Waiting text="Preparing check…" />;
   }
   const marking = job(path, 'check-mark'),
     done = !!record.finishedAt,

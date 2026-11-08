@@ -1,5 +1,11 @@
 import type { AnswerState, Goal, Question } from '../tests/test-types';
-import { GOAL_RULES, MARKING, MCQ_RULES, questionBlock } from '../tests/test-prompts';
+import {
+  GOAL_RULES,
+  MARKING,
+  MCQ_RULES,
+  questionBlock,
+  studentAnswer,
+} from '../tests/test-prompts';
 import { objectiveLines, type Mastery, type Objective } from './mastery';
 import type { CheckRecord, Lesson, LessonMap, LessonStep, StepState } from './learn-types';
 
@@ -8,10 +14,10 @@ export const TEACHING = `How to teach:
 - Teach the student to understand the mechanism, retrieve it later, and apply it to a new case.
 - Start from relevant knowledge supported by their answers. Treat a lesson title or taught status as evidence of exposure, not proof of understanding.
 - State the conditions under which a rule holds. Preserve boundaries needed for correctness.
-- Introduce unfamiliar mechanisms with a compact worked example. Ask before explaining only when the answer follows from knowledge the student has already demonstrated.
+- Before explaining a mechanism, define the target, inputs, outputs, units and unfamiliar terms. For predictions, say which entity and time period are involved and what is known when. Use a compact worked example appropriate to the subject: code for programming, concrete quantities or a specific decision for other subjects. Ask before explaining only when the answer follows from knowledge the student has already demonstrated.
 - Prefer concrete inputs, state changes, decisions and outputs. Use terminology after establishing what it means.
-- Ground everything in the student's notes and name the note. Where the notes are silent, use standard, correct knowledge.
-- Plain, direct language. Short paragraphs. Markdown, with LaTeX in $…$.`;
+- Ground explanations in the student's notes and link the supporting passage: [[path#Heading|label]], or [[path#^block-id|label]] when that block ID already exists. Verify the path and anchor; link to the note itself if it has no suitable anchor. Never invent headings or block IDs. Keep answer-revealing citations out of questions shown before an attempt. Where no supporting note exists, use standard, correct knowledge without fabricating a citation.
+- Explain only what is needed, without vague philosophical prose or length quotas. Plain, direct language. Short paragraphs. Markdown, with LaTeX in $…$.`;
 
 /**
  * When to show rather than tell, from the vault's figure guide: only when the student would understand
@@ -25,7 +31,8 @@ const DRAWN = `- A shape or picture Mermaid can't show, with no figure in the no
 const QUESTION_FORMAT = `${GOAL_RULES}
 ${MCQ_RULES}
 Write the question, rubric and model answer as one aligned task.
-The question states the required action, relevant assumptions and expected answer form. Do not imply the outcome through wording.
+The question states one substantive task, relevant assumptions and expected answer form. It is self-contained: define its scenario, target, inputs, outputs, units and unfamiliar terms without relying on another question or worked example. State what is predicted, per entity and time period, and what is known when. Do not add irrelevant numbers, length quotas or visible grading instructions. Do not imply the outcome through wording.
+One verdict with its reason is one task. A list of independent errors to repair, several separate predictions, or separate deployment, monitoring and retraining decisions is not one task merely because they share a scenario. Choose one such issue for this question; save the others for separate checks. Do not use "for each practice" to disguise several questions as one.
 Every scored requirement must follow from what the question asks. If a specific example, failure class or method is required, name it. Otherwise accept technically valid alternatives.
 Ask explicitly for any intermediate value or calculation that earns marks. Otherwise do not require it in the rubric. A response that fully answers the question must not lose credit for omitting unrequested intermediate values.
 Each rubric point assesses one independently checkable claim. Separate a correct outcome from its required explanation. Do not combine unrelated claims into one all-or-nothing point.
@@ -88,18 +95,19 @@ Return empty lists when nothing changes.`;
 }
 
 export function checkPrompt(m: Mastery, o: Objective, goal: Goal, previous: CheckRecord[]) {
-  const past = previous
-    .slice(-4)
-    .flatMap((c) =>
-      c.questions.map((q) => `- (${c.goal}) ${q.prompt.replace(/\s+/g, ' ').slice(0, 200)}`),
-    );
+  const past = previous.slice(-4).flatMap((c) =>
+    c.questions.map((q) => {
+      const mark = c.marks[q.id];
+      return `- (${c.goal}) ${q.prompt.replace(/\s+/g, ' ').slice(0, 200)}\n  Answer: ${studentAnswer(q, c.answers[q.id]) || '(blank)'}${mark ? `\n  Result: ${mark.score}/${q.marks}; ${mark.feedback}` : ''}`;
+    }),
+  );
   return `Write a short check on one objective. It will be answered days from now to test whether the student still understands it.
 ${objectiveBlock(o)}
 Course: ${m.course}
 
-Goal: ${goal}. Write one to three questions at this goal, each worth 1–4 marks. Use fresh wording and new cases; the student must not be able to pass by remembering an earlier question.
-${past.length ? `Earlier check questions on this objective (do not repeat them):\n${past.join('\n')}\n` : ''}${o.state === 'misconception' || o.state === 'slipping' ? 'The latest evidence shows a mistake. Aim at least one question at it.\n' : ''}
-Read the notes first. Question ids are c1, c2, c3; set objective to "${o.id}" and goal on each.
+Goal: ${goal}. Write ONE or TWO focused, self-contained checks on this objective, not a broad curriculum. The FIRST is mcq. Add a second short or application check only when it gives useful evidence of a distinct gap within this objective. Usually use 1–2 marks for written checks and 1 for mcq. Use fresh wording and new cases; the student must not be able to pass by remembering an earlier question.
+${past.length ? `Earlier questions, answers and feedback on this objective (target actual gaps; do not repeat cases):\n${past.join('\n')}\n` : ''}${o.state === 'misconception' || o.state === 'slipping' ? 'The latest evidence shows a mistake. Aim at least one question at it.\n' : ''}
+Read the notes first. Question ids are c1 and, if needed, c2; set objective to "${o.id}" and goal on each.
 ${QUESTION_FORMAT}`;
 }
 
@@ -116,9 +124,9 @@ ${o ? objectiveBlock(o) : ''}Notes to teach from:
 ${notesList(lesson.notes)}
 ${sourcesBlock(sources)}${courseBlock(m)}
 Before planning the lesson, find the edge of what the student knows. List the prerequisite ideas the lesson depends on. Skip any the mastery file already shows as taught, right once or mastered.
-Write at most four quick probe questions, one per remaining prerequisite, each worth 1 mark. Prefer mcq (recognise) or short (recall); they must be answerable in under a minute. Set objective to a mastery id when the prerequisite is one. Ids are p1, p2, …
+Write at most four quick probe questions, one per remaining prerequisite, each worth 1 mark. Prefer mcq or a focused short answer. Keep each to one substantive prerequisite task. Set objective to a mastery id when the prerequisite is one. Ids are p1, p2, …
 Return no questions if the evidence already shows where to start. note says in one sentence what the probe checks.
-${MCQ_RULES}`;
+${QUESTION_FORMAT}`;
 }
 
 const MAP_RULES = `Rules for the map:
@@ -174,10 +182,11 @@ The lesson's steps, written at the same time by other writers (planned scope, no
 ${steps}
 
 Write step ${index + 1} of ${map.steps.length}: "${step.title}". Why it is needed now: ${step.why}
-- explain: establish the idea from what the student already accepts, recalling a known foundation in a sentence rather than re-teaching it. 80 to 250 words.
+- explain: establish the idea from what the student already accepts, recalling a known foundation in a sentence rather than re-teaching it. Use only the content needed to understand this idea, with a compact concrete example and verified source links; no minimum length.
 - connect: how it links to the previous step and the goal.
 - checkFirst: true only when the check follows from knowledge the student has already demonstrated, without facts introduced by this step's explanation. The check is then asked first, as a prediction. Otherwise false.
-- check: one question (id "k${index + 1}") that shows whether this step's idea landed, worth 1–4 marks. It asks for one coherent task: a prediction, a verdict, a piece of code or one explanation. Its rubric points are parts of that answer, not unrelated tasks chained together. State every fact, type and condition the answer depends on and the expected answer form. Leave the other steps' ideas to their own checks.${lesson.objective ? ` Set objective to "${lesson.objective}".` : ''}
+- check: one question (id "k${index + 1}") that shows whether this step's idea landed, usually worth 1–2 marks for written answers or 1 for mcq. It asks for one coherent task: a prediction, a verdict, a piece of code or one explanation. Its rubric points are parts of that answer, not unrelated tasks chained together. State every fact, type and condition the answer depends on and the expected answer form. Leave the other steps' ideas to their own checks.${lesson.objective ? ` Set objective to "${lesson.objective}".` : ''}
+- Choose check.type to mix formats: ${index % 2 === 0 ? 'prefer mcq for this step' : 'prefer short for this step'}, so the lesson visibly mixes formats. Explicit learner requests and tasks that require producing code override this preference. Set goal for the thinking assessed and type for the response format; explain/apply goals may use scenario mcq. Keep their distinction clear in the task without adding learner-facing grading instructions.
 For a check that traces code, predicts an outcome or applies a mechanism, use a case not already solved in the notes or this explanation. Renaming variables, changing literal values or paraphrasing a worked question is not enough. Change a decision, dependency or operation order so it affects the reasoning or result. Keep the new case within this step's scope and supply every needed premise. Before returning, compare the check with the worked examples: the learner must apply the mechanism rather than copy a displayed answer.
 - misconceptions: the two or three likely wrong answers to the check, each with a short re-explanation aimed at that mistake.
 - figure: "" unless the step needs a figure drawn (see Visuals).
