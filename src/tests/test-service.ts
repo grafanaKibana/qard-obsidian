@@ -45,6 +45,7 @@ import {
 import {
   emptyAttempt,
   markChoice,
+  markCloze,
   markUnknown,
   questions,
   scoreOf,
@@ -581,7 +582,7 @@ export class TestService {
       false,
     );
   }
-  /** Multiple choice is marked locally; the rest waits for the agent (now, or at the end). */
+  /** Multiple choice and cloze are marked locally; the rest waits for the agent (now, or at the end). */
   async submit(folder: string, sectionId: string) {
     const { test, attempt } = this.attemptOf(folder);
     const section = test.sections.find((s) => s.id === sectionId);
@@ -594,6 +595,8 @@ export class TestService {
         marks[q.id] = markUnknown(q);
       } else if (q.type === 'mcq') {
         marks[q.id] = markChoice(q, attempt.answers[q.id]);
+      } else if (q.type === 'cloze') {
+        marks[q.id] = markCloze(q, attempt.answers[q.id]);
       }
     }
     const needsAgent = section.questions.some((q) => !marks[q.id]);
@@ -643,12 +646,12 @@ export class TestService {
         });
       };
       await setStatus('marking');
-      // Multiple choice and "I don't know" were marked on submit.
+      // Multiple choice, cloze and "I don't know" were marked on submit.
       const answers = this.attemptOf(folder).attempt.answers;
       const targets = test.sections
         .filter((s) => sectionIds.includes(s.id))
         .flatMap((s) => s.questions)
-        .filter((q) => q.type !== 'mcq' && !answers[q.id]?.unknown);
+        .filter((q) => q.type !== 'mcq' && q.type !== 'cloze' && !answers[q.id]?.unknown);
       try {
         const marks = targets.length
           ? await runValidated(
@@ -736,6 +739,9 @@ export class TestService {
     });
   }
   retry(folder: string, id: string, text: string) {
+    if (questions(this.attemptOf(folder).test).find((q) => q.id === id)?.type === 'cloze') {
+      return Promise.resolve();
+    }
     return this.track(folder, 'retry', id, async (signal) => {
       const { test, attempt } = this.attemptOf(folder),
         q = questions(test).find((x) => x.id === id)!;
@@ -778,6 +784,9 @@ export class TestService {
     });
   }
   dispute(folder: string, id: string, argument: string) {
+    if (questions(this.attemptOf(folder).test).find((q) => q.id === id)?.type === 'cloze') {
+      return Promise.resolve();
+    }
     return this.track(folder, 'dispute', id, async (signal) => {
       const { test, attempt } = this.attemptOf(folder),
         q = questions(test).find((x) => x.id === id)!;

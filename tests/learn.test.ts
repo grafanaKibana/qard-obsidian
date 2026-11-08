@@ -356,6 +356,15 @@ const mcq = (id: string): Question =>
     options: ['a', 'b'],
     answer: 1,
   });
+const cloze = (id: string): Question =>
+  q(id, {
+    type: 'cloze',
+    prompt: 'A {{prior}} is used for {{purpose}}.',
+    blanks: [
+      { id: 'prior', answers: ['Dirichlet'] },
+      { id: 'purpose', answers: ['smoothing'] },
+    ],
+  });
 const markOf = (id: string, awarded: boolean[]) => ({
   id,
   score: 99,
@@ -1134,6 +1143,52 @@ describe('learning service', () => {
     await t.learn.resumeBackground();
     expect(t.calls).toHaveLength(calls);
     t.settings.aiEnabled = true;
+  });
+
+  it('marks cloze delayed checks, probes, and steps locally and never runs a typed retry', async () => {
+    const t = await mapped();
+    t.reply(questionsSchema, () => ({ questions: [cloze('c1')] }));
+    const check = (await t.learn.ensureCheck(t.path, 'params'))!;
+    t.learn.answerCheck(check, 'c1', { blanks: { prior: 'dirichlet', purpose: 'wrong' } });
+    await t.learn.submitCheck(check);
+    expect(t.learn.checkAt(check)?.marks.c1).toMatchObject({ score: 1, awarded: [true, false] });
+    expect(t.calls.some((call) => call.task.schema === marksSchema)).toBe(false);
+    t.reply(probeSchema, () => ({ questions: [cloze('p1')], note: 'Locate the gap.' }));
+    t.reply(probeMapSchema, () => ({
+      marks: [],
+      findings: 'One blank recalled.',
+      map: {
+        title: 'Priors',
+        plan: 'Review smoothing.',
+        mermaid: 'graph TD; A-->B',
+        steps: [{ title: 'Priors', why: 'Needed.' }],
+      },
+    }));
+    t.reply(stepSchema, () => ({
+      title: 'Priors',
+      explain: 'Dirichlet smooths.',
+      connect: 'Continue.',
+      checkFirst: false,
+      check: cloze('k1'),
+      misconceptions: [],
+    }));
+    const path = await t.learn.startLesson({ topic: 'Priors', notes: [] });
+    await vi.waitFor(() => expect(t.learn.lessonAt(path)?.probe).toBeDefined());
+    t.learn.answerProbe(path, 'p1', { blanks: { prior: 'Dirichlet', purpose: 'wrong' } });
+    await t.learn.submitProbe(path);
+    expect(t.learn.lessonAt(path)?.probe).toMatchObject({
+      marks: { p1: { score: 1, awarded: [true, false] } },
+    });
+    await vi.waitFor(() => expect(t.learn.lessonAt(path)?.steps[0]).toBeTruthy());
+    t.learn.answerStep(path, { blanks: { prior: 'dirichlet', purpose: 'smoothing' } });
+    await t.learn.checkStep(path);
+    const original = structuredClone(t.learn.lessonAt(path)?.state[0]);
+    expect(original?.mark).toMatchObject({ score: 2, awarded: [true, true] });
+    const calls = t.calls.length;
+    await t.learn.retryStep(path, 'A typed second attempt');
+    expect(t.learn.lessonAt(path)?.state[0]).toEqual(original);
+    expect(t.calls).toHaveLength(calls);
+    expect(t.calls.some((call) => call.task.schema === tutorMarkSchema)).toBe(false);
   });
 
   it('runs a check: written ahead by the writer, marked by the tutor, recorded as evidence', async () => {

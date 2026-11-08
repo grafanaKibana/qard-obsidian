@@ -2,7 +2,9 @@
 import { act } from 'preact/test-utils';
 import { createRoot, type Root } from 'react-dom/client';
 import { beforeEach, afterEach, expect, it, vi } from 'vitest';
-import { Component } from 'obsidian';
+import { Component, MarkdownRenderer } from 'obsidian';
+import { AnswerInput, MarkedAnswer, answered } from '../src/components/common/QuestionAnswer';
+import { markCloze, type AnswerState, type Question } from '../src/tests/test-types';
 import { ReviewAnswers } from '../src/components/tests/ReviewAnswers';
 import { DeleteTest } from '../src/components/tests/DeleteTest';
 import { TakeTest } from '../src/components/tests/TakeTest';
@@ -228,4 +230,244 @@ it('shows a deletion error and leaves the user on the selected test so they can 
   remove.mockResolvedValueOnce(undefined);
   await click(host.querySelector('[aria-label="Delete test"]'));
   expect(deleted).toHaveBeenCalledOnce();
+});
+
+const cloze: Question = {
+  id: 'gaps',
+  type: 'cloze',
+  goal: 'recall',
+  prompt:
+    'The **algorithm** uses {{method}} and chooses {{operation}}. [[HMM#Paths|Read the source]]',
+  blanks: [
+    { id: 'method', answers: ['dynamic programming', 'DP'] },
+    { id: 'operation', answers: ['max'] },
+  ],
+  marks: 2,
+  rubric: [
+    { point: 'method', marks: 1 },
+    { point: 'operation', marks: 1 },
+  ],
+  model: 'Dynamic programming; max.',
+};
+
+it('fills inline gaps within Markdown, requires every blank, and preserves exam marks', async () => {
+  const renderer = vi
+    .spyOn(MarkdownRenderer, 'render')
+    .mockImplementation(async (_app, text, el) => {
+      el.innerHTML = text
+        .replace('**algorithm**', '<strong>algorithm</strong>')
+        .replace(
+          '[[HMM#Paths|Read the source]]',
+          '<a class="internal-link" data-href="HMM#Paths">Read the source</a>',
+        );
+    });
+  let answer: AnswerState = {};
+  const render = () =>
+    root.render(
+      <AnswerInput
+        services={services}
+        question={cloze}
+        answer={answer}
+        locked={false}
+        path="Notes/HMM.md"
+        label="Question 1"
+        onChange={(patch) => {
+          answer = { ...answer, ...patch };
+          render();
+        }}
+      />,
+    );
+  try {
+    await act(async () => render());
+    await tick();
+    expect(host.textContent).toContain('2 marks');
+    expect(host.textContent).toContain('Fill in the blanks');
+    expect(host.querySelector('.qard-q-prompt strong')?.textContent).toBe('algorithm');
+    await click(host.querySelector('a.internal-link'));
+    expect(services.app.workspace.openLinkText).toHaveBeenCalledWith(
+      'HMM#Paths',
+      'Notes/HMM.md',
+      false,
+    );
+    expect(host.querySelector('textarea')).toBeNull();
+    expect(host.textContent).not.toContain('Dynamic programming; max.');
+    const fill = async (label: string, value: string) =>
+      act(async () => {
+        const input = host.querySelector<HTMLInputElement>(`input[aria-label="${label}"]`)!;
+        input.value = value;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+    await fill('Question 1: blank 1', 'DP');
+    expect(answer.blanks).toEqual({ method: 'DP' });
+    expect(answered(cloze, answer)).toBe(false);
+    await fill('Question 1: blank 2', 'sum');
+    expect(answer.blanks).toEqual({ method: 'DP', operation: 'sum' });
+    expect(answered(cloze, answer)).toBe(true);
+    await click(buttons("I don't know")[0]);
+    expect([...host.querySelectorAll('input')].every((input) => input.disabled)).toBe(true);
+    await click(buttons("I don't know")[0]);
+    await act(async () =>
+      root.render(
+        <AnswerInput
+          services={services}
+          question={cloze}
+          answer={answer}
+          locked
+          path="Notes/HMM.md"
+          label="Question 1"
+          onChange={() => {}}
+        />,
+      ),
+    );
+    expect([...host.querySelectorAll('input')].every((input) => input.disabled)).toBe(true);
+    await act(async () =>
+      root.render(
+        <MarkedAnswer
+          services={services}
+          question={cloze}
+          answer={answer}
+          mark={markCloze(cloze, answer)}
+          path="Notes/HMM.md"
+        />,
+      ),
+    );
+    await tick();
+    expect(host.textContent).toContain('DP — Correct');
+    expect(host.textContent).toContain('sum — Incorrect; expected: max');
+    expect(host.querySelector('.qard-rubric-row')).toBeNull();
+  } finally {
+    renderer.mockRestore();
+  }
+});
+
+it('takes a cloze practice test with saved gaps, unknown controls and section locking', async () => {
+  files['Qard/Tests/t/test.json'] = JSON.stringify({
+    ...TEST,
+    sections: [{ id: 's1', title: 'Recall', questions: [cloze] }],
+  });
+  files['Qard/Tests/t/attempt.json'] = JSON.stringify({
+    ...ATTEMPT,
+    finishedAt: undefined,
+    sections: { s1: { status: 'open' } },
+    answers: {},
+    marks: {},
+    review: {},
+  });
+  await act(async () =>
+    root.render(<TakeTest services={services} nav={nav} folder="Qard/Tests/t" />),
+  );
+  await tick();
+  await tick();
+  expect(host.textContent).toContain('Fill in the blanks');
+  expect(host.querySelector('textarea')).toBeNull();
+  const inputs = () => [...host.querySelectorAll<HTMLInputElement>('.qard-cloze-input')];
+  expect(inputs()).toHaveLength(2);
+  await act(async () => {
+    inputs()[0]!.value = 'DP';
+    inputs()[0]!.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  await click(buttons('Sure')[0]);
+  await click(host.querySelector('[aria-label="Flag question 1"]'));
+  expect(services.tests.get('Qard/Tests/t')?.attempt?.answers.gaps).toMatchObject({
+    blanks: { method: 'DP' },
+    confidence: 'sure',
+    flagged: true,
+  });
+  await click(buttons("I don't know")[0]);
+  expect(inputs().every((input) => input.disabled)).toBe(true);
+  await click(buttons("I don't know")[0]);
+  expect(inputs().every((input) => !input.disabled)).toBe(true);
+  // Practice tests retain their existing ability to finish with partial answers.
+  await click(buttons('Finish test')[0]);
+  await act(async () => {
+    await services.tests.flush();
+  });
+  await tick();
+  const attempt = JSON.parse(files['Qard/Tests/t/attempt.json']!);
+  expect(attempt.answers.gaps.blanks).toEqual({ method: 'DP' });
+  expect(attempt.marks.gaps).toMatchObject({ score: 1, awarded: [true, false] });
+  expect(inputs().every((input) => input.disabled)).toBe(true);
+});
+
+it('reviews cloze using saved slot grades, filled references and no text retry', async () => {
+  files['Qard/Tests/t/test.json'] = JSON.stringify({
+    ...TEST,
+    sections: [{ id: 's1', title: 'Recall', questions: [cloze] }],
+  });
+  files['Qard/Tests/t/attempt.json'] = JSON.stringify({
+    ...ATTEMPT,
+    answers: { gaps: { blanks: { method: 'accepted override', operation: 'max' } } },
+    marks: {
+      gaps: {
+        score: 1,
+        awarded: [true, false],
+        annotations: [],
+        mistake: 'incomplete',
+        feedback: 'Saved grading.',
+      },
+    },
+    review: {},
+  });
+  await act(async () =>
+    root.render(<ReviewAnswers services={services} nav={nav} folder="Qard/Tests/t" />),
+  );
+  await tick();
+  await tick();
+  expect(host.textContent).toContain('accepted override — Correct');
+  expect(host.textContent).toContain('max — Incorrect; expected: max');
+  expect(host.querySelector('.qard-rail-title')?.textContent).toContain('accepted override');
+  expect(host.textContent).not.toContain('{{method}}');
+  expect(buttons('Try again')).toHaveLength(0);
+  expect(buttons('Dispute')).toHaveLength(0);
+  expect(buttons('Ask')).toHaveLength(1);
+  expect(host.querySelector('.qard-rubric-row')).toBeNull();
+  await click(buttons('Model answer')[0]);
+  await click(buttons('Compare with mine')[0]);
+  expect(host.querySelector('.qard-compare .qard-plain')?.textContent).toContain(
+    'uses accepted override and chooses max',
+  );
+  expect(host.querySelector('textarea[aria-label="Second attempt"]')).toBeNull();
+});
+
+it('supports prototype-named blank IDs without inherited answers or completion crashes', async () => {
+  const question: Question = {
+    ...cloze,
+    prompt: 'A {{constructor}} creates an {{__proto__}}.',
+    blanks: [
+      { id: 'constructor', answers: ['constructor'] },
+      { id: '__proto__', answers: ['object'] },
+    ],
+  };
+  let answer: AnswerState = {};
+  const render = () =>
+    root.render(
+      <AnswerInput
+        services={services}
+        question={question}
+        answer={answer}
+        locked={false}
+        path="Notes/HMM.md"
+        label="Question 1"
+        onChange={(patch) => {
+          answer = { ...answer, ...patch };
+          render();
+        }}
+      />,
+    );
+  await act(async () => render());
+  await tick();
+  const inputs = () => [...host.querySelectorAll<HTMLInputElement>('.qard-cloze-input')];
+  expect(inputs().map((input) => input.value)).toEqual(['', '']);
+  await act(async () => {
+    inputs()[1]!.value = 'object';
+    inputs()[1]!.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  expect(answered(question, answer)).toBe(false);
+  expect(inputs()[0]!.value).toBe('');
+  await act(async () => {
+    inputs()[0]!.value = 'constructor';
+    inputs()[0]!.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  expect(answered(question, answer)).toBe(true);
+  expect(markCloze(question, answer)).toMatchObject({ score: 2, awarded: [true, true] });
 });

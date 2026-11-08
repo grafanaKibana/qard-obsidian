@@ -51,10 +51,27 @@ Qard/Tests/_profile.md   study profile, updated after each marked test
 
 Rules Qard checks when it opens the file:
 
-- `type` is `short`, `long`, `calc` or `mcq`.
+- `type` is `short`, `long`, `calc`, `mcq` or `cloze`.
 - Question ids are unique across the test.
 - Each question's rubric marks add up to its `marks`.
 - `mcq` questions need at least two `options` and an `answer` index that points to one of them.
+- `cloze` questions put each `{{id}}` slot exactly once in plain question text, with a matching `blanks` entry containing that `id` and nonempty accepted `answers`. Each blank has one rubric point worth one mark. The total marks equal the number of blanks. Answers are compared locally after Unicode normalization, case folding and whitespace normalization; meaningful punctuation is retained. Include valid synonyms as explicit accepted answers.
 - `prompt`, `model` and options are Markdown, with LaTeX in `$…$`. `source` is optional and links the question to a note.
 
 A file that breaks these rules shows as "Needs attention" under Tests.
+
+For example, a terminology question can use this format:
+
+```json
+{
+  "id": "q3",
+  "type": "cloze",
+  "prompt": "The observed outcome compared with a prediction is its {{target}}.",
+  "blanks": [{ "id": "target", "answers": ["target", "label"] }],
+  "marks": 1,
+  "rubric": [{ "point": "Identifies the observed target or label.", "marks": 1 }],
+  "model": "The observed outcome compared with a prediction is its target."
+}
+```
+
+Qard stores typed gaps in `answers[q3].blanks`, keyed by the slot ID. Each gap is graded independently; one wrong gap does not erase correct gaps. Blanks use their accepted answers rather than an AI re-mark or free-text second attempt.

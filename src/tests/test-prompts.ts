@@ -7,7 +7,7 @@ import type {
   TestPlan,
   TestRequest,
 } from './test-types';
-import { questions } from './test-types';
+import { answerText, questions } from './test-types';
 
 /** Shared by every task. Agents read the vault; Qard writes all files from their JSON. */
 export const PREAMBLE = `You are the study assistant inside Qard, an Obsidian study plugin. You write tests, lessons and checks, teach, and mark answers.
@@ -29,7 +29,8 @@ export const GOAL_RULES = `Each question has a goal, and the goal decides the fo
 - recognise (tell ideas apart): mcq
 - recall (state a fact, name, formula): short
 - explain (why or how): long
-- apply (use it on a new case, calculate, write code): calc, or long for code`;
+- apply (use it on a new case, calculate, write code): calc, or long for code
+Cloze is also available for focused term recall: put named slots such as {{term}} in the prompt and provide blanks: [{id: "term", answers: ["accepted answer", "valid alias"]}]. Use unique slots in plain question text, one rubric point and 1 mark per slot. Include valid equivalent answers as explicit aliases; avoid ambiguous gaps.`;
 const objectivesBlock = (objectives?: string) =>
   objectives?.trim()
     ? `
@@ -59,7 +60,7 @@ Draft a short test plan for the student to approve. Do not write the questions y
 - title: at most eight words.
 - goal: two to four sentences that restate the request precisely, including any emphasis.
 - sources: keep every note the student chose; add others you found, each with a few words of reason. Read enough to be sure they fit.
-- sections: two to four groups of related questions. Each has a one-sentence focus, the question mix (short answer, long answer, calculation, multiple choice) and its marks.
+- sections: two to four groups of related questions. Each has a one-sentence focus, the question mix (short answer, long answer, calculation, multiple choice, cloze) and its marks.
 - Aim for about ${d.questions} questions unless the request says otherwise. Estimate minutes realistically.
 Keep it brief: this is a plan, not the test.`;
 }
@@ -78,6 +79,7 @@ Question types:
 - long: an explanation or comparison. 4–6 marks.
 - calc: a worked calculation with fresh numbers. The student may write LaTeX.
 - mcq: four options with exactly one correct; set answer to its index. Usually 1 mark.
+- cloze: focused term recall using named {{slots}}, 1 mark per slot.
 ${GOAL_RULES}
 ${MCQ_RULES}
 Rules:
@@ -97,7 +99,7 @@ function studentAnswer(q: Question, a: AnswerState | undefined) {
   if (q.type === 'mcq' && a?.choice !== undefined) {
     return `Picked ${String.fromCharCode(65 + a.choice)}. ${q.options?.[a.choice] ?? ''} (${a.choice === q.answer ? 'correct' : 'wrong'})`;
   }
-  return a?.text?.trim() || '(blank)';
+  return answerText(q, a).trim() || '(blank)';
 }
 export function questionBlock(q: Question, a: AnswerState | undefined) {
   return `<question id="${q.id}" type="${q.type}" marks="${q.marks}">
