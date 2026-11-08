@@ -108,7 +108,7 @@ export function CheckView({
       <div className="qard-test-heading">
         <div>
           <span className="qard-muted">
-            Check · {record.course} · {GOAL[record.goal] ?? record.goal}
+            Retention check · {record.course} · {GOAL[record.goal] ?? record.goal}
           </span>
           <h1>
             <InlineMarkdown text={record.title} path={record.mastery} services={services} />
@@ -120,6 +120,12 @@ export function CheckView({
           </span>
         )}
       </div>
+      {!done && (
+        <p className="qard-muted">
+          Answer from memory to test what you retained after learning. Your result decides what to
+          revisit and when to check again. Successful delayed checks can establish mastery.
+        </p>
+      )}
       {done && objective && (
         <p className="qard-check-outcome">
           <StateChip state={objective.state} />
@@ -157,6 +163,7 @@ export function CheckView({
             answer={record.answers[q.id]}
             locked={busy || done}
             path={record.mastery}
+            showMarks={false}
             label={`Question ${i + 1}`}
             onChange={(patch) => services.learn.answerCheck(path, q.id, patch)}
           />

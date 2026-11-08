@@ -7857,3 +7857,12 @@ div.qard-ask-q {
 .qard-deck-options .qard-actions {
   justify-content: flex-end;
 }
+
+.qard-format-help {
+  font-size: var(--font-ui-small);
+  color: var(--qard-muted);
+}
+
+.qard-format-help summary {
+  cursor: pointer;
+}
