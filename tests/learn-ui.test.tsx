@@ -84,6 +84,7 @@ beforeEach(() => {
         objective: 'params',
         title: 'Parameter counts',
         goal: 'explain',
+        questionPolicy: 1,
         questions: [
           q('c1', {
             type: 'mcq',
@@ -585,4 +586,46 @@ it('selected check deletion returns to Learn', async () => {
   expect(files.has(CHECK)).toBe(false);
   expect(files.has(MASTERY)).toBe(true);
   expect(deleted).toHaveBeenCalledOnce();
+});
+
+it('hides cached questions while preparing a check and offers retry after a failed review', async () => {
+  await services.learn.loadCheck(CHECK);
+  const cached = services.learn.checkAt(CHECK)!;
+  cached.questionPolicy = undefined;
+  let reject!: (error: Error) => void;
+  const load = vi.spyOn(services.learn, 'loadCheck').mockImplementationOnce(
+    () =>
+      new Promise((_resolve, fail) => {
+        reject = fail;
+      }),
+  );
+  await act(async () => root.render(<CheckView services={services} nav={nav} path={CHECK} />));
+  await tick();
+  expect(host.textContent).toContain('Preparing check');
+  expect(host.textContent).not.toContain('Prompt c2');
+  expect(host.querySelector('textarea')).toBeNull();
+  await act(async () => {
+    reject(new Error('Review unavailable'));
+  });
+  expect(host.querySelector('[role="alert"]')?.textContent).toContain('Review unavailable');
+  expect(host.textContent).not.toContain('Prompt c2');
+  load.mockImplementationOnce(async () => {
+    cached.questions = [
+      q('reviewed', {
+        prompt: 'Reviewed replacement question',
+      }) as (typeof cached.questions)[number],
+    ];
+    cached.questionPolicy = 1;
+    return cached;
+  });
+  await click(buttons('Retry check')[0]);
+  await tick();
+  await tick();
+  expect(load).toHaveBeenCalledTimes(2);
+  await vi.waitFor(async () => {
+    await tick();
+    expect(host.textContent).toContain('Reviewed replacement question');
+  });
+  expect(host.textContent).not.toContain('Prompt c2');
+  load.mockRestore();
 });
