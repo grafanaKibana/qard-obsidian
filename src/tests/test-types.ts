@@ -1,6 +1,6 @@
 import type { SourceSnapshot } from '../cards/source-sync-types';
 /** Practice-test files. Qard is the only writer; agents return JSON that Qard validates and saves. */
-export type QuestionType = 'short' | 'long' | 'mcq' | 'calc';
+export type QuestionType = 'short' | 'long' | 'mcq' | 'calc' | 'cloze';
 export type Confidence = 'sure' | 'unsure' | 'guess';
 export type AnnotationKind = 'correct' | 'wrong' | 'vague' | 'missing' | 'insight';
 export type Mistake =
@@ -10,7 +10,7 @@ export type Mistake =
   | 'incomplete'
   | 'unknown'
   | 'none';
-/** What a question is for; the format follows from it. */
+/** What a question assesses, independently of its response format. */
 export type Goal = 'recognise' | 'recall' | 'explain' | 'apply';
 
 export interface TestPlan {
@@ -33,6 +33,7 @@ export interface Question {
   marks: number;
   options?: string[];
   answer?: number;
+  blanks?: { id: string; answers: string[] }[];
   rubric: RubricPoint[];
   model: string;
   source?: { path: string; heading?: string };
@@ -71,6 +72,7 @@ export interface QuestionMark {
 export interface AnswerState {
   text?: string;
   choice?: number;
+  blanks?: Record<string, string>;
   confidence?: Confidence;
   flagged?: boolean;
   unknown?: boolean;
@@ -165,4 +167,53 @@ export function markChoice(q: Question, answer: AnswerState | undefined): Questi
     mistake: right ? 'none' : 'misconception',
     feedback: right ? 'Correct.' : `The answer is “${q.options?.[q.answer ?? -1] ?? ''}”.`,
   };
+}
+
+/** Canonical caseless comparison without discarding meaningful punctuation. */
+export function normalizeClozeAnswer(text: string): string {
+  return text
+    .normalize('NFKC')
+    .trim()
+    .replace(/\s+/gu, ' ')
+    .toLowerCase()
+    .replace(/ß/g, 'ss')
+    .replace(/ς/g, 'σ');
+}
+
+/** Blank order is rubric order; every blank earns one mark. */
+export function markCloze(q: Question, answer: AnswerState | undefined): QuestionMark {
+  if (answer?.unknown) {
+    return markUnknown(q);
+  }
+  const awarded = (q.blanks ?? []).map((blank) => {
+    const raw = answer?.blanks?.[blank.id];
+    const value = normalizeClozeAnswer(typeof raw === 'string' ? raw : '');
+    return !!value && blank.answers.some((alias) => normalizeClozeAnswer(alias) === value);
+  });
+  const score = awarded.filter(Boolean).length;
+  const correct = awarded.length > 0 && awarded.every(Boolean);
+  return {
+    score,
+    awarded,
+    annotations: [],
+    mistake: correct ? 'none' : score ? 'incomplete' : 'misconception',
+    feedback: correct ? 'Correct.' : 'Compare each blank with the model answer.',
+  };
+}
+
+/** The answer as the student saw it, with unanswered blanks left visible. */
+export function answerText(q: Question, answer: AnswerState | undefined): string {
+  if (answer?.unknown) {
+    return "I don't know";
+  }
+  if (q.type === 'mcq') {
+    return q.options?.[answer?.choice ?? -1] ?? '';
+  }
+  if (q.type === 'cloze') {
+    return q.prompt.replace(/\{\{([^{}]+)\}\}/g, (slot, id: string) => {
+      const value = answer?.blanks?.[id];
+      return typeof value === 'string' ? value.trim() || slot : slot;
+    });
+  }
+  return answer?.text ?? '';
 }

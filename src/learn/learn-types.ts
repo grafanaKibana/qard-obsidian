@@ -4,7 +4,7 @@ import type { AnswerState, Goal, Question, QuestionMark } from '../tests/test-ty
 import type { MasteryState } from './mastery';
 import type { Figure } from './figures';
 
-/** One to three fresh questions on one objective, written ahead of time and kept afterwards as evidence. */
+/** One or two fresh questions on one objective, written ahead of time and kept afterwards as evidence. */
 export interface CheckRecord {
   version: 1;
   createdAt: number;
@@ -14,6 +14,8 @@ export interface CheckRecord {
   title: string;
   goal: Goal;
   questions: Question[];
+  /** Generation policy used for unanswered checks; answered records are kept unchanged. */
+  questionPolicy?: number;
   answers: Record<string, AnswerState>;
   marks: Record<string, QuestionMark>;
   status: 'ready' | 'marking' | 'marked' | 'error';
@@ -72,6 +74,8 @@ export interface Lesson {
   probe?: {
     questions: Question[];
     answers: Record<string, AnswerState>;
+    /** What this diagnostic checks and why it is useful. */
+    note?: string;
     submitted?: boolean;
     marks?: Record<string, QuestionMark>;
     findings?: string;

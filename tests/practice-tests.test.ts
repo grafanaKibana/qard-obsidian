@@ -1,4 +1,6 @@
 import { describe, it, expect, beforeAll, vi } from 'vitest';
+import { answerText, markCloze, type Question } from '../src/tests/test-types';
+import { readQuestions, readProbe, readStep } from '../src/learn/learn-schema';
 import { placeAnnotations } from '../src/tests/annotate';
 import {
   readMarks,
@@ -71,6 +73,103 @@ const mark = (score: number, awarded: boolean[]) => ({
   annotations: [{ quote: 'sums', kind: 'wrong', note: 'Viterbi maximises.' }],
   mistake: 'misconception',
   feedback: 'Close.',
+});
+
+const CLOZE: Question = {
+  id: 'c1',
+  type: 'cloze',
+  prompt: 'The {{algorithm}} finds the {{path}}.',
+  marks: 2,
+  rubric: [
+    { point: 'Algorithm', marks: 1 },
+    { point: 'Path', marks: 1 },
+  ],
+  model: 'The Viterbi algorithm finds the best path.',
+  blanks: [
+    { id: 'algorithm', answers: ['Viterbi algorithm', 'Viterbi'] },
+    { id: 'path', answers: ['best path', 'most likely path'] },
+  ],
+};
+
+describe('cloze answers', () => {
+  it('awards individual blanks deterministically using exact normalized aliases', () => {
+    expect(
+      markCloze(CLOZE, {
+        blanks: { algorithm: '  ＶＩＴＥＲＢＩ  algorithm ', path: 'BEST  PATH' },
+      }),
+    ).toMatchObject({ score: 2, awarded: [true, true], mistake: 'none' });
+    expect(
+      markCloze(CLOZE, { blanks: { algorithm: 'viterbi', path: 'best path.' } }),
+    ).toMatchObject({ score: 1, awarded: [true, false], mistake: 'incomplete' });
+    expect(
+      markCloze({ ...CLOZE, blanks: [{ id: 'constructor', answers: ['value'] }] }, {}),
+    ).toMatchObject({ score: 0, awarded: [false] });
+    expect(markCloze(CLOZE, undefined)).toMatchObject({ score: 0, awarded: [false, false] });
+    expect(
+      markCloze(CLOZE, { unknown: true, blanks: { algorithm: 'Viterbi', path: 'best path' } }),
+    ).toMatchObject({ score: 0, awarded: [false, false], mistake: 'unknown' });
+    const unicode = {
+      ...CLOZE,
+      blanks: [{ id: 'algorithm', answers: ['Straße'] }, CLOZE.blanks![1]!],
+    };
+    expect(markCloze(unicode, { blanks: { algorithm: 'STRASSE' } }).awarded).toEqual([true, false]);
+  });
+
+  it('serializes filled context without inventing missing answers', () => {
+    expect(answerText(CLOZE, { blanks: { algorithm: 'Viterbi' } })).toBe(
+      'The Viterbi finds the {{path}}.',
+    );
+    expect(answerText(CLOZE, { unknown: true })).toBe("I don't know");
+    expect(answerText({ ...CLOZE, type: 'mcq', options: ['a', 'b'] }, { choice: 1 })).toBe('b');
+    expect(answerText({ ...CLOZE, type: 'short' }, { text: 'My answer' })).toBe('My answer');
+  });
+
+  it('validates cloze consistently across tests, questions, probes, and lesson checks', () => {
+    const readers = [
+      (question: Question) =>
+        readTest({
+          title: 'Cloze',
+          sections: [{ id: 's1', title: 'Cloze', questions: [question] }],
+        }),
+      (question: Question) => readQuestions({ questions: [question] }),
+      (question: Question) => readProbe({ questions: [question], note: '' }),
+      (question: Question) =>
+        readStep({
+          title: 'Step',
+          explain: '',
+          connect: '',
+          checkFirst: true,
+          check: question,
+          misconceptions: [],
+        }),
+    ];
+    const invalid: Partial<Question>[] = [
+      { blanks: undefined },
+      {
+        blanks: [
+          { id: 'algorithm', answers: ['Viterbi'] },
+          { id: 'algorithm', answers: ['path'] },
+        ],
+      },
+      { blanks: [{ id: 'algorithm', answers: [] }, CLOZE.blanks![1]!] },
+      { blanks: [{ id: 'algorithm', answers: ['  '] }, CLOZE.blanks![1]!] },
+      { prompt: 'The {{algorithm}} finds {{missing}}.' },
+      { prompt: 'The {{algorithm}} finds {{algorithm}}.' },
+      { prompt: 'The {{algorithm}} finds {{path}} and {{broken.' },
+      { marks: 3 },
+      { rubric: [{ point: 'Both', marks: 2 }] },
+      {
+        rubric: [
+          { point: 'A', marks: 0 },
+          { point: 'B', marks: 2 },
+        ],
+      },
+    ];
+    for (const read of readers) {
+      expect(() => read(CLOZE)).not.toThrow();
+      for (const patch of invalid) expect(() => read({ ...CLOZE, ...patch })).toThrow();
+    }
+  });
 });
 
 describe('agent replies are validated before Qard saves anything', () => {
@@ -365,6 +464,37 @@ describe('practice test lifecycle', () => {
       ),
     };
   }
+
+  it('persists cloze answers and marks locally without a marker call', async () => {
+    const test = { title: 'Cloze', sections: [{ id: 's1', title: 'Fill in', questions: [CLOZE] }] };
+    const { storage, tests, runner } = service([
+      () => test,
+      () => ({ answer: 'Only exact accepted aliases earn marks.' }),
+    ]);
+    const folder = await tests.generate({ request });
+    await until(() => !!tests.get(folder)?.test);
+    tests.answer(folder, 'c1', { blanks: { algorithm: 'Viterbi', path: 'wrong' } });
+    await tests.submit(folder, 's1');
+    expect(tests.get(folder)?.attempt?.sections.s1?.status).toBe('marked');
+    expect(tests.get(folder)?.attempt?.marks.c1).toMatchObject({
+      score: 1,
+      awarded: [true, false],
+    });
+    expect(runner.prompts).toHaveLength(1);
+    await tests.retry(folder, 'c1', 'best path');
+    expect(runner.prompts).toHaveLength(1);
+    const originalMark = tests.get(folder)?.attempt?.marks.c1;
+    await tests.dispute(folder, 'c1', 'Why is wrong rejected?');
+    expect(tests.get(folder)?.attempt?.marks.c1).toEqual(originalMark);
+    expect(tests.get(folder)?.attempt?.review.c1?.retry).toBeUndefined();
+    expect(tests.get(folder)?.attempt?.review.c1?.followups).toHaveLength(1);
+    const reloaded = service([], {}, storage.files);
+    const saved = await reloaded.tests.load(folder);
+    expect(saved.attempt?.answers.c1?.blanks).toEqual({ algorithm: 'Viterbi', path: 'wrong' });
+    expect(saved.attempt?.marks.c1).toEqual(originalMark);
+    expect(saved.test?.sections[0]?.questions[0]?.blanks).toEqual(CLOZE.blanks);
+    expect(reloaded.runner.prompts).toHaveLength(0);
+  });
 
   it('persists folder attachments and the full note snapshot through planning and generation', async () => {
     const notes = Array.from({ length: 10 }, (_, i) => `Courses/AI/Lecture ${i + 1}.md`);

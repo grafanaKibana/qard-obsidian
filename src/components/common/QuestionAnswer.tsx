@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { QardServices } from '../../views/services';
 import type { AnswerState, Confidence, Question, QuestionMark } from '../../tests/test-types';
 import { AnswerFeedback, MarkScheme } from './AnswerFeedback';
@@ -20,6 +21,7 @@ export function AnswerInput({
   locked,
   path,
   label,
+  showMarks = true,
 }: {
   services: QardServices;
   question: Question;
@@ -28,19 +30,57 @@ export function AnswerInput({
   locked: boolean;
   path: string;
   label: string;
+  showMarks?: boolean;
 }) {
   const unknown = !!answer?.unknown;
   return (
     <article className="qard-q">
       <div className="qard-q-meta">
         <span>{label}</span>
-        <span>
-          {q.marks} {q.marks === 1 ? 'mark' : 'marks'}
-        </span>
+        {showMarks && (
+          <span>
+            {q.marks} {q.marks === 1 ? 'mark' : 'marks'}
+          </span>
+        )}
       </div>
-      <div className="qard-q-prompt">
-        <Markdown text={q.prompt} path={path} services={services} />
-      </div>
+      <p className="qard-label">
+        {q.type === 'mcq'
+          ? 'Choose an answer'
+          : q.type === 'cloze'
+            ? 'Fill in the blanks'
+            : 'Write an answer'}
+      </p>
+      {q.goal && (
+        <details className="qard-format-help">
+          <summary>Why this format?</summary>
+          <p className="qard-muted">
+            {q.type === 'mcq'
+              ? 'Choosing between alternatives tests whether you can recognise the distinction.'
+              : q.type === 'cloze'
+                ? 'Filling the gaps tests recall of the missing terms in context.'
+                : q.goal === 'apply'
+                  ? 'Writing your solution shows how you apply the idea.'
+                  : q.goal === 'explain'
+                    ? 'Writing an explanation shows how you connect the ideas.'
+                    : 'Writing from memory tests what you can recall without answer choices.'}
+          </p>
+        </details>
+      )}
+      {q.type === 'cloze' ? (
+        <ClozePrompt
+          services={services}
+          question={q}
+          answer={answer}
+          path={path}
+          label={label}
+          locked={locked || unknown}
+          onChange={onChange}
+        />
+      ) : (
+        <div className="qard-q-prompt">
+          <Markdown text={q.prompt} path={path} services={services} />
+        </div>
+      )}
       {q.type === 'mcq' ? (
         <div className="qard-options" role="radiogroup" aria-label={`${label} options`}>
           {q.options?.map((o, i) => (
@@ -57,7 +97,7 @@ export function AnswerInput({
             </button>
           ))}
         </div>
-      ) : (
+      ) : q.type !== 'cloze' ? (
         <textarea
           className="qard-answer-input"
           aria-label={`Answer to ${label.toLowerCase()}`}
@@ -67,7 +107,7 @@ export function AnswerInput({
           disabled={unknown}
           onChange={(e) => onChange({ text: e.target.value })}
         />
-      )}
+      ) : null}
       <div className="qard-q-tools">
         <button
           className={'qard-conf qard-dont-know' + (unknown ? ' is-on' : '')}
@@ -101,7 +141,13 @@ export function AnswerInput({
 }
 
 export const answered = (q: Question, a?: AnswerState) =>
-  !!a && (a.unknown || (q.type === 'mcq' ? a.choice !== undefined : !!a.text?.trim()));
+  !!a &&
+  (a.unknown ||
+    (q.type === 'mcq'
+      ? a.choice !== undefined
+      : q.type === 'cloze'
+        ? !!q.blanks?.length && q.blanks.every((blank) => !!a.blanks?.[blank.id]?.trim())
+        : !!a.text?.trim()));
 
 /** A marked answer: underlines linked to the marker's notes, the mark scheme, and the model answer on request. */
 export function MarkedAnswer({
@@ -146,10 +192,22 @@ export function MarkedAnswer({
             ))
           )}
         </section>
+      ) : q.type === 'cloze' ? (
+        <ClozePrompt
+          services={services}
+          question={q}
+          answer={answer}
+          path={path}
+          label="Your answer"
+          locked
+          mark={mark}
+        />
       ) : (
         <AnswerFeedback services={services} answer={answer} mark={mark} path={path} />
       )}
-      {q.type !== 'mcq' && <MarkScheme services={services} question={q} mark={mark} path={path} />}
+      {q.type !== 'mcq' && q.type !== 'cloze' && (
+        <MarkScheme services={services} question={q} mark={mark} path={path} />
+      )}
       <button className="qard-text-button" aria-expanded={model} onClick={() => setModel(!model)}>
         {model ? 'Hide model answer' : 'Model answer'}
       </button>
@@ -158,6 +216,116 @@ export function MarkedAnswer({
           <Markdown text={q.model} path={path} services={services} />
         </div>
       )}
+    </div>
+  );
+}
+
+/** Keep Obsidian's full Markdown render, placing controls only at the named gaps. */
+export function ClozePrompt({
+  services,
+  question: q,
+  answer,
+  path,
+  label,
+  locked,
+  onChange,
+  mark,
+}: {
+  services: QardServices;
+  question: Question;
+  answer?: AnswerState;
+  path: string;
+  label: string;
+  locked: boolean;
+  onChange?: (patch: Partial<AnswerState>) => void;
+  mark?: QuestionMark;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [slots, setSlots] = useState<{ id: string; target: HTMLElement }[]>([]);
+  useEffect(() => {
+    const host = ref.current;
+    if (!host) {
+      return;
+    }
+    let targets: { id: string; target: HTMLElement }[] = [];
+    const place = () => {
+      const walker = document.createTreeWalker(host, NodeFilter.SHOW_TEXT);
+      const nodes: Text[] = [];
+      while (walker.nextNode()) {
+        const node = walker.currentNode as Text;
+        if (
+          !node.parentElement?.closest('.qard-cloze-slot') &&
+          /\{\{([^{}]+)\}\}/.test(node.data)
+        ) {
+          nodes.push(node);
+        }
+      }
+      for (const node of nodes) {
+        const fragment = createFragment();
+        let end = 0;
+        for (const match of node.data.matchAll(/\{\{([^{}]+)\}\}/g)) {
+          const id = match[1]!;
+          if (!q.blanks?.some((blank) => blank.id === id)) {
+            continue;
+          }
+          fragment.append(node.data.slice(end, match.index));
+          const target = host.createSpan({ cls: 'qard-cloze-slot' });
+          fragment.append(target);
+          targets.push({ id, target });
+          end = match.index + match[0].length;
+        }
+        if (end) {
+          fragment.append(node.data.slice(end));
+          node.replaceWith(fragment);
+        }
+      }
+      targets = targets.filter(({ target }) => host.contains(target));
+      setSlots((previous) =>
+        previous.length === targets.length &&
+        previous.every((slot, i) => slot.target === targets[i]?.target)
+          ? previous
+          : [...targets],
+      );
+    };
+    const observer = new MutationObserver(place);
+    observer.observe(host, { childList: true, subtree: true });
+    place();
+    return () => observer.disconnect();
+  }, [q.prompt, q.blanks]);
+  return (
+    <div className="qard-q-prompt" ref={ref}>
+      <Markdown text={q.prompt} path={path} services={services} />
+      {slots.map(({ id, target }, i) => {
+        const index = q.blanks!.findIndex((blank) => blank.id === id);
+        const blank = q.blanks![index]!;
+        const correct = !!mark?.awarded[index];
+        return createPortal(
+          mark ? (
+            <span className={correct ? 'is-full' : 'is-zero'}>
+              <strong>
+                {answer?.unknown ? "I didn't know" : answer?.blanks?.[id] || 'No answer'}
+              </strong>
+              <span>
+                {' '}
+                — {correct ? 'Correct' : `Incorrect; expected: ${blank.answers.join(' / ')}`}
+              </span>
+            </span>
+          ) : (
+            <input
+              className="qard-cloze-input"
+              aria-label={`${label}: blank ${index + 1}`}
+              value={answer?.blanks?.[id] ?? ''}
+              disabled={locked}
+              autoComplete="off"
+              onChange={(event) =>
+                onChange?.({ blanks: { ...answer?.blanks, [id]: event.target.value } })
+              }
+            />
+          ),
+          target,
+          `${id}-${i}`,
+        );
+      })}
     </div>
   );
 }

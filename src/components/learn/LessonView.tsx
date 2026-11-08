@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import type { QardServices } from '../../views/services';
 import type { Lesson } from '../../learn/learn-types';
+import { answerText } from '../../tests/test-types';
 import type { Objective } from '../../learn/mastery';
 import { isoDay } from '../../learn/mastery';
 import { InlineMarkdown, Markdown } from '../Markdown';
@@ -246,7 +247,7 @@ function LessonProbe({
     <div className="qard-test">
       <div className="qard-test-heading">
         <div>
-          <span className="qard-muted">Lesson · {lesson.course ?? 'Before we start'}</span>
+          <span className="qard-muted">Diagnostic · {lesson.course ?? 'Before we start'}</span>
           <h1>
             <InlineMarkdown
               text={lesson.topic}
@@ -257,9 +258,13 @@ function LessonProbe({
         </div>
       </div>
       <p className="qard-muted">
-        A few quick questions first, so the lesson starts from what you already know. Say "I don't
-        know" rather than guessing.
+        These diagnostic questions choose where the lesson starts and update evidence about
+        prerequisites. They do not establish mastery of this lesson's objective. Choose "I don't
+        know" when you cannot answer.
       </p>
+      {probe.note && (
+        <Markdown text={probe.note} path={lesson.notes[0] ?? path} services={services} />
+      )}
       {probe.questions.map((q, i) => (
         <AnswerInput
           key={q.id}
@@ -268,6 +273,7 @@ function LessonProbe({
           answer={probe.answers[q.id]}
           locked={false}
           path={lesson.notes[0] ?? path}
+          showMarks={false}
           label={`Question ${i + 1}`}
           onChange={(patch) => services.learn.answerProbe(path, q.id, patch)}
         />
@@ -326,13 +332,25 @@ function LessonMapView({
               <div key={q.id} className="qard-doc-row">
                 <span className={ok ? 'is-full' : 'is-zero'}>{ok ? '✓' : '✕'}</span>
                 <div className="qard-probe-prompt">
-                  <Markdown text={q.prompt.split(/\n\s*\n/)[0]!} path={where} services={services} />
+                  <Markdown
+                    text={
+                      (q.type === 'cloze' ? answerText(q, probe.answers[q.id]) : q.prompt).split(
+                        /\n\s*\n/,
+                      )[0]!
+                    }
+                    path={where}
+                    services={services}
+                  />
                 </div>
               </div>
             );
           })}
         </section>
       )}
+      <p className="qard-muted">
+        This lesson teaches the objective. Predictions before explanations and checks after them
+        guide feedback. Finishing marks it as taught; later retention checks establish mastery.
+      </p>
       <section>
         <h2>Plan</h2>
         <div className="qard-doc-body">
@@ -497,6 +515,22 @@ function LessonSteps({
               <div className="qard-lesson-connect">
                 <Markdown text={step.connect} path={where} services={services} />
               </div>
+              {step.check.source && (
+                <button
+                  className="qard-link"
+                  onClick={() => {
+                    const source = step.check.source!;
+                    void services.app.workspace.openLinkText(
+                      source.path + (source.heading ? `#${source.heading}` : ''),
+                      where,
+                      false,
+                    );
+                  }}
+                >
+                  Read source: {step.check.source.path.split('/').pop()!.replace(/\.md$/, '')}
+                  {step.check.source.heading ? ` › ${step.check.source.heading}` : ''}
+                </button>
+              )}
               <div className="qard-lesson-draw">
                 <DrawButton
                   figure={st?.figure}
@@ -508,16 +542,19 @@ function LessonSteps({
           )}
           {!st?.mark ? (
             <>
-              {step.checkFirst && (
-                <p className="qard-label">Try this first. Work it out from what you know.</p>
-              )}
+              <p className="qard-muted">
+                {step.checkFirst
+                  ? 'Prediction before the explanation: work it out from what you know. Your answer guides feedback, then reveals the explanation. Finishing the lesson marks it as taught; delayed checks establish mastery.'
+                  : 'Check after the explanation: recall what you just learned. Your answer guides feedback. Finishing the lesson marks it as taught; a later retention check tests what stays with you.'}
+              </p>
               <AnswerInput
                 services={services}
                 question={step.check}
                 answer={st?.answer}
                 locked={running(tutor)}
                 path={where}
-                label={step.checkFirst ? 'Before the explanation' : 'Check'}
+                showMarks={false}
+                label={step.checkFirst ? 'Prediction' : 'Check after explanation'}
                 onChange={(patch) => services.learn.answerStep(path, patch)}
               />
               <JobError job={tutor} retry={() => void services.learn.checkStep(path)} />
@@ -565,7 +602,8 @@ function LessonSteps({
                   <Markdown text={st.reteach} path={where} services={services} />
                 </div>
               )}
-              {st.mark.score < step.check.marks &&
+              {step.check.type !== 'cloze' &&
+                st.mark.score < step.check.marks &&
                 !st.answer?.unknown &&
                 (st.retry ? (
                   <div className="qard-panel">
@@ -787,12 +825,16 @@ function LessonClose({
             services={services}
           />
         </h1>
+        <p className="qard-muted">
+          Lesson finished: taught, with retention still to check. Later checks establish mastery and
+          schedule what comes next.
+        </p>
         {objective && (
           <p className="qard-check-outcome">
             <StateChip state={objective.state} />
             <span className="qard-muted">
               {objective.due
-                ? `First check ${relativeDay(objective.due, isoDay(Date.now()))}. Getting it right straight after a lesson doesn't count yet.`
+                ? `First retention check ${relativeDay(objective.due, isoDay(Date.now()))}.`
                 : ''}
             </span>
           </p>
