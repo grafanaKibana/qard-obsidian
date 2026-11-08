@@ -785,7 +785,7 @@ export class TestService {
   }
   dispute(folder: string, id: string, argument: string) {
     if (questions(this.attemptOf(folder).test).find((q) => q.id === id)?.type === 'cloze') {
-      return this.ask(folder, id, argument);
+      return Promise.resolve();
     }
     return this.track(folder, 'dispute', id, async (signal) => {
       const { test, attempt } = this.attemptOf(folder),

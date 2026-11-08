@@ -299,7 +299,7 @@ function QuestionReview({
           <button className={panel === 'ask' ? 'is-on' : ''} onClick={() => toggle('ask')}>
             Ask
           </button>
-          {q.type !== 'mcq' && (
+          {q.type !== 'mcq' && q.type !== 'cloze' && (
             <button
               className={panel === 'dispute' ? 'is-on' : ''}
               onClick={() => toggle('dispute')}

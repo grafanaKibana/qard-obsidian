@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { QardServices } from '../../views/services';
 import type { AnswerState, Confidence, Question, QuestionMark } from '../../tests/test-types';
+import { blankAnswer } from '../../tests/test-types';
 import { AnswerFeedback, MarkScheme } from './AnswerFeedback';
 import { InlineMarkdown, Markdown } from '../Markdown';
 import { scoreTone } from './FeedbackStatus';
@@ -146,7 +147,7 @@ export const answered = (q: Question, a?: AnswerState) =>
     (q.type === 'mcq'
       ? a.choice !== undefined
       : q.type === 'cloze'
-        ? !!q.blanks?.length && q.blanks.every((blank) => !!a.blanks?.[blank.id]?.trim())
+        ? !!q.blanks?.length && q.blanks.every((blank) => !!blankAnswer(a, blank.id).trim())
         : !!a.text?.trim()));
 
 /** A marked answer: underlines linked to the marker's notes, the mark scheme, and the model answer on request. */
@@ -303,7 +304,7 @@ export function ClozePrompt({
           mark ? (
             <span className={correct ? 'is-full' : 'is-zero'}>
               <strong>
-                {answer?.unknown ? "I didn't know" : answer?.blanks?.[id] || 'No answer'}
+                {answer?.unknown ? "I didn't know" : blankAnswer(answer, id) || 'No answer'}
               </strong>
               <span>
                 {' '}
@@ -314,7 +315,7 @@ export function ClozePrompt({
             <input
               className="qard-cloze-input"
               aria-label={`${label}: blank ${index + 1}`}
-              value={answer?.blanks?.[id] ?? ''}
+              value={blankAnswer(answer, id)}
               disabled={locked}
               autoComplete="off"
               onChange={(event) =>

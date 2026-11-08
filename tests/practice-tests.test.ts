@@ -487,6 +487,9 @@ describe('practice test lifecycle', () => {
     await tests.dispute(folder, 'c1', 'Why is wrong rejected?');
     expect(tests.get(folder)?.attempt?.marks.c1).toEqual(originalMark);
     expect(tests.get(folder)?.attempt?.review.c1?.retry).toBeUndefined();
+    expect(tests.get(folder)?.attempt?.review.c1?.followups).toBeUndefined();
+    expect(runner.prompts).toHaveLength(1);
+    await tests.ask(folder, 'c1', 'Why is wrong rejected?');
     expect(tests.get(folder)?.attempt?.review.c1?.followups).toHaveLength(1);
     const reloaded = service([], {}, storage.files);
     const saved = await reloaded.tests.load(folder);

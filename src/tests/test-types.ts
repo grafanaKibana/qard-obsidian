@@ -181,13 +181,22 @@ export function normalizeClozeAnswer(text: string): string {
 }
 
 /** Blank order is rubric order; every blank earns one mark. */
+export function blankAnswer(answer: AnswerState | undefined, id: string): string {
+  const blanks = answer?.blanks;
+  if (!blanks || typeof blanks !== 'object' || !Object.prototype.hasOwnProperty.call(blanks, id)) {
+    return '';
+  }
+  const value = blanks[id];
+  return typeof value === 'string' ? value : '';
+}
+
+/** Blank order is rubric order; every blank earns one mark. */
 export function markCloze(q: Question, answer: AnswerState | undefined): QuestionMark {
   if (answer?.unknown) {
     return markUnknown(q);
   }
   const awarded = (q.blanks ?? []).map((blank) => {
-    const raw = answer?.blanks?.[blank.id];
-    const value = normalizeClozeAnswer(typeof raw === 'string' ? raw : '');
+    const value = normalizeClozeAnswer(blankAnswer(answer, blank.id));
     return !!value && blank.answers.some((alias) => normalizeClozeAnswer(alias) === value);
   });
   const score = awarded.filter(Boolean).length;
@@ -211,8 +220,7 @@ export function answerText(q: Question, answer: AnswerState | undefined): string
   }
   if (q.type === 'cloze') {
     return q.prompt.replace(/\{\{([^{}]+)\}\}/g, (slot, id: string) => {
-      const value = answer?.blanks?.[id];
-      return typeof value === 'string' ? value.trim() || slot : slot;
+      return blankAnswer(answer, id).trim() || slot;
     });
   }
   return answer?.text ?? '';

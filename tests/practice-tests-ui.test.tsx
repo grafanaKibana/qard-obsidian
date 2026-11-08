@@ -418,6 +418,8 @@ it('reviews cloze using saved slot grades, filled references and no text retry',
   expect(host.querySelector('.qard-rail-title')?.textContent).toContain('accepted override');
   expect(host.textContent).not.toContain('{{method}}');
   expect(buttons('Try again')).toHaveLength(0);
+  expect(buttons('Dispute')).toHaveLength(0);
+  expect(buttons('Ask')).toHaveLength(1);
   expect(host.querySelector('.qard-rubric-row')).toBeNull();
   await click(buttons('Model answer')[0]);
   await click(buttons('Compare with mine')[0]);
@@ -425,4 +427,47 @@ it('reviews cloze using saved slot grades, filled references and no text retry',
     'uses accepted override and chooses max',
   );
   expect(host.querySelector('textarea[aria-label="Second attempt"]')).toBeNull();
+});
+
+it('supports prototype-named blank IDs without inherited answers or completion crashes', async () => {
+  const question: Question = {
+    ...cloze,
+    prompt: 'A {{constructor}} creates an {{__proto__}}.',
+    blanks: [
+      { id: 'constructor', answers: ['constructor'] },
+      { id: '__proto__', answers: ['object'] },
+    ],
+  };
+  let answer: AnswerState = {};
+  const render = () =>
+    root.render(
+      <AnswerInput
+        services={services}
+        question={question}
+        answer={answer}
+        locked={false}
+        path="Notes/HMM.md"
+        label="Question 1"
+        onChange={(patch) => {
+          answer = { ...answer, ...patch };
+          render();
+        }}
+      />,
+    );
+  await act(async () => render());
+  await tick();
+  const inputs = () => [...host.querySelectorAll<HTMLInputElement>('.qard-cloze-input')];
+  expect(inputs().map((input) => input.value)).toEqual(['', '']);
+  await act(async () => {
+    inputs()[1]!.value = 'object';
+    inputs()[1]!.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  expect(answered(question, answer)).toBe(false);
+  expect(inputs()[0]!.value).toBe('');
+  await act(async () => {
+    inputs()[0]!.value = 'constructor';
+    inputs()[0]!.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  expect(answered(question, answer)).toBe(true);
+  expect(markCloze(question, answer)).toMatchObject({ score: 2, awarded: [true, true] });
 });
