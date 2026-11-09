@@ -360,10 +360,12 @@ const cloze = (id: string): Question =>
   q(id, {
     type: 'cloze',
     prompt: 'A {{prior}} is used for {{purpose}}.',
-    blanks: [
-      { id: 'prior', answers: ['Dirichlet'] },
-      { id: 'purpose', answers: ['smoothing'] },
+    blanks: [{ id: 'prior' }, { id: 'purpose' }],
+    rubric: [
+      { point: 'Names the Dirichlet prior.', marks: 1 },
+      { point: 'Explains smoothing.', marks: 1 },
     ],
+    model: 'A Dirichlet prior is used for smoothing.',
   });
 const markOf = (id: string, awarded: boolean[]) => ({
   id,
@@ -1145,26 +1147,64 @@ describe('learning service', () => {
     t.settings.aiEnabled = true;
   });
 
-  it('marks cloze delayed checks, probes, and steps locally and never runs a typed retry', async () => {
+  it('marks cloze checks, probes and steps through the tutor, recovering failures without local grading', async () => {
     const t = await mapped();
-    t.reply(questionsSchema, () => ({ questions: [cloze('c1')] }));
+    t.reply(questionsSchema, () => ({ questions: [cloze('c1'), cloze('unknown-check')] }));
     const check = (await t.learn.ensureCheck(t.path, 'params'))!;
     expect(t.learn.checkAt(check)?.questions[0]?.goal).toBe('recall');
-    t.learn.answerCheck(check, 'c1', { blanks: { prior: 'dirichlet', purpose: 'wrong' } });
+    t.learn.answerCheck(check, 'c1', { blanks: { prior: 'Dirichlet distribution' } });
+    t.learn.answerCheck(check, 'unknown-check', { unknown: true });
+    let checkFails = true;
+    t.reply(marksSchema, ({ prompt }) => {
+      if (checkFails) throw new Error('Tutor unavailable');
+      expect(prompt).toContain('Dirichlet distribution');
+      expect(prompt).not.toContain('<question id="unknown-check"');
+      const slots = JSON.parse(
+        /<cloze_submissions>([\s\S]*?)<\/cloze_submissions>/.exec(prompt)![1]!,
+      );
+      expect(slots).toEqual([
+        { id: 'prior', rubricPoint: 1, text: 'Dirichlet distribution' },
+        { id: 'purpose', rubricPoint: 2, text: '' },
+      ]);
+      return { questions: [markOf('c1', [true, false])] };
+    });
     await t.learn.submitCheck(check);
-    expect(t.learn.checkAt(check)?.marks.c1).toMatchObject({ score: 1, awarded: [true, false] });
-    expect(t.calls.some((call) => call.task.schema === marksSchema)).toBe(false);
-    t.reply(probeSchema, () => ({ questions: [cloze('p1')], note: 'Locate the gap.' }));
-    t.reply(probeMapSchema, () => ({
-      marks: [],
-      findings: 'One blank recalled.',
-      map: {
-        title: 'Priors',
-        plan: 'Review smoothing.',
-        mermaid: 'graph TD; A-->B',
-        steps: [{ title: 'Priors', why: 'Needed.' }],
+    expect(t.learn.checkAt(check)).toMatchObject({ status: 'error', error: 'Tutor unavailable' });
+    expect(t.learn.checkAt(check)?.finishedAt).toBeUndefined();
+    expect(t.learn.checkAt(check)?.marks.c1).toBeUndefined();
+    expect(JSON.parse(t.files.get(check)!).answers.c1.blanks).toEqual({
+      prior: 'Dirichlet distribution',
+    });
+    checkFails = false;
+    await t.learn.submitCheck(check);
+    expect(t.learn.checkAt(check)).toMatchObject({
+      status: 'marked',
+      marks: {
+        c1: { score: 1, awarded: [true, false] },
+        'unknown-check': { score: 0, mistake: 'unknown' },
       },
+    });
+    expect(t.learn.checkAt(check)?.finishedAt).toBeDefined();
+    expect(t.calls.filter((call) => call.task.schema === marksSchema)).toHaveLength(2);
+
+    t.reply(probeSchema, () => ({
+      questions: [cloze('p1'), cloze('unknown-probe'), mcq('choice-probe')],
+      note: 'Locate the gap.',
     }));
+    t.reply(probeMapSchema, ({ prompt }) => {
+      expect(prompt).toContain('Return marks only for: p1.');
+      expect(prompt).toContain('Dirichlet distribution');
+      return {
+        marks: [markOf('p1', [true, false])],
+        findings: 'One blank recalled.',
+        map: {
+          title: 'Priors',
+          plan: 'Review smoothing.',
+          mermaid: 'graph TD; A-->B',
+          steps: [{ title: 'Priors', why: 'Needed.' }],
+        },
+      };
+    });
     t.reply(stepSchema, () => ({
       title: 'Priors',
       explain: 'Dirichlet smooths.',
@@ -1176,14 +1216,38 @@ describe('learning service', () => {
     const path = await t.learn.startLesson({ topic: 'Priors', notes: [] });
     await vi.waitFor(() => expect(t.learn.lessonAt(path)?.probe).toBeDefined());
     expect(t.learn.lessonAt(path)?.probe?.questions[0]?.goal).toBe('recall');
-    t.learn.answerProbe(path, 'p1', { blanks: { prior: 'Dirichlet', purpose: 'wrong' } });
+    t.learn.answerProbe(path, 'p1', {
+      blanks: { prior: 'Dirichlet distribution', purpose: 'wrong' },
+    });
+    t.learn.answerProbe(path, 'unknown-probe', { unknown: true });
+    t.learn.answerProbe(path, 'choice-probe', { choice: 1 });
     await t.learn.submitProbe(path);
     expect(t.learn.lessonAt(path)?.probe).toMatchObject({
-      marks: { p1: { score: 1, awarded: [true, false] } },
+      marks: {
+        p1: { score: 1, awarded: [true, false] },
+        'unknown-probe': { score: 0, mistake: 'unknown' },
+        'choice-probe': { score: 1 },
+      },
     });
     await vi.waitFor(() => expect(t.learn.lessonAt(path)?.steps[0]).toBeTruthy());
     expect(t.learn.lessonAt(path)?.steps[0]?.check.goal).toBe('recall');
-    t.learn.answerStep(path, { blanks: { prior: 'dirichlet', purpose: 'smoothing' } });
+    t.learn.answerStep(path, {
+      blanks: { prior: 'Dirichlet distribution', purpose: 'avoiding zero estimates' },
+    });
+    let stepFails = true;
+    t.reply(tutorMarkSchema, ({ prompt }) => {
+      if (stepFails) throw new Error('Tutor unavailable');
+      expect(prompt).toContain('avoiding zero estimates');
+      return {
+        ...markOf('k1', [true, true]),
+        reply: 'Both meanings are correct.',
+        misconception: -1,
+      };
+    });
+    await t.learn.checkStep(path);
+    expect(t.learn.lessonAt(path)?.state[0]?.mark).toBeUndefined();
+    expect(t.learn.job(path, 'tutor', '0')?.error).toBe('Tutor unavailable');
+    stepFails = false;
     await t.learn.checkStep(path);
     const original = structuredClone(t.learn.lessonAt(path)?.state[0]);
     expect(original?.mark).toMatchObject({ score: 2, awarded: [true, true] });
@@ -1191,7 +1255,7 @@ describe('learning service', () => {
     await t.learn.retryStep(path, 'A typed second attempt');
     expect(t.learn.lessonAt(path)?.state[0]).toEqual(original);
     expect(t.calls).toHaveLength(calls);
-    expect(t.calls.some((call) => call.task.schema === tutorMarkSchema)).toBe(false);
+    expect(t.calls.filter((call) => call.task.schema === tutorMarkSchema)).toHaveLength(2);
   });
 
   it('runs a check: written ahead by the writer, marked by the tutor, recorded as evidence', async () => {

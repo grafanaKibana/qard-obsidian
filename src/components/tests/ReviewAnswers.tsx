@@ -276,9 +276,7 @@ function QuestionReview({
         <AnswerFeedback services={services} answer={answer} mark={mark} path={path} />
       ) : null}
 
-      {q.type !== 'cloze' && (
-        <MarkScheme services={services} question={q} mark={mark} path={path} />
-      )}
+      <MarkScheme services={services} question={q} mark={mark} path={path} />
 
       <section className="qard-review-actions" aria-label="Review actions">
         <div className="qard-action-group">
@@ -299,7 +297,7 @@ function QuestionReview({
           <button className={panel === 'ask' ? 'is-on' : ''} onClick={() => toggle('ask')}>
             Ask
           </button>
-          {q.type !== 'mcq' && q.type !== 'cloze' && (
+          {q.type !== 'mcq' && (
             <button
               className={panel === 'dispute' ? 'is-on' : ''}
               onClick={() => toggle('dispute')}

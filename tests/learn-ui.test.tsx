@@ -614,7 +614,7 @@ it('shows graded lesson blanks without offering a free-text retry', async () => 
             type: 'cloze',
             prompt: 'Use {{method}}.',
             marks: 1,
-            blanks: [{ id: 'method', answers: ['DP'] }],
+            blanks: [{ id: 'method' }],
             rubric: [{ point: 'method', marks: 1 }],
           }),
           misconceptions: [],
@@ -638,7 +638,9 @@ it('shows graded lesson blanks without offering a free-text retry', async () => 
   await act(async () => root.render(<LessonView services={services} nav={nav} path={path} />));
   await tick();
   await tick();
-  expect(host.textContent).toContain('sum — Incorrect; expected: DP');
+  expect(host.textContent).toContain('sum — Incorrect');
+  expect(host.querySelectorAll('.qard-rubric-row')).toHaveLength(1);
+  expect(host.textContent).toContain('Mark scheme');
   expect(host.querySelector('textarea[aria-label="Second try"]')).toBeNull();
 });
 
@@ -649,7 +651,7 @@ it('shows filled answers instead of raw slots in a completed retention check', a
       type: 'cloze',
       prompt: 'Use {{method}}.',
       marks: 1,
-      blanks: [{ id: 'method', answers: ['DP'] }],
+      blanks: [{ id: 'method' }],
       rubric: [{ point: 'method', marks: 1 }],
     }),
   ];

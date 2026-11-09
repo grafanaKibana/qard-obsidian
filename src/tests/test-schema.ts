@@ -1,4 +1,3 @@
-import { normalizeClozeAnswer } from './test-types';
 import type { PracticeTest, Question, QuestionMark, TestPlan, Wrapup } from './test-types';
 
 /** The JSON Schema subset shared by structured outputs and the local validator. */
@@ -90,7 +89,7 @@ const question = obj(
     marks: num(),
     options: arr(str()),
     answer: num('Index of the correct option (multiple choice only).'),
-    blanks: arr(obj({ id: str('Slot ID in {{id}}.'), answers: arr(str('Accepted exact alias.')) })),
+    blanks: arr(obj({ id: str('Slot ID in {{id}}; blank order matches rubric order.') })),
     rubric: arr(obj({ point: str('One checkable idea.'), marks: num() })),
     model: str('A full-marks answer in Markdown.'),
     source: obj({ path: str(), heading: str() }, ['heading']),
@@ -181,14 +180,6 @@ export function validateClozeQuestion(q: Question): string[] {
     /\{\{|\}\}/.test(q.prompt.replace(/\{\{([^{}]+)\}\}/g, ''))
   ) {
     errors.push(`${q.id}: cloze slots must match blank IDs exactly once`);
-  }
-  if (
-    blanks.some(
-      (blank) =>
-        !blank.answers.length || blank.answers.some((alias) => !normalizeClozeAnswer(alias)),
-    )
-  ) {
-    errors.push(`${q.id}: every cloze blank needs nonempty accepted answers`);
   }
   if (
     q.marks !== blanks.length ||

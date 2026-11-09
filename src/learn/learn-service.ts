@@ -26,7 +26,6 @@ import { debug } from '../debug/debug-log';
 import { marksSchema, readMarks } from '../tests/test-schema';
 import {
   markChoice,
-  markCloze,
   markUnknown,
   questions as testQuestions,
   type AnswerState,
@@ -1051,8 +1050,6 @@ export class LearnService {
           marks[q.id] = markUnknown(q);
         } else if (q.type === 'mcq') {
           marks[q.id] = markChoice(q, a);
-        } else if (q.type === 'cloze') {
-          marks[q.id] = markCloze(q, a);
         }
       }
       const typed = record.questions.filter((q) => !marks[q.id]);
@@ -1405,8 +1402,6 @@ export class LearnService {
           marks[q.id] = markUnknown(q);
         } else if (q.type === 'mcq') {
           marks[q.id] = markChoice(q, a);
-        } else if (q.type === 'cloze') {
-          marks[q.id] = markCloze(q, a);
         }
       }
       lesson = { ...lesson, probe: { ...probe, submitted: true, marks } };
@@ -1585,7 +1580,7 @@ export class LearnService {
     }
     void this.patchStep(path, lesson.current, { answer: { ...st.answer, ...patch } }, false);
   }
-  /** "I don't know", cloze and right multiple-choice answers need no call; everything else goes to the tutor. */
+  /** "I don't know" and right multiple-choice answers need no call; everything else goes to the tutor. */
   checkStep(path: string) {
     const lesson = this.lesson(path),
       index = lesson.current,
@@ -1602,10 +1597,6 @@ export class LearnService {
           mark: markUnknown(q),
           reply: 'No problem. Read the explanation, then look at the model answer.',
         });
-      }
-      if (q.type === 'cloze') {
-        const mark = markCloze(q, a);
-        return this.patchStep(path, index, { mark, reply: mark.feedback });
       }
       if (q.type === 'mcq' && a?.choice === q.answer) {
         return this.patchStep(path, index, { mark: markChoice(q, a), reply: 'Right.' });

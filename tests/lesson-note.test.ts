@@ -33,10 +33,7 @@ it('exports filled cloze answers in their Markdown context', () => {
           type: 'cloze',
           prompt: 'Use **{{method}}** for {{task}}.',
           marks: 2,
-          blanks: [
-            { id: 'method', answers: ['DP'] },
-            { id: 'task', answers: ['paths'] },
-          ],
+          blanks: [{ id: 'method' }, { id: 'task' }],
           rubric: [
             { point: 'method', marks: 1 },
             { point: 'task', marks: 1 },

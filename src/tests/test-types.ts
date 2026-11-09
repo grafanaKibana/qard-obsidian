@@ -33,7 +33,7 @@ export interface Question {
   marks: number;
   options?: string[];
   answer?: number;
-  blanks?: { id: string; answers: string[] }[];
+  blanks?: { id: string }[];
   rubric: RubricPoint[];
   model: string;
   source?: { path: string; heading?: string };
@@ -169,17 +169,6 @@ export function markChoice(q: Question, answer: AnswerState | undefined): Questi
   };
 }
 
-/** Canonical caseless comparison without discarding meaningful punctuation. */
-export function normalizeClozeAnswer(text: string): string {
-  return text
-    .normalize('NFKC')
-    .trim()
-    .replace(/\s+/gu, ' ')
-    .toLowerCase()
-    .replace(/ß/g, 'ss')
-    .replace(/ς/g, 'σ');
-}
-
 /** Blank order is rubric order; every blank earns one mark. */
 export function blankAnswer(answer: AnswerState | undefined, id: string): string {
   const blanks = answer?.blanks;
@@ -188,26 +177,6 @@ export function blankAnswer(answer: AnswerState | undefined, id: string): string
   }
   const value = blanks[id];
   return typeof value === 'string' ? value : '';
-}
-
-/** Blank order is rubric order; every blank earns one mark. */
-export function markCloze(q: Question, answer: AnswerState | undefined): QuestionMark {
-  if (answer?.unknown) {
-    return markUnknown(q);
-  }
-  const awarded = (q.blanks ?? []).map((blank) => {
-    const value = normalizeClozeAnswer(blankAnswer(answer, blank.id));
-    return !!value && blank.answers.some((alias) => normalizeClozeAnswer(alias) === value);
-  });
-  const score = awarded.filter(Boolean).length;
-  const correct = awarded.length > 0 && awarded.every(Boolean);
-  return {
-    score,
-    awarded,
-    annotations: [],
-    mistake: correct ? 'none' : score ? 'incomplete' : 'misconception',
-    feedback: correct ? 'Correct.' : 'Compare each blank with the model answer.',
-  };
 }
 
 /** The answer as the student saw it, with unanswered blanks left visible. */

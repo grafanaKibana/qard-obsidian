@@ -180,9 +180,7 @@ export function MarkedAnswer({
       ) : (
         <AnswerFeedback services={services} answer={answer} mark={mark} path={path} />
       )}
-      {q.type !== 'mcq' && q.type !== 'cloze' && (
-        <MarkScheme services={services} question={q} mark={mark} path={path} />
-      )}
+      {q.type !== 'mcq' && <MarkScheme services={services} question={q} mark={mark} path={path} />}
       <button className="qard-text-button" aria-expanded={model} onClick={() => setModel(!model)}>
         {model ? 'Hide model answer' : 'Model answer'}
       </button>
@@ -297,10 +295,7 @@ function ClozePromptContent({
               <strong>
                 {answer?.unknown ? "I didn't know" : blankAnswer(answer, id) || 'No answer'}
               </strong>
-              <span>
-                {' '}
-                — {correct ? 'Correct' : `Incorrect; expected: ${blank.answers.join(' / ')}`}
-              </span>
+              <span> — {correct ? 'Correct' : 'Incorrect'}</span>
             </span>
           ) : (
             <input

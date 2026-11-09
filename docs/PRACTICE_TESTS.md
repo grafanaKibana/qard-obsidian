@@ -55,7 +55,7 @@ Rules Qard checks when it opens the file:
 - Question ids are unique across the test.
 - Each question's rubric marks add up to its `marks`.
 - `mcq` questions need at least two `options` and an `answer` index that points to one of them.
-- `cloze` questions put each `{{id}}` slot exactly once in plain question text, with a matching `blanks` entry containing that `id` and nonempty accepted `answers`. Each blank has one rubric point worth one mark. The total marks equal the number of blanks. Answers are compared locally after Unicode normalization, case folding and whitespace normalization; meaningful punctuation is retained. Include valid synonyms as explicit accepted answers.
+- `cloze` questions put each `{{id}}` slot exactly once in plain question text, with a matching `blanks` entry containing that `id`. Each blank has one rubric point worth one mark, in the same order as `blanks`. The total marks equal the number of blanks. The marker grades each submitted blank against its rubric point, accepting equivalent wording rather than comparing against a predefined answer list.
 - `prompt`, `model` and options are Markdown, with LaTeX in `$…$`. `source` is optional and links the question to a note.
 
 A file that breaks these rules shows as "Needs attention" under Tests.
@@ -67,11 +67,11 @@ For example, a terminology question can use this format:
   "id": "q3",
   "type": "cloze",
   "prompt": "The observed outcome compared with a prediction is its {{target}}.",
-  "blanks": [{ "id": "target", "answers": ["target", "label"] }],
+  "blanks": [{ "id": "target" }],
   "marks": 1,
   "rubric": [{ "point": "Identifies the observed target or label.", "marks": 1 }],
   "model": "The observed outcome compared with a prediction is its target."
 }
 ```
 
-Qard stores typed gaps in `answers[q3].blanks`, keyed by the slot ID. Each gap is graded independently; one wrong gap does not erase correct gaps. Blanks use their accepted answers rather than an AI re-mark or free-text second attempt.
+Qard stores typed gaps in `answers[q3].blanks`, keyed by the slot ID. Each gap is graded independently; one wrong gap does not erase correct gaps. The LLM marks blanks through the same validated grading path as written answers; marks are recalculated from awarded rubric points. Missing blanks earn no mark. You can dispute a mark, but cloze questions do not offer a free-text second attempt.
