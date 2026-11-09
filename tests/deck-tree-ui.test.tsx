@@ -425,3 +425,38 @@ it.each([
     });
   },
 );
+
+it('explicitly selects the default grey without requiring a picker change', async () => {
+  const save = vi.fn(async () => {});
+  act(() =>
+    root.render(<DeckOptions deck="A" settings={readSettings({})} save={save} close={vi.fn()} />),
+  );
+  expect(host.querySelector('input[type=color]')).toBeNull();
+  await action('Use custom color');
+  expect(appearanceField('Color').value).toBe('#808080');
+  expect(host.querySelector<HTMLInputElement>('input[type=color]')!.value).toBe('#808080');
+  await action('Save options');
+  expect(save).toHaveBeenCalledWith({ A: { color: '#808080' } });
+});
+
+it('changes custom picker colors, resets to automatic, and cancels without saving', async () => {
+  const save = vi.fn(async () => {}),
+    close = vi.fn();
+  act(() =>
+    root.render(<DeckOptions deck="A" settings={readSettings({})} save={save} close={close} />),
+  );
+  await action('Use custom color');
+  await act(() => {
+    const picker = host.querySelector<HTMLInputElement>('input[type=color]')!;
+    picker.value = '#123456';
+    picker.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  expect(appearanceField('Color').value).toBe('#123456');
+  await action('Automatic color');
+  expect(appearanceField('Color').value).toBe('');
+  expect(host.querySelector('input[type=color]')).toBeNull();
+  await action('Use custom color');
+  await action('Cancel');
+  expect(close).toHaveBeenCalledOnce();
+  expect(save).not.toHaveBeenCalled();
+});

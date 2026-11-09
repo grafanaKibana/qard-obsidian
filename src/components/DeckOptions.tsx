@@ -196,13 +196,19 @@ export function DeckOptions({
           />
           <small className="qard-muted">Six-digit hex color; empty uses the automatic color.</small>
         </label>
-        <input
-          type="color"
-          aria-label="Choose a custom deck color"
-          value={readDeckColor(color) ?? '#808080'}
-          disabled={busy}
-          onChange={(e) => setColor(e.target.value)}
-        />
+        {color.trim() ? (
+          <input
+            type="color"
+            aria-label="Choose a custom deck color"
+            value={readDeckColor(color) ?? '#808080'}
+            disabled={busy}
+            onChange={(e) => setColor(e.target.value)}
+          />
+        ) : (
+          <button disabled={busy} onClick={() => setColor('#808080')}>
+            Use custom color
+          </button>
+        )}
         <button disabled={busy || !color} onClick={() => setColor('')}>
           Automatic color
         </button>
