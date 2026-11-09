@@ -1,0 +1,218 @@
+{
+  "before": "b66675b49a85a0a52cfbf804aa1cb93f849b9749",
+  "after": "3df0fe59820a9b93cabda79a5c85f7af069131fd",
+  "comparisons": 23,
+  "deviceScaleFactor": 2,
+  "clock": "Date.now frozen at2026-11-09T12:00Z",
+  "capture": "matching synthetic fixtures, input modes, pane/viewports, theme, action sequence and crop selector; animations/transitions/caret frozen for comparison;500ms settle",
+  "maximumExamplesPerGroup": 3,
+  "scenes": [
+    {
+      "name": "repair-menu",
+      "screen": "study",
+      "width": 768,
+      "more": true,
+      "crop": ".qard-repair-menu"
+    },
+    {
+      "name": "map-phone",
+      "screen": "map",
+      "width": 390,
+      "touch": true
+    },
+    {
+      "name": "map-wide",
+      "screen": "map",
+      "width": 1100,
+      "theme": "dark"
+    },
+    {
+      "name": "map-expanded",
+      "screen": "map",
+      "width": 768,
+      "expanded": true
+    },
+    {
+      "name": "objectives-phone",
+      "screen": "course",
+      "width": 390,
+      "touch": true,
+      "list": true
+    },
+    {
+      "name": "objectives-wide",
+      "screen": "course",
+      "width": 1000,
+      "theme": "dark",
+      "list": true
+    },
+    {
+      "name": "jobs",
+      "screen": "jobs",
+      "width": 430,
+      "touch": true,
+      "jobs": true,
+      "crop": ".qard-jobs-list"
+    },
+    {
+      "name": "masks-phone",
+      "screen": "masks",
+      "width": 390,
+      "touch": true,
+      "mask": true
+    },
+    {
+      "name": "masks-wide",
+      "screen": "masks",
+      "width": 1000,
+      "mask": true
+    },
+    {
+      "name": "popover-split",
+      "screen": "picker",
+      "width": 320,
+      "viewport": 1440,
+      "picker": true
+    },
+    {
+      "name": "usage-period",
+      "screen": "app",
+      "request": "usage",
+      "width": 320,
+      "scale": 2
+    },
+    {
+      "name": "usage-table",
+      "screen": "app",
+      "request": "usage",
+      "width": 320,
+      "scale": 2,
+      "usage": true,
+      "table": true
+    },
+    {
+      "name": "gutter-library-phone",
+      "screen": "app",
+      "width": 375,
+      "touch": true
+    },
+    {
+      "name": "gutter-editor-phone",
+      "screen": "app",
+      "request": "create",
+      "width": 375,
+      "touch": true
+    },
+    {
+      "name": "gutter-library-wide",
+      "screen": "app",
+      "width": 1280,
+      "viewport": 1440
+    },
+    {
+      "name": "gutter-editor-wide",
+      "screen": "app",
+      "request": "create",
+      "width": 1280,
+      "viewport": 1440
+    },
+    {
+      "name": "segment-session",
+      "screen": "app",
+      "request": "builder",
+      "width": 1000,
+      "crop": ".qard-session-type"
+    },
+    {
+      "name": "segment-plans",
+      "screen": "app",
+      "request": "exams",
+      "width": 1000,
+      "crop": ".qard-plans-view"
+    },
+    {
+      "name": "segment-statistics",
+      "screen": "app",
+      "request": "statistics",
+      "width": 1000,
+      "crop": ".qard-segmented"
+    },
+    {
+      "name": "badge-material",
+      "screen": "app",
+      "request": "exams",
+      "width": 430,
+      "exam": true,
+      "crop": ".qard-exam-material"
+    },
+    {
+      "name": "deck-actions",
+      "screen": "app",
+      "width": 375,
+      "touch": true,
+      "deck": true
+    },
+    {
+      "name": "lesson-badge-dark",
+      "screen": "map",
+      "width": 1000,
+      "theme": "dark",
+      "variant": "lesson-icon",
+      "crop": ".qard-map-node:has(.qard-map-lesson)"
+    },
+    {
+      "name": "waiting-surfaces",
+      "screen": "wait",
+      "width": 768,
+      "crop": ".qard-wait"
+    }
+  ],
+  "hashes": {
+    "before-masks-wide.png": "b5b6e277b1f7137e8bc81ab5fb6157bbd9b594b773518cd586ce4602cf70b9b8",
+    "after-waiting-surfaces.png": "57ce77b3ce4cfecbd968217d0fbda4d7b01f8879365f2ab87ad35b66c0abc730",
+    "before-gutter-library-wide.png": "2d595252eff71e1d701a418fb47f0503cd385a8659beb2ba40989026fb78cb7c",
+    "before-deck-actions.png": "4faddc6deabd0322f954f6afefbbe9a5cf25452238ba39eec92bf965488ae8ce",
+    "after-masks-wide.png": "4998da59a434cd7e214e1c9888ccf4148da37472d7869bc45aafd7fcf73a7847",
+    "after-gutter-library-wide.png": "2d595252eff71e1d701a418fb47f0503cd385a8659beb2ba40989026fb78cb7c",
+    "before-objectives-wide.png": "1c17b1fd484e9a548825faa3db349b06f894bcae940e92d9fc30afa7c941a9c6",
+    "after-usage-table.png": "c686042b60b65311ca3940654e0011d7f9c32864c2960c99fee5f40d71b8aacb",
+    "before-map-phone.png": "7a7443ba01d3371f1af8f842f123ef1788d02a362313f2739c2c55b7fffa4ea1",
+    "after-map-expanded.png": "a3b7a6643d414db690ecb91c7c5cf28f4a93a21a4e6d95d8cd96e34f1d6ec9ac",
+    "before-objectives-phone.png": "1833c027d0295ce45546e70bddae384018a1d75ed152c8909ec98015d6890a42",
+    "after-jobs.png": "c676cb201271812324d508598fc95392e0daa3235fa0b52c9dced9fa025477b7",
+    "after-segment-session.png": "00f3caf80395b7058031816d42d47beabd33da17145467795a13568770015dfe",
+    "before-masks-phone.png": "492578953d844bcb1e39ce0135dc267734a9b538e21f8a138e270e30e10dcc34",
+    "after-map-phone.png": "4df295dccb427286fa3780e8c71d8c22de46f70920212f363f4492e9fdd98ce2",
+    "after-segment-plans.png": "555494d4c74738c5757306ae77c4db63243b593766e8efa87859d9f8e6780dbc",
+    "after-repair-menu.png": "06a4024e200d2d4ba03260fd077a8472dbe321e5bbffa6b8b1ecdf92ad6e936e",
+    "before-segment-plans.png": "6cf365c251e9a7eeed41173d108ada56ff37f56887006e8ae9438f45c16f57c3",
+    "after-usage-period.png": "f8fb4faf467251da785f2fcc2d0be002357707b48721f4c4a469f251c31ef4a0",
+    "after-lesson-badge-dark.png": "e3d87e72634fb578e03d36dcc12c6aeed39b1dc61ae0ae6483eae4553aff0183",
+    "before-jobs.png": "36e68ff491e9951b345c4a98898821b6354625ee767271d7952050a9703c2a9e",
+    "before-popover-split.png": "03c8408f88fa8dd4bc7545f85b7c7c2b0abac3722622dbe3767c207d7f9d3f97",
+    "after-gutter-library-phone.png": "19e2fe478de5a7c3513431b643ed08a73416a1ee7a4820c99ffacbbf375255f3",
+    "after-badge-material.png": "8a2092bcfca9b02fbf24bb9e1fea15927a5ac1b5ef34aa2606b500b110544748",
+    "before-usage-period.png": "f3e173565406bfcfa1caf2479daed7dce3759ebe6be3209b5e603818c54f5762",
+    "before-segment-session.png": "ddcde996aff64c1c1fdf43d061ce92675b775775b212db9da462eb60c811313a",
+    "after-gutter-editor-wide.png": "7b1ae3ad002158946c51ea2833f5ecff67f9fdc6848f46b56ebca9c30a68cb7e",
+    "before-repair-menu.png": "07ac1f38eaaea4501b658fc695d93868772e142b1ec1f4e0d52708a24a4a0ed7",
+    "before-badge-material.png": "9dc7852d9208763823b55c3f2012dc3381e3d622f74dfaf73e870d5863eaa022",
+    "before-lesson-badge-dark.png": "6defacef3320d83cfb6d35f7c975e0357998291d76cbf9203f81a3debdd3304a",
+    "after-popover-split.png": "14285b0c40d24ebe025c0e3e19151777890761aa2d6c06825edd7d665b3bad8e",
+    "after-segment-statistics.png": "bc457fb646001c5e082cfa065aa1534df62894d0a69df81b0c646bc0d98860b6",
+    "after-masks-phone.png": "f1f8831391ab53ab10b85f4a0e8bfdcc965b332837427fea652d2e7bcc135c3b",
+    "after-gutter-editor-phone.png": "0055818604bc4c4107a8ceaf25e2e71fc8dfc7578710c01b80b4fa4ff7649738",
+    "before-gutter-editor-wide.png": "a214aebcba0399e16e379dece4f6b8a19dd7efc8da7549f9616e846f8821dabc",
+    "before-waiting-surfaces.png": "1c6b48534b1d18cc698bac5fc72c415c99246dcbefcd4c960950c71a18f9cb10",
+    "before-gutter-library-phone.png": "0f1a98445be6349192b5b0409db69f92e8257055f4212a5c3e9a645eb4329fdc",
+    "before-map-expanded.png": "ae3e53c46d8127e1e2cd9293b15232940ac601960fb3a1c72fa6ade09ef5827d",
+    "before-segment-statistics.png": "67ae1301d2ac0e3e5ed70bfcd1fe15db971525f1dcce4103af4e77dca8caac1f",
+    "before-usage-table.png": "c686042b60b65311ca3940654e0011d7f9c32864c2960c99fee5f40d71b8aacb",
+    "after-map-wide.png": "da55f83e78cbe39900775d99d00b966839c6e5da14e0e2d7d160022ba396782c",
+    "before-gutter-editor-phone.png": "f0ef70aad37327e14bab9e4ee788af1894b5c4f22c528d9faa9b1ba0589317ea",
+    "before-map-wide.png": "ba7c90e02ec8a8290e8ba7fe0b0350519b40f7618a0bf51c755a3797797ca807",
+    "after-objectives-wide.png": "7c6d2be97e7f393cd71d04d36b13f50cf8a035850019c8c65364d538bf78308f",
+    "after-deck-actions.png": "5678416211007020e617f3b619e4b5f0ecedbf789aeda301c7fd0cffddf87e3c",
+    "after-objectives-phone.png": "d2e5f1aba42a3a1a6a70c672e8c32d3e36180451be8382511257e69fca3e7a53"
+  }
+}
