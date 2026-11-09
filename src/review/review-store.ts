@@ -360,8 +360,7 @@ export class ReviewStore {
         );
       }
       const sessions =
-        (!next.scheduling || next.scheduler !== 'fsrs') &&
-        (next.scheduling !== data.settings.scheduling || next.scheduler !== data.settings.scheduler)
+        !next.scheduling || next.scheduler !== 'fsrs'
           ? data.sessions.flatMap((session) => {
               if (!session.repeatLearning) {
                 return [session];

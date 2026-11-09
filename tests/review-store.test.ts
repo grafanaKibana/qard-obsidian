@@ -81,7 +81,6 @@ it.each([
     for (const key of [
       'states',
       'history',
-      'sessions',
       'statistics',
       'links',
       'exams',
@@ -92,6 +91,13 @@ it.each([
     ] as const) {
       expect(after[key]).toEqual(before[key]);
     }
+    const sessions =
+      options.scheduling && options.scheduler === 'fsrs'
+        ? before.sessions
+        : before.sessions.map(
+            ({ repeatLearning: _repeat, learning: _learning, ...session }) => session,
+          );
+    expect(after.sessions).toEqual(sessions);
     expect(after.settings.deckOptions.A).toEqual({
       desiredRetention: 0.85,
       newCardsPerDay: 3,
@@ -106,6 +112,50 @@ it.each([
       deckOptions: { A: { desiredRetention: 0.85, newCardsPerDay: 3 } },
     });
     expect(restarted.getSnapshot().states).toEqual(before.states);
-    expect(restarted.getSnapshot().sessions).toEqual(before.sessions);
+    expect(restarted.getSnapshot().sessions).toEqual(sessions);
+  },
+);
+
+it.each([
+  { scheduler: 'simple' as const, scheduling: true },
+  { scheduler: 'fsrs' as const, scheduling: false },
+  { scheduler: 'fsrs' as const, scheduling: true },
+])(
+  'normalizes synced learning repeats on any save under $scheduler/$scheduling',
+  async (options) => {
+    const store = new ReviewStore(async () => {});
+    await store.review('stable', 1, Date.now());
+    const data = structuredClone(store.getSnapshot());
+    Object.assign(data.settings, options);
+    data.sessions = [0, 1].map((position) => ({
+      id: position ? 'finished' : 'pending',
+      title: 'Synced deck',
+      results: [],
+      cardIds: ['stable'],
+      position,
+      style: 'normal',
+      createdAt: 2000,
+      updatedAt: 2000,
+      repeatLearning: true,
+      learning: [{ cardId: 'stable', due: data.states.stable!.due! }],
+    }));
+    const restored = new ReviewStore(async () => {});
+    restored.load(data);
+    const before = structuredClone(restored.getSnapshot());
+    expect(before.sessions).toHaveLength(2);
+    expect(before.sessions[1]!.learning).toHaveLength(1);
+    await restored.saveSettings({
+      ...before.settings,
+      deckOptions: { A: { color: '#123456' } },
+    });
+    const after = restored.getSnapshot();
+    expect(after.states).toEqual(before.states);
+    expect(after.history).toEqual(before.history);
+    if (options.scheduler === 'fsrs' && options.scheduling) {
+      expect(after.sessions).toEqual(before.sessions);
+    } else {
+      const { repeatLearning: _repeat, learning: _learning, ...pending } = before.sessions[0]!;
+      expect(after.sessions).toEqual([pending]);
+    }
   },
 );
