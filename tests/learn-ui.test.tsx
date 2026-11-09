@@ -194,9 +194,10 @@ it('a check: answer, "I don\'t know" disables the input, submit marks and moves 
   await act(async () => {
     root.render(<CheckView services={services} nav={nav} path={CHECK} />);
   });
-  await tick();
-  await tick();
-  expect(host.textContent).toContain('Retention check');
+  await vi.waitFor(async () => {
+    await tick();
+    expect(host.textContent).toContain('Retention check');
+  });
   expect(host.textContent).toContain('Your result decides what to revisit');
   expect(host.textContent).toContain('Choose an answer');
   expect(host.textContent).toContain('Write an answer');
