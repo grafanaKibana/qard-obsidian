@@ -14,8 +14,10 @@ export interface CheckRecord {
   title: string;
   goal: Goal;
   questions: Question[];
-  /** Generation policy used for unanswered checks; answered records are kept unchanged. */
+  /** Legacy metadata, retained for compatibility; freshness uses promptFingerprint. */
   questionPolicy?: number;
+  /** Static generation/review instructions used to prepare these questions. */
+  promptFingerprint?: string;
   answers: Record<string, AnswerState>;
   marks: Record<string, QuestionMark>;
   status: 'ready' | 'marking' | 'marked' | 'error';

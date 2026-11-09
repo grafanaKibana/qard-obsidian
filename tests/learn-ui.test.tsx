@@ -1,9 +1,11 @@
 // @vitest-environment jsdom
+import { webcrypto } from 'node:crypto';
 import { act } from 'preact/test-utils';
 import { createRoot, type Root } from 'react-dom/client';
-import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, expect, it, vi } from 'vitest';
 import { Component } from 'obsidian';
 import { LearnService } from '../src/learn/learn-service';
+import { checkPromptFingerprint } from '../src/learn/step-review';
 import { type LearnStorage } from '../src/learn/learn-contracts';
 import { newMasteryNote } from '../src/learn/mastery';
 import { readSettings } from '../src/settings/settings';
@@ -51,7 +53,10 @@ const nav = {
   lesson: vi.fn(),
   studyDue: vi.fn(),
 } satisfies LearnNav;
-beforeEach(() => {
+beforeAll(() => {
+  vi.stubGlobal('crypto', webcrypto);
+});
+beforeEach(async () => {
   HTMLDialogElement.prototype.showModal = function () {
     this.setAttribute('open', '');
   };
@@ -84,7 +89,8 @@ beforeEach(() => {
         objective: 'params',
         title: 'Parameter counts',
         goal: 'explain',
-        questionPolicy: 2,
+        questionPolicy: 1,
+        promptFingerprint: await checkPromptFingerprint(),
         questions: [
           q('c1', {
             type: 'mcq',
@@ -719,7 +725,7 @@ it.each([true, false])(
 it('hides cached questions while preparing a check and offers retry after a failed review', async () => {
   await services.learn.loadCheck(CHECK);
   const cached = services.learn.checkAt(CHECK)!;
-  cached.questionPolicy = undefined;
+  cached.promptFingerprint = undefined;
   let reject!: (error: Error) => void;
   const load = vi.spyOn(services.learn, 'loadCheck').mockImplementationOnce(
     () =>
@@ -743,7 +749,7 @@ it('hides cached questions while preparing a check and offers retry after a fail
         prompt: 'Reviewed replacement question',
       }) as (typeof cached.questions)[number],
     ];
-    cached.questionPolicy = 1;
+    cached.promptFingerprint = await checkPromptFingerprint();
     return cached;
   });
   await click(buttons('Retry check')[0]);

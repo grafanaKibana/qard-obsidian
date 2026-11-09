@@ -1,5 +1,10 @@
 import { formatLessonNote } from './lesson-note';
-import { writeReviewedLearning, writeReviewedQuestions, writeReviewedStep } from './step-review';
+import {
+  checkPromptFingerprint,
+  writeReviewedLearning,
+  writeReviewedQuestions,
+  writeReviewedStep,
+} from './step-review';
 import { insertUnderHeading } from './note-edits';
 import { summarise, scoreQuestion } from './learning-evidence';
 import type {
@@ -105,7 +110,7 @@ import type {
 } from './learn-types';
 
 const LESSONS_PER_DAY = 3;
-const QUESTION_POLICY = 2;
+const QUESTION_POLICY = 1;
 /** Lesson steps are written this many at a time, so the whole lesson is ready soon after the plan. */
 const STEP_WRITERS = 3;
 const SOURCE_BUDGET = 60_000;
@@ -1009,13 +1014,18 @@ export class LearnService {
     }
     const m = await this.course(record.mastery);
     const objective = m.objectives.find((o) => o.id === record.objective);
-    if (objective && this.stale(record, objective)) {
+    const fingerprint = await checkPromptFingerprint();
+    if (this.isRemoved(path)) {
+      throw new Error('This check was deleted.');
+    }
+    const latest = this.checks.get(path)!;
+    if (objective && this.stale(latest, objective, fingerprint)) {
       await this.ensureCheck(record.mastery, record.objective);
       if (this.isRemoved(path)) {
         throw new Error('This check was deleted.');
       }
       const refreshed = this.checks.get(path)!;
-      if (refreshed === record && this.stale(refreshed, objective)) {
+      if (refreshed === latest && this.stale(refreshed, objective, fingerprint)) {
         throw new Error(
           this.job(`${record.mastery}#${record.objective}`, 'check-write')?.error ??
             'This check could not be updated. Try again.',
@@ -1023,7 +1033,7 @@ export class LearnService {
       }
       return refreshed;
     }
-    return record;
+    return latest;
   }
   private pathOf(record: CheckRecord) {
     return [...this.checks.entries()].find(([, c]) => c === record)?.[0];
@@ -1034,8 +1044,8 @@ export class LearnService {
       .sort((a, b) => b.createdAt - a.createdAt)[0];
     return found && this.pathOf(found);
   }
-  /** A check written before its notes changed is rewritten, as long as nothing has been answered. */
-  private stale(record: CheckRecord, o: Objective) {
+  /** Refresh changed instructions or notes only while the check is untouched. */
+  private stale(record: CheckRecord, o: Objective, fingerprint: string) {
     if (
       Object.keys(record.answers).length ||
       Object.keys(record.marks).length ||
@@ -1044,7 +1054,7 @@ export class LearnService {
       return false;
     }
     return (
-      record.questionPolicy !== QUESTION_POLICY ||
+      record.promptFingerprint !== fingerprint ||
       o.notes.some((n) => {
         const path = this.storage.resolve(n, record.mastery);
         const t = path && this.storage.modified(path);
@@ -1069,8 +1079,9 @@ export class LearnService {
       if (!o) {
         throw new Error(`No objective "${objective}" in ${m.course}.`);
       }
+      const fingerprint = await checkPromptFingerprint();
       const existing = await this.pendingCheck(mastery, objective);
-      if (existing && !this.stale(this.checks.get(existing)!, o)) {
+      if (existing && !this.stale(this.checks.get(existing)!, o, fingerprint)) {
         return existing;
       }
       const goal = goalFor(o.state),
@@ -1101,7 +1112,7 @@ export class LearnService {
         throw new Error('This objective no longer exists.');
       }
       // A learner may have started this check while its replacement was being reviewed.
-      if (existing && !this.stale(this.checks.get(existing)!, o)) {
+      if (existing && !this.stale(this.checks.get(existing)!, o, fingerprint)) {
         return existing;
       }
       const record: CheckRecord = {
@@ -1113,6 +1124,7 @@ export class LearnService {
         title: o.title,
         goal,
         questionPolicy: QUESTION_POLICY,
+        promptFingerprint: fingerprint,
         questions: written.slice(0, 2).map((q) => ({
           ...q,
           objective,

@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { webcrypto } from 'node:crypto';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import {
   addDays,
@@ -15,7 +16,7 @@ import {
 import { layoutGraph, layoutTopic, OBJECTIVE, routeTo, topicsOf } from '../src/learn/course-graph';
 import { courseUpdateSchema, firstSentences } from '../src/learn/learn-schema';
 import { LearnService } from '../src/learn/learn-service';
-import { stepReviewSchema } from '../src/learn/step-review';
+import { checkPromptFingerprint, stepReviewSchema } from '../src/learn/step-review';
 import { insertUnderHeading } from '../src/learn/note-edits';
 import { summarise } from '../src/learn/learning-evidence';
 import { type LearnStorage } from '../src/learn/learn-contracts';
@@ -40,6 +41,7 @@ import type { PracticeTest, Question } from '../src/tests/test-types';
 
 beforeAll(() => {
   (globalThis as { window?: unknown }).window ??= globalThis;
+  vi.stubGlobal('crypto', webcrypto);
 });
 
 const MASTERY = `---
@@ -1525,19 +1527,113 @@ describe('learning service', () => {
     const path = await first;
     expect(await second).toBe(path);
     expect(t.learn.checkAt(path!)!).toMatchObject({
-      questionPolicy: 2,
+      questionPolicy: 1,
+      promptFingerprint: await checkPromptFingerprint(),
       questions: [{ id: 'candidate2' }],
     });
     expect(JSON.parse(t.files.get(path!)!).questions[0].id).toBe('candidate2');
   });
 
-  it('upgrades untouched old-policy checks on load but preserves any started or completed record', async () => {
+  it.each([undefined, 'old-prompt-fingerprint'])(
+    'refreshes an untouched check with fingerprint %s once, then reuses the saved replacement',
+    async (promptFingerprint) => {
+      const t = await mapped();
+      const path = `Qard/Checks/DS346/${DAY} params.json`;
+      t.files.set(
+        path,
+        JSON.stringify(checkRecord(t.path, { questionPolicy: 1, promptFingerprint })),
+      );
+      t.reply(questionsSchema, () => ({ questions: [q('reviewed')] }));
+      const fresh = await t.learn.loadCheck(path);
+      expect(fresh).toMatchObject({
+        questionPolicy: 1,
+        promptFingerprint: await checkPromptFingerprint(),
+        questions: [{ id: 'reviewed' }],
+      });
+      const saved = t.files.get(path);
+      const calls = t.calls.length;
+      expect(await t.restart().loadCheck(path)).toEqual(fresh);
+      expect(t.files.get(path)).toBe(saved);
+      expect(t.calls).toHaveLength(calls);
+    },
+  );
+
+  it('refreshes the same saved check when the prompt fingerprint changes without changing its policy number', async () => {
     const t = await mapped();
     const path = `Qard/Checks/DS346/${DAY} params.json`;
-    t.files.set(path, JSON.stringify(checkRecord(t.path, { questionPolicy: 1 })));
-    t.reply(questionsSchema, () => ({ questions: [q('reviewed')] }));
-    const fresh = await t.learn.loadCheck(path);
-    expect(fresh).toMatchObject({ questionPolicy: 2, questions: [{ id: 'reviewed' }] });
+    const original = checkRecord(t.path, {
+      questionPolicy: 1,
+      promptFingerprint: await checkPromptFingerprint(),
+    });
+    t.files.set(path, JSON.stringify(original));
+    expect(await t.learn.loadCheck(path)).toEqual(original);
+    const calls = t.calls.length;
+    const fingerprint = vi
+      .spyOn(await import('../src/learn/step-review'), 'checkPromptFingerprint')
+      .mockResolvedValue('changed-prompt-fingerprint');
+    try {
+      t.reply(questionsSchema, () => ({ questions: [q('new-prompt')] }));
+      const fresh = await t.restart().loadCheck(path);
+      expect(fresh).toMatchObject({
+        questionPolicy: 1,
+        promptFingerprint: 'changed-prompt-fingerprint',
+        questions: [{ id: 'new-prompt' }],
+      });
+      expect(t.calls).toHaveLength(calls + 2);
+      const saved = t.files.get(path);
+      expect(await t.restart().loadCheck(path)).toEqual(fresh);
+      expect(t.files.get(path)).toBe(saved);
+      expect(t.calls).toHaveLength(calls + 2);
+    } finally {
+      fingerprint.mockRestore();
+    }
+  });
+
+  it('reuses a matching prompt despite legacy policy numbers and changes to recent format history', async () => {
+    const t = await mapped();
+    const path = `Qard/Checks/DS346/${DAY} params.json`;
+    const promptFingerprint = await checkPromptFingerprint();
+    const calls = t.calls.length;
+    for (const questionPolicy of [undefined, 1, 2]) {
+      const original = JSON.stringify(checkRecord(t.path, { questionPolicy, promptFingerprint }));
+      t.files.set(path, original);
+      t.files.set(
+        `Qard/Checks/DS346/history-${questionPolicy}.json`,
+        JSON.stringify(
+          checkRecord(t.path, {
+            objective: 'lda-generative',
+            createdAt: 10 + (questionPolicy ?? 0),
+            questions: [mcq('history')],
+            answers: { history: { choice: 1 } },
+            finishedAt: 2,
+          }),
+        ),
+      );
+      expect(await t.restart().loadCheck(path)).toEqual(JSON.parse(original));
+      expect(t.files.get(path)).toBe(original);
+    }
+    expect(t.calls).toHaveLength(calls);
+  });
+
+  it('automatically detects changes to the generation and review response contracts', async () => {
+    const original = await checkPromptFingerprint();
+    expect(original).toMatch(/^[a-f0-9]{64}$/);
+    for (const schema of [questionsSchema, stepReviewSchema]) {
+      const description = schema.description;
+      try {
+        schema.description = 'A changed response contract.';
+        expect(await checkPromptFingerprint()).not.toBe(original);
+      } finally {
+        if (description === undefined) delete schema.description;
+        else schema.description = description;
+      }
+      expect(await checkPromptFingerprint()).toBe(original);
+    }
+  });
+
+  it('preserves any started or completed check byte-for-byte despite a missing or outdated prompt fingerprint', async () => {
+    const t = await mapped();
+    const path = `Qard/Checks/DS346/${DAY} params.json`;
     const calls = t.calls.length;
     for (const patch of [
       { answers: { old: { text: 'Started' } } },
@@ -1549,14 +1645,96 @@ describe('learning service', () => {
       },
       { finishedAt: 0 },
     ]) {
-      const original = JSON.stringify(checkRecord(t.path, { questionPolicy: 1, ...patch }));
-      t.files.set(path, original);
-      const restarted = t.restart();
-      expect(await restarted.loadCheck(path)).toEqual(JSON.parse(original));
-      expect(t.files.get(path)).toBe(original);
+      for (const promptFingerprint of [undefined, 'old-prompt-fingerprint']) {
+        const original = JSON.stringify(
+          checkRecord(t.path, { questionPolicy: 2, promptFingerprint, ...patch }),
+        );
+        t.files.set(path, original);
+        const restarted = t.restart();
+        expect(await restarted.loadCheck(path)).toEqual(JSON.parse(original));
+        expect(t.files.get(path)).toBe(original);
+      }
     }
     expect(t.calls).toHaveLength(calls);
   });
+
+  it.each([true, false])(
+    'preserves an answer entered during fingerprint calculation when the saved fingerprint matches: %s',
+    async (matches) => {
+      const t = await mapped();
+      const path = `Qard/Checks/DS346/${DAY} params.json`;
+      const current = await checkPromptFingerprint();
+      const saved = matches ? current : 'old-prompt';
+      t.files.set(path, JSON.stringify(checkRecord(t.path, { promptFingerprint: saved })));
+      let calculated!: (value: string) => void;
+      const fingerprint = vi
+        .spyOn(await import('../src/learn/step-review'), 'checkPromptFingerprint')
+        .mockResolvedValue(current)
+        .mockImplementationOnce(
+          () =>
+            new Promise((resolve) => {
+              calculated = resolve;
+            }),
+        );
+      try {
+        const calls = t.calls.length;
+        const loading = t.learn.loadCheck(path);
+        await vi.waitFor(() => expect(calculated).toBeDefined());
+        t.learn.answerCheck(path, 'old', { text: 'My original answer' });
+        calculated(current);
+        expect(await loading).toMatchObject({
+          promptFingerprint: saved,
+          questions: [{ id: 'old' }],
+          answers: { old: { text: 'My original answer' } },
+        });
+        await t.learn.flush();
+        expect(JSON.parse(t.files.get(path!)!).answers.old.text).toBe('My original answer');
+        expect(t.calls).toHaveLength(calls);
+      } finally {
+        fingerprint.mockRestore();
+      }
+    },
+  );
+
+  it.each([true, false])(
+    'rejects a check deleted during fingerprint calculation when the saved fingerprint matches: %s',
+    async (matches) => {
+      const t = await mapped();
+      const path = `Qard/Checks/DS346/${DAY} params.json`;
+      const current = await checkPromptFingerprint();
+      t.files.set(
+        path,
+        JSON.stringify(
+          checkRecord(t.path, { promptFingerprint: matches ? current : 'old-prompt' }),
+        ),
+      );
+      let calculated!: (value: string) => void;
+      const fingerprint = vi
+        .spyOn(await import('../src/learn/step-review'), 'checkPromptFingerprint')
+        .mockResolvedValue(current)
+        .mockImplementationOnce(
+          () =>
+            new Promise((resolve) => {
+              calculated = resolve;
+            }),
+        );
+      try {
+        const calls = t.calls.length;
+        const loading = t.learn.loadCheck(path);
+        const rejected = expect(loading).rejects.toThrow(/deleted/);
+        await vi.waitFor(() => expect(calculated).toBeDefined());
+        await t.learn.removeCheck(path);
+        calculated(current);
+        await rejected;
+        await t.learn.flush();
+        expect(t.files.has(path)).toBe(false);
+        expect(t.learn.checkAt(path)).toBeUndefined();
+        expect(t.calls).toHaveLength(calls);
+      } finally {
+        fingerprint.mockRestore();
+      }
+    },
+  );
 
   it('opens answered history without requiring the original course file', async () => {
     const t = setup();
@@ -1726,10 +1904,11 @@ describe('learning service', () => {
     const params = (await t.learn.course(t.path)).objectives.find((o) => o.id === 'params')!;
     expect(params).toMatchObject({ state: 'right once', due: addDays(DAY, 7) });
     expect(params.evidence.at(-1)).toBe('2026-09-29 check explain 3/3 sure');
-    await settle();
     // The next check is written straight away, at a harder goal.
-    expect(t.calls.filter((c) => c.task.schema === questionsSchema).at(-1)!.task.prompt).toContain(
-      'Goal: apply',
+    await vi.waitFor(() =>
+      expect(
+        t.calls.filter((c) => c.task.schema === questionsSchema).at(-1)!.task.prompt,
+      ).toContain('Goal: apply'),
     );
   });
 
@@ -2049,7 +2228,8 @@ describe('deleting learning material', () => {
         version: 1,
         mastery: t.path,
         objective: 'params',
-        questionPolicy: 2,
+        questionPolicy: 1,
+        promptFingerprint: await checkPromptFingerprint(),
         answers: {},
         marks: {},
         questions: [],
@@ -2128,7 +2308,7 @@ describe('deleting learning material', () => {
         }),
     );
     const running = t.learn.ensureCheck(t.path, 'params');
-    await settle();
+    await vi.waitFor(() => expect(finish).toBeDefined());
     await t.learn.removeCourse(t.path);
     finish({ questions: [q('c1')] });
     await running;

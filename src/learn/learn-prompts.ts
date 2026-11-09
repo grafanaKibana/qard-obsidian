@@ -95,6 +95,12 @@ Propose how the objectives should grow. Never rename, merge or rewrite existing 
 Return empty lists when nothing changes.`;
 }
 
+export const CHECK_RULES = `Write a short check on one objective. It will be answered days from now to test whether the student still understands it.
+Write ONE or TWO focused, self-contained checks at the supplied goal on this objective, not a broad curriculum. Choose each format for the capability being assessed, using the recent history to balance equally suitable formats. Add a second check only when it gives useful evidence of a distinct gap within this objective; use another suitable format when that fits the task, without adding a question just for variety. Usually use 1–2 marks for written checks, 1 for mcq and 1 per cloze slot. Use fresh wording and new cases; the student must not be able to pass by remembering an earlier question.
+Use earlier questions, answers and feedback to target actual gaps; do not repeat cases. If the objective's state is misconception or slipping, aim at least one question at the latest demonstrated mistake.
+Read the notes first. Question ids are c1 and, if needed, c2; set objective to the supplied objective id and goal on each.
+${QUESTION_FORMAT}`;
+
 export function checkPrompt(
   m: Mastery,
   o: Objective,
@@ -108,15 +114,13 @@ export function checkPrompt(
       return `- (${c.goal}) ${q.prompt.replace(/\s+/g, ' ').slice(0, 200)}\n  Answer: ${studentAnswer(q, c.answers[q.id]) || '(blank)'}${mark ? `\n  Result: ${mark.score}/${q.marks}; ${mark.feedback}` : ''}`;
     }),
   );
-  return `Write a short check on one objective. It will be answered days from now to test whether the student still understands it.
+  return `${CHECK_RULES}
+
 ${objectiveBlock(o)}
 Course: ${m.course}
+Goal: ${goal}.
 ${formatHistory(history ?? previous.flatMap((record) => record.questions))}
-
-Goal: ${goal}. Write ONE or TWO focused, self-contained checks on this objective, not a broad curriculum. Choose each format for the capability being assessed, using the recent history to balance equally suitable formats. Add a second check only when it gives useful evidence of a distinct gap within this objective; use another suitable format when that fits the task, without adding a question just for variety. Usually use 1–2 marks for written checks, 1 for mcq and 1 per cloze slot. Use fresh wording and new cases; the student must not be able to pass by remembering an earlier question.
-${past.length ? `Earlier questions, answers and feedback on this objective (target actual gaps; do not repeat cases):\n${past.join('\n')}\n` : ''}${o.state === 'misconception' || o.state === 'slipping' ? 'The latest evidence shows a mistake. Aim at least one question at it.\n' : ''}
-Read the notes first. Question ids are c1 and, if needed, c2; set objective to "${o.id}" and goal on each.
-${QUESTION_FORMAT}`;
+${past.length ? `Earlier questions, answers and feedback on this objective:\n${past.join('\n')}\n` : ''}`;
 }
 
 export function markCheckPrompt(check: CheckRecord, ids: string[]) {

@@ -1,8 +1,17 @@
-import { CANCELLED, runValidated, type AgentRunner, type AgentTask } from '../agents/runner';
+import {
+  CANCELLED,
+  SCHEMA_INSTRUCTION,
+  runValidated,
+  validationRepairPrompt,
+  type AgentRunner,
+  type AgentTask,
+} from '../agents/runner';
 import { arr, check, obj, str } from '../tests/test-schema';
 import type { Question } from '../tests/test-types';
 import { questionsSchema, readQuestions, readStep } from './learn-schema';
 import type { LessonStep } from './learn-types';
+import { CHECK_RULES } from './learn-prompts';
+import { PREAMBLE, formatHistory } from '../tests/test-prompts';
 
 export const stepReviewSchema = obj({ issues: arr(str('One concrete problem to repair.')) });
 
@@ -31,6 +40,25 @@ ${sources ? `\n<source_text>\n${sources}\n</source_text>\n` : ''}
 <proposed_material>
 ${JSON.stringify(candidate, null, 2)}
 </proposed_material>`;
+}
+
+const REPAIR_RULES = `Repair the proposed material below before it can be shown to the learner. Fix every listed issue while keeping the original task's scope and response schema. Return the whole corrected response.`;
+
+/** Tracks the actual instructions and schemas, excluding changing learner context. */
+export async function checkPromptFingerprint() {
+  const text = JSON.stringify([
+    PREAMBLE,
+    CHECK_RULES,
+    formatHistory([]),
+    formatHistory([{ type: 'short' }]),
+    reviewPrompt('', null),
+    REPAIR_RULES,
+    validationRepairPrompt('', null),
+    SCHEMA_INSTRUCTION(questionsSchema),
+    SCHEMA_INSTRUCTION(stepReviewSchema),
+  ]);
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
 export function stepReviewPrompt(context: string, step: LessonStep, sources?: string) {
@@ -90,7 +118,7 @@ export async function writeReviewedLearning<T>(
         `The generated learning material still needs correction after three attempts: ${review.issues.join(' ')}`,
       );
     }
-    repair = `\n\nRepair the proposed material below before it can be shown to the learner. Fix every listed issue while keeping the original task's scope and response schema. Return the whole corrected response.\nIssues:\n${review.issues.map((issue) => `- ${issue}`).join('\n')}\nPrevious proposed material:\n${JSON.stringify(candidate, null, 2)}`;
+    repair = `\n\n${REPAIR_RULES}\nIssues:\n${review.issues.map((issue) => `- ${issue}`).join('\n')}\nPrevious proposed material:\n${JSON.stringify(candidate, null, 2)}`;
   }
   throw new Error('No reviewed learning material was produced.');
 }
