@@ -245,6 +245,7 @@ Order can be deck/note order or shuffle. The session shows progress through the 
 | 1 / 2 / 3 / 4 | Again / Hard / Good / Easy, after reveal |
 | U | Undo the last rating in this visit, including from the completion screen |
 | S | Skip the current card for this session |
+| P | Pause the current card until you resume it from its preview |
 | E | Edit the current card and return to its queue position |
 | F | Toggle focus mode |
 | Escape | Exit focus; otherwise show/cancel the leave-session confirmation |

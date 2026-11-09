@@ -81,7 +81,9 @@ async function key(key: string, target = host) {
 }
 async function click(text: string) {
   await act(async () => {
-    const button = [...host.querySelectorAll('button')].find((b) => b.textContent?.trim() === text);
+    const button = [...host.querySelectorAll('button')].find((b) =>
+      b.textContent?.trim().startsWith(text),
+    );
     expect(button, host.textContent ?? '').toBeDefined();
     button!.click();
     await services.reviews.flush().catch(() => {});
