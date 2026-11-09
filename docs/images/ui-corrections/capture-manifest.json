@@ -1,0 +1,132 @@
+{
+  "before": "3df0fe59820a9b93cabda79a5c85f7af069131fd",
+  "after": "fc441e4ffceeeb32d61b6c36d40fafd8715483d6",
+  "comparisons": 13,
+  "deviceScaleFactor": 2,
+  "clock": "2026-11-09T12:00Z",
+  "capture": "same fixtures/theme/input/viewport/pane/action/crop; animations, transitions and caret frozen;500ms settle",
+  "maximumExamplesPerGroup": 3,
+  "scenes": [
+    {
+      "name": "map-phone",
+      "screen": "map",
+      "width": 390,
+      "touch": true
+    },
+    {
+      "name": "map-wide",
+      "screen": "map",
+      "width": 1100,
+      "theme": "dark"
+    },
+    {
+      "name": "map-expanded",
+      "screen": "map",
+      "width": 768,
+      "expanded": true
+    },
+    {
+      "name": "objectives-phone",
+      "screen": "course",
+      "width": 390,
+      "touch": true,
+      "list": true
+    },
+    {
+      "name": "objectives-wide",
+      "screen": "course",
+      "width": 1000,
+      "theme": "dark",
+      "list": true
+    },
+    {
+      "name": "jobs-phone",
+      "screen": "jobs",
+      "width": 375,
+      "touch": true,
+      "jobs": true,
+      "crop": ".qard-jobs-list"
+    },
+    {
+      "name": "jobs-wide",
+      "screen": "jobs",
+      "width": 768,
+      "jobs": true,
+      "crop": ".qard-jobs-list"
+    },
+    {
+      "name": "masks-phone",
+      "screen": "masks",
+      "width": 390,
+      "touch": true,
+      "mask": true
+    },
+    {
+      "name": "masks-wide",
+      "screen": "masks",
+      "width": 1000,
+      "mask": true
+    },
+    {
+      "name": "types-phone",
+      "screen": "app",
+      "request": "create",
+      "width": 375,
+      "touch": true,
+      "crop": ".qard-card-type"
+    },
+    {
+      "name": "types-wide",
+      "screen": "app",
+      "request": "create",
+      "width": 1000,
+      "crop": ".qard-card-type"
+    },
+    {
+      "name": "jobs-stop-hover",
+      "screen": "jobs",
+      "width": 375,
+      "touch": true,
+      "jobs": true,
+      "hoverStop": true,
+      "crop": ".qard-jobs-list"
+    },
+    {
+      "name": "mask-placeholders",
+      "screen": "masks",
+      "width": 390,
+      "touch": true,
+      "mask": true,
+      "clearDimensions": true,
+      "crop": ".qard-mask-toolbar"
+    }
+  ],
+  "hashes": {
+    "before-mask-placeholders.png": "1bbc100c057dad9f4fbbf6d182f9742893383532f3e00306c2ea822f1816cc00",
+    "before-masks-wide.png": "4998da59a434cd7e214e1c9888ccf4148da37472d7869bc45aafd7fcf73a7847",
+    "after-masks-wide.png": "a5e5d274195f6b75a4c6403ee5384f6acae35c19829a7eb9b570c7b29e8cf0f1",
+    "before-objectives-wide.png": "7c6d2be97e7f393cd71d04d36b13f50cf8a035850019c8c65364d538bf78308f",
+    "before-map-phone.png": "4df295dccb427286fa3780e8c71d8c22de46f70920212f363f4492e9fdd98ce2",
+    "after-map-expanded.png": "b5e784c0e5513c4914877866582dfb72b2159e6d56eed43642f24c412d949260",
+    "before-objectives-phone.png": "d2e5f1aba42a3a1a6a70c672e8c32d3e36180451be8382511257e69fca3e7a53",
+    "before-jobs-wide.png": "820441412cebd6cdd5a24daf6ea4e97dc28ec084d37249310d68f8a2d10811dc",
+    "after-jobs-wide.png": "9a1bedffc8555e2a32e5174e737cfe0f2866c712c52b84dc04a1b1587d410941",
+    "before-masks-phone.png": "f1f8831391ab53ab10b85f4a0e8bfdcc965b332837427fea652d2e7bcc135c3b",
+    "after-map-phone.png": "44ae43e882ee13be4e87f8cc318cd3f71b792e687f07834bbe93a118fdc3a44a",
+    "after-jobs-stop-hover.png": "87fd66afa28764ab8155c4432ce0e03a7ba355d141ad793ec7b569f882288790",
+    "before-types-phone.png": "0336a084caf8a0346c5d544377aacb6ecce73df7e4a8ec13beead59191d5d6bf",
+    "after-types-phone.png": "b09047a9e01504fb0fb65512618d353433ab7013fd917af1cc5c30ca68c4d1c1",
+    "before-jobs-stop-hover.png": "31bb5b166f04cfd732b06581591c7bfa6da640f0ef495b97b360f3e33bbe00ce",
+    "after-masks-phone.png": "c6410b51395c8c24ba2cb3dfbf7c04c28b4ed897ffc24266b01fa2502a62b8be",
+    "after-mask-placeholders.png": "9ec309471bbb304e5e2c74c10d595d71e92e655a397bec68fe954d6fdf329765",
+    "before-jobs-phone.png": "735cfe52ed89bb870babb77348b8881d843481f6cb1189a05e3f9b75a506c514",
+    "after-jobs-phone.png": "3305604dfae6e9c2a50814845c794e95ba445ff2e0ba5696e9acc215b389d80e",
+    "before-map-expanded.png": "a3b7a6643d414db690ecb91c7c5cf28f4a93a21a4e6d95d8cd96e34f1d6ec9ac",
+    "after-map-wide.png": "08010822bfb2dd4dc966ff12be66ceaa8372514f2b9ba198bb51a6b71b059307",
+    "after-types-wide.png": "89d20101f074a0de27f1bbe3826e2fb5f64f5195349db377bc83ccfa4b85c78f",
+    "before-types-wide.png": "af379ccffd50daa483b6d00c773c3435f8c36940232f57bbcb1167c7e6cefac2",
+    "before-map-wide.png": "da55f83e78cbe39900775d99d00b966839c6e5da14e0e2d7d160022ba396782c",
+    "after-objectives-wide.png": "bcd0fb9c1a8ec3c77d5ea7784274b0a3199bb3b3fd23116af9aad66e677aed1a",
+    "after-objectives-phone.png": "097c5b43d91e356f34b7599917b060676316a12b9368fe087a5972525d45270f"
+  }
+}
