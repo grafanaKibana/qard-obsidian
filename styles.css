@@ -2,7 +2,7 @@
 .qard-app button.qard-statistics-link {
   border-color: transparent;
   color: var(--qard-muted);
-  font-size: 12px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-app button.qard-statistics-link[aria-current='page'] {
@@ -28,16 +28,8 @@
   margin: -12px 0 0;
 }
 
-.qard-statistics h1 {
-  font-size: 30px;
-  letter-spacing: -1px;
-}
-
 .qard-statistics h2 {
   margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: -0.15px;
 }
 
 .qard-statistics p {
@@ -84,13 +76,14 @@
 .qard-stats-metrics dt,
 .qard-stats-memory-metrics dt {
   color: var(--qard-muted);
-  font-size: 11px;
+  font-size: var(--qard-font-meta);
+  line-height: 1.5;
 }
 
 .qard-stats-metrics dd {
   font-size: clamp(25px, 4.5cqw, 36px);
-  font-weight: 500;
-  letter-spacing: -1.3px;
+  font-weight: var(--qard-weight-medium);
+  letter-spacing: -0.03em;
   line-height: 1.25;
   margin: 10px 0;
 }
@@ -99,13 +92,13 @@
 .qard-stats-memory-metrics span {
   color: var(--qard-muted);
   display: block;
-  font-size: 10px;
+  font-size: var(--qard-font-meta);
   line-height: 1.5;
 }
 
 .qard-stats-empty {
   color: var(--qard-muted);
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   padding: 20px 0 0;
 }
 
@@ -119,8 +112,8 @@
 .qard-stats-title-line > span,
 .qard-stats-caption {
   color: var(--qard-muted);
-  font-size: 10px;
-  line-height: 1.6;
+  font-size: var(--qard-font-meta);
+  line-height: 1.5;
 }
 
 .qard-stats-activity {
@@ -142,7 +135,7 @@
 
 .qard-app .qard-stats-year select {
   padding: 6px 9px;
-  font-size: 12px;
+  font-size: var(--qard-font-control);
   width: auto;
 }
 
@@ -357,7 +350,7 @@
 
 .qard-stats-forecast strong {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: var(--qard-weight-medium);
 }
 
 .qard-stats-forecast span {
@@ -422,14 +415,13 @@
 
 .qard-stats-deck-name h3 {
   margin: 0 0 6px;
-  font-weight: 500;
-  font-size: 13px;
   overflow-wrap: anywhere;
 }
 
 .qard-stats-deck-name > span {
-  font-size: 10px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
+  line-height: 1.5;
 }
 
 .qard-stats-deck-track {
@@ -457,7 +449,7 @@
 
 .qard-stats-deck-value strong {
   font-size: 13px;
-  font-weight: 500;
+  font-weight: var(--qard-weight-medium);
 }
 
 .qard-stats-deck-value.has-due {
@@ -465,7 +457,7 @@
 }
 
 .qard-app .qard-stats-deck button {
-  font-size: 11px;
+  font-size: var(--qard-font-control);
   justify-self: end;
   padding: 6px 0 6px 8px;
 }
@@ -481,7 +473,7 @@
   padding: 18px 0;
   cursor: pointer;
   list-style: none;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
 }
 
 .qard-stats-details > summary::-webkit-details-marker {
@@ -494,13 +486,15 @@
 
 .qard-stats-details small {
   color: var(--qard-muted);
-  font-size: 10px;
+  font-size: var(--qard-font-meta);
   margin-left: 8px;
+  line-height: 1.5;
 }
 
 .qard-stats-details > summary > span:nth-child(2) {
   color: var(--qard-muted);
-  font-size: 10px;
+  font-size: var(--qard-font-meta);
+  line-height: 1.5;
 }
 
 .qard-stats-details[open] > summary > svg {
@@ -527,7 +521,8 @@
   gap: 12px;
   margin-top: -16px;
   color: var(--qard-muted);
-  font-size: 10px;
+  font-size: var(--qard-font-meta);
+  line-height: 1.5;
 }
 
 .qard-stats-footnote details {
@@ -596,10 +591,6 @@
     gap: 14px;
   }
 
-  .qard-stats-heading h1 {
-    font-size: 26px;
-  }
-
   .qard-stats-metrics {
     gap: 10px;
   }
@@ -610,7 +601,7 @@
 
   .qard-stats-metrics dd {
     font-size: 26px;
-    letter-spacing: -1px;
+    letter-spacing: -0.03em;
   }
 
   .qard-stats-metrics span {
@@ -890,11 +881,23 @@
   --qard-on-blue: #fff;
   --qard-tint: color-mix(in srgb, var(--qard-blue) 6%, var(--qard-bg));
 
+  /* UI roles follow Obsidian's type settings; reading and data keep their own scale. */
+  --qard-font-page: calc(var(--font-ui-large, 20px) * 1.2);
+  --qard-font-section: var(--font-ui-medium, 15px);
+  --qard-font-body: var(--font-ui-medium, 15px);
+  --qard-font-meta: var(--font-ui-smaller, 12px);
+  --qard-font-control: var(--font-ui-small, 13px);
+  --qard-font-reading: var(--font-text-size, 16px);
+  --qard-weight-normal: var(--font-normal, 400);
+  --qard-weight-medium: var(--font-medium, 500);
+  --qard-weight-strong: var(--font-semibold, 600);
+
   height: 100%;
   min-height: 0;
   color: var(--qard-text);
   background: var(--qard-bg);
-  font: 14px/1.5 var(--font-interface, system-ui, sans-serif);
+  font: var(--qard-weight-normal) var(--qard-font-body) / 1.5
+    var(--font-interface, system-ui, sans-serif);
 }
 
 .theme-dark .qard-app {
@@ -917,16 +920,18 @@
 }
 
 .qard-app h1 {
-  font-size: 26px;
-  font-weight: 550;
+  font-size: var(--qard-font-page);
+  font-weight: var(--qard-weight-strong);
   line-height: 1.25;
-  letter-spacing: -0.7px;
+  letter-spacing: -0.02em;
   overflow-wrap: anywhere;
 }
 
-.qard-app h2 {
-  font-size: 14px;
-  font-weight: 550;
+.qard-app h2,
+.qard-app h3 {
+  font-size: var(--qard-font-section);
+  font-weight: var(--qard-weight-strong);
+  line-height: 1.4;
 }
 
 .qard-app button {
@@ -943,10 +948,12 @@
   color: var(--qard-text);
   box-shadow: none;
   font: inherit;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
   white-space: normal;
   cursor: pointer;
   transition: background 0.12s;
+  font-weight: var(--qard-weight-medium);
+  line-height: 1.4;
 }
 
 .qard-app button:hover {
@@ -995,7 +1002,7 @@
 }
 
 .qard-app kbd {
-  font: 11px var(--font-interface);
+  font: var(--qard-font-meta) var(--font-interface);
   color: var(--qard-muted);
   padding: 1px 5px;
   border: 1px solid var(--qard-border);
@@ -1017,7 +1024,8 @@
   border: 1px solid var(--qard-border);
   border-radius: 7px;
   padding: 9px 11px;
-  font: inherit;
+  font: var(--qard-weight-normal) var(--qard-font-control) / 1.4
+    var(--font-interface, system-ui, sans-serif);
   background-color: var(--qard-bg);
   color: var(--qard-text);
   box-shadow: none;
@@ -1031,6 +1039,7 @@
 }
 
 .qard-app textarea {
+  font-size: var(--qard-font-reading);
   resize: vertical;
   min-height: 110px;
   line-height: 1.65;
@@ -1065,7 +1074,7 @@
 }
 
 .qard-test-delete .qard-error {
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   max-width: 280px;
 }
 
@@ -1075,14 +1084,14 @@
   gap: 10px;
   min-width: 0;
   color: var(--qard-muted);
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
 }
 
 .qard-breadcrumb button {
   border: 0;
   padding: 3px 0;
   color: var(--qard-muted);
-  font-size: 12px;
+  font-size: var(--qard-font-control);
   text-align: left;
 }
 
@@ -1094,8 +1103,8 @@
 }
 
 .qard-breadcrumb button.qard-wordmark {
-  font-weight: 600;
-  font-size: 15px;
+  font-weight: var(--qard-weight-strong);
+  font-size: var(--qard-font-control);
   color: var(--qard-text);
   flex-shrink: 0;
   gap: 8px;
@@ -1126,7 +1135,7 @@
 .qard-heading p {
   margin-top: 6px;
   color: var(--qard-muted);
-  font-size: 13px;
+  font-size: var(--qard-font-body);
 }
 
 .qard-actions {
@@ -1189,8 +1198,8 @@
 }
 
 .qard-deck-badge > span {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: var(--qard-font-body);
+  font-weight: var(--qard-weight-strong);
   letter-spacing: -0.5px;
 }
 
@@ -1242,13 +1251,15 @@
 }
 
 .qard-deck-name strong {
-  font-size: 15px;
-  font-weight: 500;
+  font-size: var(--qard-font-body);
+  font-weight: var(--qard-weight-medium);
   overflow-wrap: anywhere;
 }
 
 .qard-deck-name small {
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
+  font-weight: var(--qard-weight-normal);
+  line-height: 1.5;
   color: var(--qard-muted);
 }
 
@@ -1263,13 +1274,15 @@
 }
 
 .qard-muted {
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
+  font-weight: var(--qard-weight-normal);
+  line-height: 1.5;
   color: var(--qard-muted);
 }
 
 .qard-eyebrow {
   display: block;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
   margin-bottom: 15px;
 }
@@ -1299,14 +1312,14 @@
 }
 
 .qard-topic-heading strong {
-  font-weight: 500;
-  font-size: 14px;
+  font-weight: var(--qard-weight-medium);
+  font-size: var(--qard-font-body);
 }
 
 .qard-topic-heading span {
   margin-left: auto;
   color: var(--qard-muted);
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   flex-shrink: 0;
 }
 
@@ -1331,8 +1344,9 @@
 }
 
 .qard-warning-label {
-  font-size: 11px;
+  font-size: var(--qard-font-meta);
   color: var(--text-error);
+  line-height: 1.5;
 }
 
 .qard-builder {
@@ -1351,22 +1365,15 @@
   margin-bottom: 26px;
 }
 
-.qard-app .qard-setup-heading h1 {
-  font-size: 23px;
-  font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: -0.6px;
-}
-
 .qard-app .qard-setup-heading p {
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
 }
 
 .qard-app .qard-setup-heading > button {
   padding: 5px 0;
   min-height: 28px;
   flex-shrink: 0;
-  font-size: 12px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-panel-heading {
@@ -1377,15 +1384,10 @@
   border-bottom: 1px solid var(--qard-border);
 }
 
-.qard-app .qard-panel-heading h2 {
-  font-size: 12px;
-  font-weight: 500;
-}
-
 .qard-app .qard-panel-heading button {
   padding: 3px 0;
   min-height: 24px;
-  font-size: 12px;
+  font-size: var(--qard-font-control);
   color: var(--qard-blue);
 }
 
@@ -1449,7 +1451,7 @@
 }
 
 .qard-select-deck .qard-deck-badge > span {
-  font-size: 11px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-selection-copy {
@@ -1460,24 +1462,26 @@
 
 .qard-select-deck summary strong {
   display: block;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--qard-font-body);
+  font-weight: var(--qard-weight-medium);
 }
 
 .qard-selection-copy small {
   display: block;
   color: var(--qard-muted);
-  font-size: 11px;
+  font-size: var(--qard-font-meta);
   margin-top: 2px;
+  line-height: 1.5;
 }
 
 .qard-selection-count {
   margin-left: auto;
   color: var(--qard-muted);
   white-space: nowrap;
-  font-size: 11px;
+  font-size: var(--qard-font-meta);
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
+  line-height: 1.5;
 }
 
 .qard-selection-topics {
@@ -1487,7 +1491,7 @@
 }
 
 .qard-select-topic {
-  font-size: 12px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-select-topic > summary {
@@ -1510,7 +1514,7 @@
   align-items: flex-start;
   padding: 8px 0;
   cursor: pointer;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
 }
 
 .qard-individuals span {
@@ -1527,8 +1531,6 @@
 
 .qard-app .qard-session-options > h2 {
   margin-bottom: 14px;
-  font-size: 12px;
-  font-weight: 500;
 }
 
 .qard-session-options > label {
@@ -1536,7 +1538,7 @@
   flex-direction: column;
   gap: 7px;
   color: var(--qard-muted);
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   margin-bottom: 18px;
 }
 
@@ -1545,7 +1547,7 @@
   flex-direction: column;
   gap: 7px;
   color: var(--qard-muted);
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
 }
 
 .qard-session-type {
@@ -1560,7 +1562,7 @@
   padding: 6px 9px;
   min-height: 30px;
   border-radius: 3px;
-  font-size: 12px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-app .qard-session-type button[aria-pressed='true'] {
@@ -1572,11 +1574,11 @@
 .qard-app .qard-session-description {
   margin: 9px 0 22px;
   min-height: 36px;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
 }
 
 .qard-app .qard-session-options select {
-  font-size: 12px;
+  font-size: var(--qard-font-control);
   padding: 9px 10px;
   border-radius: 5px;
 }
@@ -1592,21 +1594,21 @@
 
 .qard-session-counts strong {
   display: block;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--qard-font-body);
+  font-weight: var(--qard-weight-medium);
 }
 
 .qard-session-counts small {
   display: block;
   margin-top: 3px;
-  font-size: 11px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
 }
 
 .qard-app .qard-session-start .qard-primary {
   padding: 10px 14px;
   border-radius: 5px;
-  font-size: 12px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-app .qard-selection-note {
@@ -1614,8 +1616,9 @@
   align-items: baseline;
   gap: 6px;
   margin-top: 16px;
-  font-size: 11px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
+  line-height: 1.5;
 }
 
 .qard-preview-toolbar {
@@ -1642,8 +1645,8 @@
 
 .qard-markdown {
   position: relative;
-  font-size: 16px;
-  line-height: 1.7;
+  font-size: var(--qard-font-reading);
+  line-height: 1.65;
   overflow-wrap: anywhere;
   user-select: text;
 }
@@ -1725,7 +1728,7 @@
   flex-direction: column;
   gap: 8px;
   min-width: 0;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
   color: var(--qard-muted);
 }
 
@@ -1842,7 +1845,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
 }
 
@@ -1858,7 +1861,7 @@
 .qard-study-toolbar button {
   border-color: transparent;
   color: var(--qard-muted);
-  font-size: 12px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-study-area {
@@ -1868,7 +1871,7 @@
 
 .qard-study-progress {
   text-align: center;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
   color: var(--qard-muted);
   margin-bottom: 12px;
 }
@@ -1877,7 +1880,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
   margin-bottom: 12px;
 }
 
@@ -1885,7 +1888,7 @@
   display: grid;
   gap: 8px;
   margin: 20px 0;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-typed-recall textarea {
@@ -1902,7 +1905,7 @@
   gap: 4px 10px;
   margin: 0 0 12px;
   color: var(--qard-muted);
-  font-size: 13px;
+  font-size: var(--qard-font-body);
 }
 
 .qard-editor-destination {
@@ -1931,7 +1934,7 @@
   justify-content: center;
   min-width: 0;
   padding: 7px 8px;
-  font-size: 12px;
+  font-size: var(--qard-font-control);
   white-space: nowrap;
 }
 
@@ -2079,13 +2082,13 @@
 }
 
 .qard-rating strong {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--qard-font-control);
+  font-weight: var(--qard-weight-medium);
 }
 
 .qard-app button.qard-hide-answer {
   border-color: transparent;
-  font-size: 11px;
+  font-size: var(--qard-font-control);
   color: var(--qard-muted);
   margin-top: 12px;
 }
@@ -2097,13 +2100,13 @@
   align-items: center;
   justify-content: space-between;
   margin-top: 12px;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
 }
 
 .qard-study-foot button {
   border-color: transparent;
-  font-size: 11px;
+  font-size: var(--qard-font-control);
   color: var(--qard-muted);
 }
 
@@ -2138,17 +2141,17 @@
 
 .qard-summary-stats strong {
   font-size: 23px;
-  font-weight: 500;
+  font-weight: var(--qard-weight-medium);
 }
 
 .qard-summary-ratings strong {
   font-size: 17px;
-  font-weight: 500;
+  font-weight: var(--qard-weight-medium);
 }
 
 .qard-summary-stats span,
 .qard-summary-ratings span {
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
 }
 
@@ -2175,7 +2178,7 @@
 .qard-difficulty-heading p {
   margin-top: 4px;
   color: var(--qard-muted);
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
 }
 
 .qard-difficulty-median {
@@ -2187,12 +2190,13 @@
   border-radius: 6px;
   background: var(--qard-soft);
   color: var(--qard-muted);
-  font-size: 11px;
+  font-size: var(--qard-font-meta);
+  line-height: 1.5;
 }
 
 .qard-difficulty-median strong {
   color: var(--qard-text);
-  font-weight: 500;
+  font-weight: var(--qard-weight-medium);
 }
 
 .qard-difficulty-plot {
@@ -2272,7 +2276,7 @@
 .qard-difficulty-ratings small {
   color: var(--qard-muted);
   font-size: 10px;
-  font-weight: 400;
+  font-weight: var(--qard-weight-normal);
 }
 
 .qard-difficulty-direction {
@@ -2294,7 +2298,7 @@
   border: 1px solid var(--qard-border);
   border-radius: 8px;
   background: var(--qard-soft);
-  font-size: 13px;
+  font-size: var(--qard-font-body);
   margin: 20px 0;
 }
 
@@ -2311,13 +2315,13 @@
   border-radius: 7px;
   color: var(--text-error, #bc4051);
   background: var(--qard-soft);
-  font-size: 13px;
+  font-size: var(--qard-font-body);
   margin: 15px 0;
 }
 
 .qard-index-issues {
   margin-bottom: 24px;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
 }
 
 .qard-index-issues > button {
@@ -2340,7 +2344,7 @@
 }
 
 .qard-voice button {
-  font-size: 12px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-voice audio {
@@ -2350,7 +2354,7 @@
 
 .qard-voice p {
   width: 100%;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
   text-align: center;
 }
@@ -2474,10 +2478,6 @@ body.qard-focus-active .status-bar {
     gap: 16px;
   }
 
-  .qard-app h1 {
-    font-size: 23px;
-  }
-
   .qard-editor-meta,
   .qard-editor-rendered {
     grid-template-columns: 1fr;
@@ -2494,10 +2494,6 @@ body.qard-focus-active .status-bar {
 
   .qard-preview-side {
     padding: 22px;
-  }
-
-  .qard-topic-heading strong {
-    font-size: 13px;
   }
 
   .qard-summary-stats,
@@ -2611,11 +2607,6 @@ body.qard-focus-active .status-bar {
   flex: 1 1 240px;
 }
 
-.qard-app .qard-library-heading h1 {
-  font-size: 20px;
-  letter-spacing: -0.4px;
-}
-
 .qard-library-heading p {
   line-height: 1.65;
   max-width: 48ch;
@@ -2627,7 +2618,8 @@ body.qard-focus-active .status-bar {
 
 .qard-tabs {
   display: flex;
-  gap: 26px;
+  flex-wrap: wrap;
+  gap: 8px 26px;
   width: 100%;
   border-bottom: 1px solid var(--qard-border);
 }
@@ -2639,9 +2631,9 @@ body.qard-focus-active .status-bar {
   padding: 0 0 13px;
   margin-bottom: -1px;
   min-height: 38px;
-  font-size: 20px;
-  font-weight: 500;
-  letter-spacing: -0.4px;
+  font-size: var(--qard-font-control);
+  font-weight: var(--qard-weight-strong);
+  letter-spacing: normal;
   color: var(--qard-muted);
   background: transparent;
 }
@@ -2662,11 +2654,7 @@ body.qard-focus-active .status-bar {
 
 @container qard-workspace (max-width: 500px) {
   .qard-tabs {
-    gap: 20px;
-  }
-
-  .qard-app .qard-tabs button {
-    font-size: 18px;
+    gap: 8px 20px;
   }
 
   .qard-page-review {
@@ -2676,7 +2664,7 @@ body.qard-focus-active .status-bar {
 
 .qard-test-status {
   margin-left: auto;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
   white-space: nowrap;
 }
@@ -2687,7 +2675,7 @@ body.qard-focus-active .status-bar {
   min-height: 0;
   color: var(--qard-blue);
   background: transparent;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-app .qard-link:hover {
@@ -2700,8 +2688,8 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-label {
-  font-size: 12px;
-  font-weight: 500;
+  font-size: var(--qard-font-meta);
+  font-weight: var(--qard-weight-medium);
   color: var(--qard-muted);
   margin: 0 0 10px;
 }
@@ -2712,7 +2700,7 @@ body.qard-focus-active .status-bar {
   flex-wrap: wrap;
   gap: 8px 10px;
   min-width: 0;
-  font-size: 15px;
+  font-size: var(--qard-font-body);
   margin: 0 0 6px;
 }
 
@@ -2897,8 +2885,8 @@ body.qard-focus-active .status-bar {
   border: 0;
   padding: 0;
   min-height: 0;
-  font-size: 17px;
-  line-height: 1.6;
+  font-size: var(--qard-font-reading);
+  line-height: 1.65;
   resize: none;
   background: transparent;
   box-shadow: none;
@@ -2945,7 +2933,7 @@ body.qard-focus-active .status-bar {
   padding: 5px 11px;
   border: 1px solid var(--qard-border);
   border-radius: 999px;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
   color: var(--qard-muted);
   background: var(--qard-bg);
 }
@@ -3011,7 +2999,8 @@ body.qard-focus-active .status-bar {
 
 .qard-popover-item small {
   color: var(--qard-muted);
-  font-size: 11px;
+  font-size: var(--qard-font-meta);
+  line-height: 1.5;
 }
 
 .qard-folder-chip {
@@ -3041,7 +3030,7 @@ body.qard-focus-active .status-bar {
 
 .qard-hint {
   padding: 0 4px;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
 }
 
 /* Plan */
@@ -3060,22 +3049,13 @@ body.qard-focus-active .status-bar {
   gap: 8px;
 }
 
-.qard-doc h1 {
-  font-size: 28px;
-}
-
 .qard-app .qard-doc h2 {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  color: var(--qard-muted);
   margin-bottom: 10px;
 }
 
 .qard-doc-body {
-  font-size: 15px;
-  line-height: 1.7;
+  font-size: var(--qard-font-reading);
+  line-height: 1.65;
 }
 
 .qard-doc-row {
@@ -3092,7 +3072,8 @@ body.qard-focus-active .status-bar {
 
 .qard-doc-row .qard-muted {
   flex: 1;
-  font-size: 12.5px;
+  font-size: var(--qard-font-meta);
+  line-height: 1.5;
 }
 
 .qard-doc-section {
@@ -3104,14 +3085,14 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-doc-section strong {
-  font-weight: 550;
-  font-size: 15px;
+  font-weight: var(--qard-weight-medium);
+  font-size: var(--qard-font-body);
 }
 
 .qard-doc-section p {
   color: var(--qard-muted);
-  font-size: 13.5px;
-  line-height: 1.55;
+  font-size: var(--qard-font-meta);
+  line-height: 1.5;
   margin: 2px 0;
 }
 
@@ -3147,14 +3128,14 @@ body.qard-focus-active .status-bar {
   border: 0;
   padding: 0;
   min-height: 0;
-  font-size: 12.5px;
+  font-size: var(--qard-font-control);
   color: var(--qard-muted);
   background: transparent;
 }
 
 .qard-app .qard-test-steps button.is-current {
   color: var(--qard-text);
-  font-weight: 600;
+  font-weight: var(--qard-weight-strong);
 }
 
 .qard-app .qard-test-steps button.is-done {
@@ -3168,7 +3149,7 @@ body.qard-focus-active .status-bar {
   padding: 10px 14px;
   border-radius: 10px;
   background: var(--qard-soft);
-  font-size: 13px;
+  font-size: var(--qard-font-body);
   margin-bottom: 8px;
 }
 
@@ -3203,13 +3184,13 @@ body.qard-focus-active .status-bar {
 .qard-q-meta {
   display: flex;
   justify-content: space-between;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
 }
 
 .qard-q-prompt .qard-markdown {
-  font-size: 17px;
-  line-height: 1.55;
+  font-size: var(--qard-font-reading);
+  line-height: 1.65;
 }
 
 .qard-app textarea.qard-answer-input {
@@ -3217,7 +3198,7 @@ body.qard-focus-active .status-bar {
   background: var(--qard-soft);
   border-radius: 10px;
   padding: 13px 15px;
-  font-size: 15px;
+  font-size: var(--qard-font-reading);
   min-height: 0;
 }
 
@@ -3253,7 +3234,8 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-option .qard-markdown {
-  font-size: 15px;
+  font-size: var(--qard-font-reading);
+  line-height: 1.65;
 }
 
 .qard-radio {
@@ -3279,14 +3261,14 @@ body.qard-focus-active .status-bar {
   border: 0;
   min-height: 28px;
   padding: 4px 8px;
-  font-size: 12px;
+  font-size: var(--qard-font-control);
   color: var(--qard-muted);
 }
 
 .qard-app button.qard-conf.is-on {
   background: var(--qard-tint);
   color: var(--qard-blue);
-  font-weight: 600;
+  font-weight: var(--qard-weight-strong);
 }
 
 .qard-app button.qard-flag.is-on {
@@ -3322,15 +3304,15 @@ body.qard-focus-active .status-bar {
 
 .qard-score-big {
   font-size: 54px;
-  font-weight: 560;
-  letter-spacing: -2px;
+  font-weight: var(--qard-weight-strong);
+  letter-spacing: -0.03em;
   line-height: 1;
   margin: 10px 0 12px;
 }
 
 .qard-score-big span {
   color: var(--qard-muted);
-  font-weight: 400;
+  font-weight: var(--qard-weight-normal);
 }
 
 .qard-score-big small {
@@ -3338,19 +3320,19 @@ body.qard-focus-active .status-bar {
   letter-spacing: 0;
   color: var(--qard-muted);
   margin-left: 14px;
-  font-weight: 400;
+  font-weight: var(--qard-weight-normal);
 }
 
 .qard-section-scores {
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
   color: var(--qard-muted);
 }
 
 .qard-section-scores strong {
-  font-weight: 600;
+  font-weight: var(--qard-weight-strong);
 }
 
 .qard-app button.qard-fix {
@@ -3372,18 +3354,19 @@ body.qard-focus-active .status-bar {
 
 .qard-fix strong {
   display: block;
-  font-weight: 560;
-  font-size: 15px;
+  font-weight: var(--qard-weight-strong);
+  font-size: var(--qard-font-body);
   margin-bottom: 3px;
 }
 
 .qard-fix .qard-markdown {
-  font-size: 13.5px;
+  font-size: var(--qard-font-reading);
   color: var(--qard-muted);
+  line-height: 1.65;
 }
 
 .qard-sure {
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-bad);
   white-space: nowrap;
 }
@@ -3413,12 +3396,14 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-suggestion-body .qard-markdown {
-  font-size: 14px;
+  font-size: var(--qard-font-reading);
+  line-height: 1.65;
 }
 
 .qard-suggestion-body strong .qard-markdown {
-  font-size: 15px;
-  font-weight: 560;
+  font-size: var(--qard-font-reading);
+  font-weight: var(--qard-weight-strong);
+  line-height: 1.65;
 }
 
 .qard-suggestion-actions {
@@ -3461,7 +3446,7 @@ body.qard-focus-active .status-bar {
   min-height: 34px;
   padding: 6px 10px;
   text-align: left;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-app button.qard-rail-item {
@@ -3481,13 +3466,13 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-rail-score {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--qard-font-meta);
+  font-weight: var(--qard-weight-strong);
 }
 
 .qard-rail-section {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: var(--qard-font-meta);
+  font-weight: var(--qard-weight-strong);
   letter-spacing: 0.5px;
   text-transform: uppercase;
   color: var(--qard-muted);
@@ -3519,7 +3504,7 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-review-summary {
-  font-size: 13px;
+  font-size: var(--qard-font-body);
   line-height: 1.6;
   color: var(--qard-muted);
 }
@@ -3534,11 +3519,11 @@ body.qard-focus-active .status-bar {
 .qard-review-prompt .qard-markdown {
   font-size: 19px;
   line-height: 1.5;
-  font-weight: 500;
+  font-weight: var(--qard-weight-medium);
 }
 
 .qard-review-tag {
-  font-size: 13px;
+  font-size: var(--qard-font-control);
   color: var(--qard-muted);
 }
 
@@ -3548,8 +3533,8 @@ body.qard-focus-active .status-bar {
 
 .qard-review-score {
   font-size: 30px;
-  font-weight: 560;
-  letter-spacing: -1px;
+  font-weight: var(--qard-weight-strong);
+  letter-spacing: -0.03em;
   line-height: 1.2;
   white-space: nowrap;
   flex-shrink: 0;
@@ -3571,8 +3556,8 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-marked-text {
-  font-size: 15px;
-  line-height: 1.9;
+  font-size: var(--qard-font-reading);
+  line-height: 1.65;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   user-select: text;
@@ -3677,13 +3662,13 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-note .qard-markdown {
-  font-size: 13.5px;
-  line-height: 1.55;
+  font-size: var(--qard-font-reading);
+  line-height: 1.65;
 }
 
 .qard-note-kind {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--qard-font-meta);
+  font-weight: var(--qard-weight-strong);
 }
 
 .qard-note-correct .qard-note-kind {
@@ -3761,7 +3746,7 @@ body.qard-focus-active .status-bar {
   gap: 10px;
   align-items: baseline;
   padding: 8px 0;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-rubric-row + .qard-rubric-row {
@@ -3824,7 +3809,8 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-panel .qard-markdown {
-  font-size: 15px;
+  font-size: var(--qard-font-reading);
+  line-height: 1.65;
 }
 
 .qard-panel-actions {
@@ -3855,8 +3841,8 @@ body.qard-focus-active .status-bar {
 .qard-plain {
   white-space: pre-wrap;
   color: var(--qard-muted);
-  font-size: 15px;
-  line-height: 1.7;
+  font-size: var(--qard-font-reading);
+  line-height: 1.65;
 }
 
 .qard-followup {
@@ -3866,15 +3852,15 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-followup strong {
-  font-weight: 560;
-  font-size: 14px;
+  font-weight: var(--qard-weight-strong);
+  font-size: var(--qard-font-body);
 }
 
 .qard-override {
   display: flex;
   gap: 10px;
   align-items: baseline;
-  font-size: 14px;
+  font-size: var(--qard-font-body);
   padding: 4px 0;
 }
 
@@ -3919,7 +3905,7 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-resume strong {
-  font-weight: 550;
+  font-weight: var(--qard-weight-medium);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -3952,11 +3938,12 @@ body.qard-focus-active .status-bar {
   align-items: center;
   padding: 2px 8px;
   border-radius: 999px;
-  font-size: 11.5px;
-  font-weight: 550;
+  font-size: var(--qard-font-meta);
+  font-weight: var(--qard-weight-medium);
   white-space: nowrap;
   color: var(--qard-muted);
   background: var(--qard-soft);
+  line-height: 1.5;
 }
 
 .qard-state-gap,
@@ -3987,7 +3974,8 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-small {
-  font-size: 12.5px;
+  font-size: var(--qard-font-meta);
+  line-height: 1.5;
 }
 
 .qard-app button.qard-row-button {
@@ -4013,15 +4001,16 @@ body.qard-focus-active .status-bar {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 14.5px;
+  font-size: var(--qard-font-body);
 }
 
 .qard-row-button .qard-muted {
   flex: 0 1 auto;
-  font-size: 12.5px;
+  font-size: var(--qard-font-meta);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.5;
 }
 
 .qard-row-button .qard-check + span {
@@ -4065,8 +4054,8 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-objective-main strong {
-  font-weight: 550;
-  font-size: 14.5px;
+  font-weight: var(--qard-weight-medium);
+  font-size: var(--qard-font-body);
   overflow-wrap: anywhere;
 }
 
@@ -4077,7 +4066,7 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-objective-due {
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   text-align: right;
 }
 
@@ -4089,7 +4078,7 @@ body.qard-focus-active .status-bar {
 .qard-app .qard-objective-actions button {
   min-height: 30px;
   padding: 4px 10px;
-  font-size: 12.5px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-check-outcome {
@@ -4138,12 +4127,13 @@ body.qard-focus-active .status-bar {
 .qard-lesson-why .qard-markdown {
   color: var(--qard-muted);
   font-style: italic;
-  font-size: 15px;
+  font-size: var(--qard-font-reading);
+  line-height: 1.65;
 }
 
 .qard-lesson-explain {
-  font-size: 15.5px;
-  line-height: 1.7;
+  font-size: var(--qard-font-reading);
+  line-height: 1.65;
   padding: 6px 0 14px;
 }
 
@@ -4159,7 +4149,8 @@ body.qard-focus-active .status-bar {
   padding: 14px 16px;
   border-radius: 12px;
   background: var(--qard-tint);
-  font-size: 15px;
+  font-size: var(--qard-font-reading);
+  line-height: 1.65;
 }
 
 .qard-reteach {
@@ -4199,7 +4190,8 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-probe-results .qard-doc-row {
-  font-size: 13.5px;
+  font-size: var(--qard-font-meta);
+  line-height: 1.5;
 }
 
 .qard-learn-recent {
@@ -4303,7 +4295,7 @@ body.qard-focus-active .status-bar {
   border: 0;
   min-height: 28px;
   padding: 3px 12px;
-  font-size: 12.5px;
+  font-size: var(--qard-font-control);
   background: transparent;
   color: var(--qard-muted);
 }
@@ -4343,7 +4335,7 @@ body.qard-focus-active .status-bar {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
 }
 
@@ -4352,7 +4344,7 @@ body.qard-focus-active .status-bar {
   min-height: 0;
   padding: 3px 8px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: var(--qard-font-control);
   color: var(--qard-muted);
   background: transparent;
 }
@@ -4626,7 +4618,7 @@ body.qard-focus-active .status-bar {
 .qard-map-zoom {
   min-width: 40px;
   text-align: center;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
   font-variant-numeric: tabular-nums;
 }
@@ -4651,7 +4643,7 @@ body.qard-focus-active .status-bar {
   min-height: 0;
   width: 100%;
   min-width: 0;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-map-panel {
@@ -4673,8 +4665,6 @@ body.qard-focus-active .status-bar {
 
 .qard-map-panel h3 {
   margin: 0;
-  font-size: 17px;
-  line-height: 1.35;
 }
 
 .qard-map-panel p {
@@ -4706,7 +4696,7 @@ body.qard-focus-active .status-bar {
 .qard-app .qard-map-panel-actions button {
   min-height: 32px;
   padding: 5px 12px;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
   gap: 6px;
 }
 
@@ -4719,7 +4709,7 @@ body.qard-focus-active .status-bar {
   min-height: 30px;
   padding: 4px 6px;
   text-align: left;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
   background: transparent;
 }
 
@@ -4753,7 +4743,7 @@ body.qard-focus-active .status-bar {
   flex-shrink: 0;
   width: 18px;
   color: var(--qard-muted);
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
@@ -4849,7 +4839,7 @@ body.qard-focus-active .status-bar {
 
 .qard-topic-ready {
   color: var(--qard-blue);
-  font-weight: 600;
+  font-weight: var(--qard-weight-strong);
 }
 
 .qard-topic-warn text {
@@ -4893,7 +4883,7 @@ body.qard-focus-active .status-bar {
   gap: 2px;
   min-height: 28px;
   padding: 0 6px 0 2px;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
   color: var(--qard-blue);
 }
 
@@ -4902,8 +4892,8 @@ body.qard-focus-active .status-bar {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 13px;
-  font-weight: 650;
+  font-size: var(--qard-font-control);
+  font-weight: var(--qard-weight-strong);
   color: var(--qard-text);
   white-space: nowrap;
 }
@@ -4932,7 +4922,8 @@ body.qard-focus-active .status-bar {
 
 .qard-resume.is-static .qard-waiting {
   margin: 0;
-  font-size: 13.5px;
+  font-size: var(--qard-font-meta);
+  line-height: 1.5;
 }
 
 .qard-lesson-trail {
@@ -4942,17 +4933,17 @@ body.qard-focus-active .status-bar {
   gap: 8px;
   max-width: 720px;
   margin: 0 auto 14px;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
   color: var(--qard-muted);
 }
 
 .qard-app .qard-lesson-trail .qard-link {
-  font-size: 13px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-app .qard-lesson-trail-map {
   margin-left: auto;
-  font-size: 12.5px;
+  font-size: var(--qard-font-meta);
 }
 
 .qard-map-lesson circle {
@@ -4976,7 +4967,7 @@ body.qard-focus-active .status-bar {
   min-height: 28px;
   padding: 3px 12px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: var(--qard-font-control);
   color: var(--qard-text);
   background: var(--qard-tint);
   border-color: color-mix(in srgb, var(--qard-blue) 25%, var(--qard-border));
@@ -4993,8 +4984,8 @@ body.qard-focus-active .status-bar {
 
 .qard-jobs-heading {
   padding: 14px 16px;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--qard-font-meta);
+  font-weight: var(--qard-weight-strong);
   border-bottom: 1px solid var(--qard-border);
 }
 
@@ -5019,14 +5010,14 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-jobs-item strong {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--qard-font-body);
+  font-weight: var(--qard-weight-strong);
 }
 
 .qard-jobs-detail {
   max-width: 100%;
   color: var(--qard-muted);
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
@@ -5037,8 +5028,9 @@ body.qard-focus-active .status-bar {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 6px 12px;
-  font-size: 11px;
+  font-size: var(--qard-font-meta);
   font-variant-numeric: tabular-nums;
+  line-height: 1.5;
 }
 
 .qard-jobs-note {
@@ -5102,14 +5094,14 @@ body.qard-focus-active .status-bar {
 
 .qard-wait-estimate {
   color: var(--qard-muted);
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   line-height: 1.8;
 }
 
 .qard-wait-description {
   margin: 0;
   color: var(--qard-muted);
-  font-size: 13px;
+  font-size: var(--qard-font-body);
   line-height: 1.7;
 }
 
@@ -5155,7 +5147,7 @@ body.qard-focus-active .status-bar {
 
 .qard-wait-ready strong {
   color: var(--qard-text);
-  font-weight: 600;
+  font-weight: var(--qard-weight-strong);
 }
 
 .qard-wait-body {
@@ -5189,7 +5181,8 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-wait-front .qard-markdown {
-  font-size: 17px;
+  font-size: var(--qard-font-reading);
+  line-height: 1.65;
 }
 
 .qard-wait-back {
@@ -5267,8 +5260,8 @@ body.qard-focus-active .status-bar {
 
 .qard-usage-total strong {
   font-size: 44px;
-  font-weight: 560;
-  letter-spacing: -1.5px;
+  font-weight: var(--qard-weight-strong);
+  letter-spacing: -0.03em;
   line-height: 1;
 }
 
@@ -5280,14 +5273,14 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-usage-stats dt {
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
 }
 
 .qard-usage-stats dd {
   margin: 2px 0 0;
   font-size: 17px;
-  font-weight: 600;
+  font-weight: var(--qard-weight-strong);
   font-variant-numeric: tabular-nums;
 }
 
@@ -5348,7 +5341,7 @@ body.qard-focus-active .status-bar {
 .qard-usage-legend {
   display: flex;
   gap: 16px;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
   margin-top: -12px;
 }
@@ -5364,14 +5357,14 @@ body.qard-focus-active .status-bar {
 .qard-usage-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13.5px;
+  font-size: var(--qard-font-control);
   font-variant-numeric: tabular-nums;
 }
 
 .qard-usage-table th {
   text-align: right;
-  font-weight: 500;
-  font-size: 12px;
+  font-weight: var(--qard-weight-medium);
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
   padding: 6px 8px;
   border-bottom: 1px solid var(--qard-border);
@@ -5390,7 +5383,8 @@ body.qard-focus-active .status-bar {
 
 .qard-usage-table td:first-child small {
   display: block;
-  font-size: 11.5px;
+  font-size: var(--qard-font-meta);
+  line-height: 1.5;
 }
 
 /* Who is working: a quiet tag after progress text */
@@ -5399,9 +5393,9 @@ body.qard-focus-active .status-bar {
   margin-left: 10px;
   padding: 1px 7px;
   border-radius: 999px;
-  font-size: 11px;
-  font-weight: 500;
-  line-height: 1.6;
+  font-size: var(--qard-font-meta);
+  font-weight: var(--qard-weight-medium);
+  line-height: 1.5;
   color: var(--qard-muted);
   background: var(--qard-soft);
   border: 1px solid var(--qard-border);
@@ -5419,8 +5413,8 @@ body.qard-focus-active .status-bar {
 /* Lesson captions render Markdown and LaTeX, in the muted caption style. */
 .qard-lesson-findings .qard-markdown {
   color: var(--qard-muted);
-  font-size: 15px;
-  line-height: 1.6;
+  font-size: var(--qard-font-reading);
+  line-height: 1.65;
 }
 
 .qard-probe-prompt {
@@ -5429,14 +5423,14 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-probe-prompt .qard-markdown {
-  font-size: 13.5px;
-  line-height: 1.5;
+  font-size: var(--qard-font-reading);
+  line-height: 1.65;
 }
 
 .qard-doc-why .qard-markdown {
   color: var(--qard-muted);
-  font-size: 13.5px;
-  line-height: 1.55;
+  font-size: var(--qard-font-reading);
+  line-height: 1.65;
   margin: 2px 0;
 }
 
@@ -5474,7 +5468,7 @@ body.qard-focus-active .status-bar {
   border-radius: 12px 12px 4px 12px;
   background: var(--qard-tint);
   color: var(--qard-text);
-  font-size: 14px;
+  font-size: var(--qard-font-control);
   line-height: 1.45;
   text-align: left;
   white-space: pre-wrap;
@@ -5492,7 +5486,7 @@ div.qard-ask-q {
 }
 
 .qard-ask-a .qard-markdown {
-  font-size: 15px;
+  font-size: var(--qard-font-reading);
   line-height: 1.65;
 }
 
@@ -5515,7 +5509,7 @@ div.qard-ask-q {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 12px;
+  font-size: var(--qard-font-control);
   color: var(--qard-muted);
 }
 
@@ -5563,12 +5557,13 @@ div.qard-ask-q {
 
 .qard-ask-fold strong {
   color: var(--qard-text);
-  font-weight: 550;
-  font-size: 13.5px;
+  font-weight: var(--qard-weight-medium);
+  font-size: var(--qard-font-body);
 }
 
 .qard-ask-fold span {
-  font-size: 12.5px;
+  font-size: var(--qard-font-meta);
+  line-height: 1.5;
 }
 
 .qard-ask-card {
@@ -5590,8 +5585,8 @@ div.qard-ask-q {
   resize: none;
   padding: 8px 12px;
   border-radius: 10px;
-  font-size: 14px;
-  line-height: 1.45;
+  font-size: var(--qard-font-reading);
+  line-height: 1.65;
 }
 
 .qard-panel-ask {
@@ -5621,8 +5616,8 @@ div.qard-ask-q {
 
 .qard-lesson-connect .qard-markdown {
   color: var(--qard-muted);
-  font-size: 15px;
-  line-height: 1.6;
+  font-size: var(--qard-font-reading);
+  line-height: 1.65;
 }
 
 /* Cancelling and recovering stuck jobs */
@@ -5631,7 +5626,7 @@ div.qard-ask-q {
   align-items: center;
   gap: 12px;
   margin: 6px 0 10px;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-job-controls.is-stuck {
@@ -5669,7 +5664,7 @@ div.qard-ask-q {
   flex-shrink: 0;
   padding: 0;
   min-height: 24px;
-  font-size: 12px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-app button.qard-jobs-cancel:hover {
@@ -5678,7 +5673,8 @@ div.qard-ask-q {
 
 .qard-jobs-stuck {
   color: var(--text-warning, #d9822b);
-  font-size: 11px;
+  font-size: var(--qard-font-meta);
+  line-height: 1.5;
 }
 
 .qard-ask-thinking {
@@ -5890,9 +5886,6 @@ div.qard-ask-q {
 }
 
 .qard-card-sources h3 {
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.4;
   color: var(--qard-text);
 }
 
@@ -5907,7 +5900,7 @@ div.qard-ask-q {
   gap: 6px;
   flex-shrink: 0;
   padding: 6px 10px;
-  font-size: 12px;
+  font-size: var(--qard-font-control);
   white-space: nowrap;
   color: var(--qard-muted);
 }
@@ -5950,7 +5943,7 @@ div.qard-ask-q {
   box-shadow: none;
   justify-content: flex-start;
   text-align: left;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
   color: var(--qard-text);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -5963,7 +5956,7 @@ div.qard-ask-q {
 }
 
 .qard-card-sources .qard-source-pending {
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-blue);
 }
 
@@ -6000,7 +5993,8 @@ div.qard-ask-q {
 .qard-source-search .qard-popover > .qard-source-caveat {
   margin-top: 4px;
   border-top: 1px solid var(--qard-border);
-  font-size: 11px;
+  font-size: var(--qard-font-meta);
+  line-height: 1.5;
 }
 
 @media (width <= 520px) {
@@ -6061,8 +6055,9 @@ div.qard-ask-q {
 }
 
 .qard-plans-view button > span {
-  font-size: 11px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
+  line-height: 1.5;
 }
 
 .qard-plans-empty {
@@ -6076,7 +6071,6 @@ div.qard-ask-q {
 }
 
 .qard-app .qard-plans-empty h2 {
-  font-size: 17px;
   color: var(--qard-text);
 }
 
@@ -6108,16 +6102,14 @@ div.qard-ask-q {
 }
 
 .qard-app .qard-exam-plan-head h2 {
-  font-size: 17px;
-  line-height: 1.4;
   overflow-wrap: anywhere;
 }
 
 .qard-exam-plan-head p {
   margin-top: 4px;
-  font-size: 11px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .qard-exam-date {
@@ -6139,7 +6131,7 @@ div.qard-ask-q {
 
 .qard-exam-date strong {
   font-size: 21px;
-  font-weight: 550;
+  font-weight: var(--qard-weight-medium);
   line-height: 1.25;
 }
 
@@ -6154,12 +6146,12 @@ div.qard-ask-q {
   justify-content: space-between;
   align-items: baseline;
   gap: 12px;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
 }
 
 .qard-exam-coverage strong {
-  font-weight: 500;
+  font-weight: var(--qard-weight-medium);
   color: var(--qard-text);
 }
 
@@ -6192,7 +6184,7 @@ div.qard-ask-q {
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
 }
 
@@ -6208,7 +6200,7 @@ div.qard-ask-q {
   padding: 14px 0 0;
   border-radius: 0;
   color: var(--qard-muted);
-  font-size: 12px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-app button.qard-exam-details-toggle:hover {
@@ -6238,7 +6230,7 @@ div.qard-ask-q {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
 }
 
 .qard-exam-details dt,
@@ -6257,7 +6249,7 @@ div.qard-ask-q {
 
 .qard-exam-warning {
   color: var(--text-warning);
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   line-height: 1.6;
 }
 
@@ -6275,7 +6267,7 @@ div.qard-ask-q {
   display: flex;
   align-items: center;
   gap: 9px;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
   color: var(--qard-muted);
 }
 
@@ -6286,7 +6278,8 @@ div.qard-ask-q {
   place-items: center;
   border-radius: 50%;
   background: var(--qard-soft);
-  font-size: 11px;
+  font-size: var(--qard-font-meta);
+  line-height: 1.5;
 }
 
 .qard-exam-steps li[aria-current='step'] {
@@ -6312,11 +6305,6 @@ div.qard-ask-q {
   min-width: 0;
 }
 
-.qard-app .qard-exam-step h2 {
-  font-size: 18px;
-  line-height: 1.4;
-}
-
 .qard-exam-fields {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -6328,7 +6316,7 @@ div.qard-ask-q {
   flex-direction: column;
   gap: 9px;
   min-width: 0;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-app .qard-exam-fields input {
@@ -6364,14 +6352,15 @@ div.qard-ask-q {
 }
 
 .qard-exam-material-main strong {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--qard-font-body);
+  font-weight: var(--qard-weight-medium);
   overflow-wrap: anywhere;
 }
 
 .qard-exam-material-main small {
-  font-size: 11px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
+  line-height: 1.5;
 }
 
 .qard-exam-material-main .qard-deck-badge {
@@ -6398,8 +6387,9 @@ div.qard-ask-q {
   border-top: 1px solid var(--qard-border);
   padding: 11px 0;
   color: var(--qard-muted);
-  font-size: 11px;
+  font-size: var(--qard-font-meta);
   cursor: pointer;
+  line-height: 1.5;
 }
 
 .qard-exam-topic-picker summary::-webkit-details-marker {
@@ -6423,7 +6413,7 @@ div.qard-ask-q {
   gap: 10px;
   padding: 7px 0;
   min-width: 0;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   cursor: pointer;
 }
 
@@ -6457,7 +6447,8 @@ div.qard-ask-q {
   border: 1px solid var(--qard-border);
   border-radius: 8px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: var(--qard-font-meta);
+  line-height: 1.5;
 }
 
 .qard-exam-days label:hover {
@@ -6488,20 +6479,18 @@ div.qard-ask-q {
 
 .qard-exam-summary h3 {
   margin: 0 0 6px;
-  font-size: 15px;
-  font-weight: 550;
   overflow-wrap: anywhere;
 }
 
 .qard-exam-summary p {
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   line-height: 1.6;
   color: var(--qard-muted);
 }
 
 .qard-exam-summary dl {
   margin-top: 22px;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
 }
 
 .qard-exam-summary dd {
@@ -6546,10 +6535,6 @@ div.qard-ask-q {
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.qard-app .qard-calendar-month h2 {
-  font-size: 16px;
 }
 
 .qard-calendar-heading .qard-actions {
@@ -6672,14 +6657,10 @@ div.qard-ask-q {
 }
 
 .qard-app .qard-calendar-agenda h2 {
-  font-size: 15px;
   margin-top: 5px;
-  line-height: 1.5;
 }
 
 .qard-calendar-agenda h3 {
-  font-size: 11px;
-  font-weight: 500;
   color: var(--qard-muted);
   margin: 0 0 12px;
 }
@@ -6698,8 +6679,8 @@ div.qard-ask-q {
 }
 
 .qard-agenda-event strong {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--qard-font-body);
+  font-weight: var(--qard-weight-medium);
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
@@ -6709,7 +6690,7 @@ div.qard-ask-q {
   flex-direction: column;
   align-items: flex-start;
   gap: 10px;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
 }
 
@@ -6752,7 +6733,7 @@ div.qard-ask-q {
 
   .qard-exam-steps li {
     gap: 6px;
-    font-size: 12px;
+    font-size: var(--qard-font-meta);
   }
 
   .qard-app button.qard-calendar-day {
@@ -6784,9 +6765,7 @@ div.qard-ask-q {
 }
 
 .qard-app .qard-saved-sessions > h2 {
-  font-size: 13px;
   color: var(--qard-muted);
-  line-height: 1.5;
 }
 
 .qard-saved-session {
@@ -6814,15 +6793,15 @@ div.qard-ask-q {
 .qard-saved-session-title {
   display: block;
   min-width: 0;
-  font-size: 14px;
-  font-weight: 550;
+  font-size: var(--qard-font-body);
+  font-weight: var(--qard-weight-medium);
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
 
 .qard-saved-session-progress {
   display: block;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   color: var(--qard-muted);
   line-height: 1.5;
 }
@@ -7054,7 +7033,7 @@ div.qard-ask-q {
 .qard-mask-mode > span {
   grid-column: 2;
   color: var(--qard-muted);
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
 }
 
 .qard-mask-size {
@@ -7085,7 +7064,7 @@ div.qard-ask-q {
 
   .qard-app .qard-card-type button {
     flex: 1;
-    font-size: 12px;
+    font-size: var(--qard-font-control);
     padding: 7px 8px;
   }
 
@@ -7105,7 +7084,7 @@ div.qard-ask-q {
   border-radius: 5px;
   color: var(--qard-muted);
   font-size: 10px;
-  font-weight: 500;
+  font-weight: var(--qard-weight-medium);
   line-height: 1.4;
 }
 
@@ -7136,7 +7115,7 @@ div.qard-ask-q {
 .qard-app button.qard-repair-fixed {
   border-color: transparent;
   color: var(--qard-muted);
-  font-size: 11px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-app .qard-card-more > button[aria-expanded='true'] {
@@ -7152,7 +7131,7 @@ div.qard-ask-q {
   margin-bottom: 6px;
   border-bottom: 1px solid var(--qard-border);
   color: var(--qard-muted);
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   line-height: 1.6;
 }
 
@@ -7168,7 +7147,7 @@ div.qard-ask-q {
 
 .qard-repair-copy strong {
   color: var(--qard-text);
-  font-weight: 500;
+  font-weight: var(--qard-weight-medium);
 }
 
 .qard-repair-copy p {
@@ -7202,7 +7181,7 @@ div.qard-ask-q {
   justify-content: flex-start;
   border: 0;
   color: var(--qard-text);
-  font-size: 12px;
+  font-size: var(--qard-font-control);
 }
 
 @container (max-width: 440px) {
@@ -7233,7 +7212,6 @@ div.qard-ask-q {
 
 .qard-improve-card .qard-heading h2 {
   margin: 0;
-  font-size: 16px;
 }
 
 .qard-improvement-drafts {
@@ -7250,13 +7228,12 @@ div.qard-ask-q {
 
 .qard-improvement-draft h3 {
   margin: 0;
-  font-size: 13px;
 }
 
 .qard-improvement-draft label {
   display: grid;
   gap: 6px;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
 }
 
 .qard-improvement-draft textarea {
@@ -7270,7 +7247,7 @@ div.qard-ask-q {
   align-items: flex-start;
   gap: 8px;
   margin-block: 12px;
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
 }
 
 .qard-improvement-check input {
@@ -7301,13 +7278,13 @@ div.qard-ask-q {
 }
 
 .qard-today-deck-copy strong {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--qard-font-body);
+  font-weight: var(--qard-weight-medium);
 }
 
 .qard-today-deck-copy small {
   color: var(--qard-muted);
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
 }
 
 .qard-today-deck-action {
@@ -7316,7 +7293,7 @@ div.qard-ask-q {
   gap: 6px;
   flex-shrink: 0;
   color: var(--qard-blue);
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
 }
 
 /* Topics stay visible beneath their deck, with a separate review action. */
@@ -7352,13 +7329,14 @@ div.qard-ask-q {
   gap: 4px 12px;
   white-space: normal;
   overflow-wrap: anywhere;
-  font-size: 13px;
+  font-size: var(--qard-font-body);
 }
 
 .qard-today-topic-copy small {
   color: var(--qard-muted);
-  font-size: 11px;
+  font-size: var(--qard-font-meta);
   white-space: nowrap;
+  line-height: 1.5;
 }
 
 @container (max-width: 420px) {
@@ -7404,17 +7382,9 @@ div.qard-ask-q {
   flex-wrap: wrap;
 }
 
-.qard-app .qard-desk-heading h1,
-.qard-app .qard-deck-heading h1 {
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: -0.4px;
-}
-
 .qard-app .qard-desk-heading p,
 .qard-app .qard-deck-heading p {
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
   margin-top: 6px;
 }
 
@@ -7425,7 +7395,7 @@ div.qard-ask-q {
   gap: 16px;
   padding-bottom: 9px;
   border-bottom: 1px solid var(--qard-border);
-  font-size: 12px;
+  font-size: var(--qard-font-meta);
 }
 
 .qard-app .qard-library-search {
@@ -7441,7 +7411,7 @@ div.qard-ask-q {
 .qard-app .qard-library-search input[type='search'] {
   width: 158px;
   min-width: 0;
-  font-size: 12px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-study-desk .qard-deck-list {
@@ -7484,14 +7454,6 @@ div.qard-ask-q {
   padding-left: 24px;
 }
 
-.qard-desk-review h2 {
-  color: var(--qard-muted);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
 .qard-desk-review-main {
   padding: 1px 0 20px;
 }
@@ -7506,14 +7468,14 @@ div.qard-ask-q {
 
 .qard-desk-due strong {
   font-size: 60px;
-  font-weight: 400;
+  font-weight: var(--qard-weight-normal);
   line-height: 1;
-  letter-spacing: -3px;
+  letter-spacing: -0.03em;
   overflow-wrap: anywhere;
 }
 
 .qard-desk-due span {
-  font-size: 13px;
+  font-size: var(--qard-font-control);
   color: var(--qard-muted);
 }
 
@@ -7521,7 +7483,7 @@ div.qard-ask-q {
   width: 100%;
   justify-content: space-between;
   padding: 9px 12px;
-  font-size: 12px;
+  font-size: var(--qard-font-control);
   border-radius: 5px;
 }
 
@@ -7537,7 +7499,7 @@ div.qard-ask-q {
   border: 0;
   border-radius: 4px;
   padding: 8px 0;
-  font-size: 12px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-desk-create h2 {
@@ -7551,7 +7513,7 @@ div.qard-ask-q {
 .qard-app button.qard-deck-back {
   margin: -6px 0 14px;
   min-height: 26px;
-  font-size: 12px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-deck-identity {
@@ -7566,7 +7528,7 @@ div.qard-ask-q {
 
 .qard-deck-detail .qard-actions button {
   border-radius: 5px;
-  font-size: 12px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-deck-detail .qard-topics {
@@ -7596,8 +7558,8 @@ div.qard-ask-q {
 }
 
 .qard-deck-detail .qard-topic-heading strong {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--qard-font-control);
+  font-weight: var(--qard-weight-medium);
   overflow-wrap: anywhere;
 }
 
@@ -7675,7 +7637,7 @@ div.qard-ask-q {
 
   .qard-desk-due strong {
     font-size: 44px;
-    letter-spacing: -2px;
+    letter-spacing: -0.03em;
   }
 
   .qard-desk-create {
@@ -7868,7 +7830,7 @@ div.qard-ask-q {
 
 .qard-time-line button.qard-text-button {
   padding: 0;
-  font-size: inherit;
+  font-size: var(--qard-font-control);
 }
 
 /* Nested decks: children sit inside their parent, indented by one step per level. */
@@ -7896,7 +7858,7 @@ div.qard-ask-q {
   align-items: center;
   gap: 6px;
   white-space: nowrap;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-deck-options {
@@ -7918,7 +7880,6 @@ div.qard-ask-q {
 
 .qard-deck-options h2 {
   margin: 0;
-  font-size: 15px;
   overflow-wrap: anywhere;
 }
 
@@ -7929,11 +7890,11 @@ div.qard-ask-q {
 .qard-deck-options label {
   display: grid;
   gap: 4px;
-  font-size: 13px;
+  font-size: var(--qard-font-control);
 }
 
 .qard-deck-options label > span {
-  font-weight: 600;
+  font-weight: var(--qard-weight-strong);
 }
 
 .qard-deck-options input {
