@@ -101,40 +101,42 @@ export function DeckBrowser({
             </span>
             {deck && <ChevronRight size={17} />}
           </button>
-          {parent && options && (
-            <button
-              className="qard-icon-button"
-              aria-label={`Deck options for ${node.name}`}
-              onClick={() => options(node.name)}
-            >
-              <Settings2 size={16} />
-            </button>
-          )}
-          {parent && studyDecks && (
-            <button
-              className="qard-deck-study"
-              aria-label={`Study ${node.name} and its subdecks`}
-              onClick={() => studyDecks(node.decks)}
-            >
-              <Play size={15} />
-              Study all
-            </button>
-          )}
-          {rename && (
-            <RenameItem
-              label={`Rename deck ${deck?.name ?? node.name}`}
-              current={deck?.name ?? node.name}
-              description="Every note holding these cards is updated, and subdecks move with it. Review history, deck options and exam plans are kept. An existing deck's name merges the two."
-              rename={(name) => rename(deck?.name ?? node.name, name)}
-            />
-          )}
-          {remove && deck && (
-            <DeleteItem
-              label={`Delete deck ${deck.name}`}
-              description="All flashcards in this deck, across every note, will be removed. Other note content stays. This cannot be undone from Qard."
-              remove={() => remove(deck.name)}
-            />
-          )}
+          <div className="qard-deck-actions">
+            {parent && options && (
+              <button
+                className="qard-icon-button"
+                aria-label={`Deck options for ${node.name}`}
+                onClick={() => options(node.name)}
+              >
+                <Settings2 size={16} />
+              </button>
+            )}
+            {parent && studyDecks && (
+              <button
+                className="qard-deck-study"
+                aria-label={`Study ${node.name} and its subdecks`}
+                onClick={() => studyDecks(node.decks)}
+              >
+                <Play size={15} />
+                Study all
+              </button>
+            )}
+            {rename && (
+              <RenameItem
+                label={`Rename deck ${deck?.name ?? node.name}`}
+                current={deck?.name ?? node.name}
+                description="Every note holding these cards is updated, and subdecks move with it. Review history, deck options and exam plans are kept. An existing deck's name merges the two."
+                rename={(name) => rename(deck?.name ?? node.name, name)}
+              />
+            )}
+            {remove && deck && (
+              <DeleteItem
+                label={`Delete deck ${deck.name}`}
+                description="All flashcards in this deck, across every note, will be removed. Other note content stays. This cannot be undone from Qard."
+                remove={() => remove(deck.name)}
+              />
+            )}
+          </div>
         </div>
         {parent && open && <div className="qard-deck-children">{node.children.map(row)}</div>}
       </div>
