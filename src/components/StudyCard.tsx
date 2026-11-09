@@ -14,7 +14,7 @@ export function StudyCard({
   services: QardServices;
 }) {
   const special = readCardFormat(card.frontMarkdown).kind !== 'basic';
-  // Keep both faces mounted so embeds are ready when the card turns. The hidden
+  // Keep both faces mounted so embeds are ready when revealed. The hidden
   // face is inert and excluded from the accessibility tree, including its links.
   return (
     <div className="qard-study-stage">
@@ -34,7 +34,7 @@ export function StudyCard({
           </div>
         </article>
         <article
-          className="qard-study-face qard-study-back"
+          className={'qard-study-face qard-study-back' + (special ? '' : ' is-basic')}
           aria-hidden={!revealed}
           inert={!revealed}
         >

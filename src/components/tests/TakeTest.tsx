@@ -189,9 +189,6 @@ export function TakeTest({
           </button>
         )}
         <span className="qard-spacer" />
-        {!submitted && marking === 'section' && (
-          <span className="qard-muted">Marked in the background, so you can keep going.</span>
-        )}
         {!submitted && !last && (
           <button
             className="qard-primary"

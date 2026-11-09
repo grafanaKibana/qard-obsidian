@@ -99,9 +99,17 @@ export function DeckBrowser({
                 {deck && below > 0 ? ` · ${below} in subdecks` : ''}
               </small>
             </span>
-            {deck && <ChevronRight size={17} />}
           </button>
           <div className="qard-deck-actions">
+            {deck && (
+              <button
+                className="qard-icon-button"
+                aria-label={`Open deck ${deck.name}`}
+                onClick={() => openDeck(deck.name)}
+              >
+                <ChevronRight size={16} />
+              </button>
+            )}
             {parent && options && (
               <button
                 className="qard-icon-button"
@@ -109,16 +117,6 @@ export function DeckBrowser({
                 onClick={() => options(node.name)}
               >
                 <Settings2 size={16} />
-              </button>
-            )}
-            {parent && studyDecks && (
-              <button
-                className="qard-deck-study"
-                aria-label={`Study ${node.name} and its subdecks`}
-                onClick={() => studyDecks(node.decks)}
-              >
-                <Play size={15} />
-                Study all
               </button>
             )}
             {rename && (
@@ -135,6 +133,16 @@ export function DeckBrowser({
                 description="All flashcards in this deck, across every note, will be removed. Other note content stays. This cannot be undone from Qard."
                 remove={() => remove(deck.name)}
               />
+            )}
+            {parent && studyDecks && (
+              <button
+                className="qard-deck-study"
+                aria-label={`Study ${node.name} and its subdecks`}
+                onClick={() => studyDecks(node.decks)}
+              >
+                <Play size={16} />
+                <span className="qard-deck-study-label">Study all</span>
+              </button>
             )}
           </div>
         </div>
