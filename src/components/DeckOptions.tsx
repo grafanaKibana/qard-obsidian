@@ -41,7 +41,17 @@ export function DeckOptions({
   const iconsId = useId();
   const icons = useMemo(() => getIconIds().sort(), []);
   const iconOptions = useMemo(() => icons.map((id) => <option key={id} value={id} />), [icons]);
-  const unavailable = !!icon.trim() && !getIcon(icon.trim());
+  const availableIcons = useMemo(() => new Set(icons), [icons]);
+  const iconId = icon.trim();
+  const unavailable = useMemo(
+    () =>
+      !!iconId &&
+      !availableIcons.has(iconId) &&
+      !availableIcons.has(`lucide-${iconId}`) &&
+      // Legacy aliases accepted by getIcon are not all listed in getIconIds.
+      !getIcon(iconId),
+    [availableIcons, iconId],
+  );
   // What applies when this deck sets nothing of its own.
   const parent = deckLineage(name)[1];
   const inherited = deckRetention(settings, parent);

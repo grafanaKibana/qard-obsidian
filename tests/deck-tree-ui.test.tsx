@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { act } from 'preact/test-utils';
+import * as obsidian from 'obsidian';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { DeckBrowser } from '../src/components/DeckBrowser';
@@ -18,6 +19,7 @@ beforeEach(() => {
 afterEach(() => {
   act(() => root.unmount());
   host.remove();
+  vi.restoreAllMocks();
 });
 const card = (id: string, deck: string) =>
   parseCards(
@@ -460,3 +462,45 @@ it('changes custom picker colors, resets to automatic, and cancels without savin
   expect(close).toHaveBeenCalledOnce();
   expect(save).not.toHaveBeenCalled();
 });
+
+it('does not construct availability SVGs while editing unrelated fields', async () => {
+  const lookup = vi.spyOn(obsidian, 'getIcon');
+  act(() =>
+    root.render(
+      <DeckOptions
+        deck="A"
+        settings={readSettings({ deckOptions: { A: { icon: 'terminal' } } })}
+        save={vi.fn()}
+        close={vi.fn()}
+      />,
+    ),
+  );
+  lookup.mockClear();
+  await typeAppearance('Color', '#123456');
+  await typeAppearance('Target retention (%)', '85');
+  expect(lookup).not.toHaveBeenCalled();
+});
+
+it.each(['terminal', 'network', 'enter'])(
+  'accepts the Obsidian icon alias %s omitted from registry IDs without repeated SVG checks',
+  async (icon) => {
+    const save = vi.fn(async () => {}),
+      lookup = vi.spyOn(obsidian, 'getIcon');
+    expect(obsidian.getIconIds()).not.toContain(icon);
+    act(() =>
+      root.render(<DeckOptions deck="A" settings={readSettings({})} save={save} close={vi.fn()} />),
+    );
+    await typeAppearance('Icon', icon);
+    expect(
+      host.querySelector('.qard-deck-appearance-preview [data-icon]')?.getAttribute('data-icon'),
+    ).toBe(icon);
+    lookup.mockClear();
+    await typeAppearance('Color', '#123456');
+    await typeAppearance('Target retention (%)', '85');
+    await action('Save options');
+    expect(save).toHaveBeenCalledWith({
+      A: { icon, color: '#123456', desiredRetention: 0.85 },
+    });
+    expect(lookup).not.toHaveBeenCalled();
+  },
+);

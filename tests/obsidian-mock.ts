@@ -99,9 +99,16 @@ export class Notice {
   constructor(public message: string) {}
 }
 export const setIcon = () => {};
-export const getIconIds = () => ['terminal', 'network', 'atom', 'database', 'ri_terminal'];
+export const getIconIds = () => [
+  'lucide-terminal',
+  'lucide-network',
+  'lucide-atom',
+  'lucide-database',
+  'ri_terminal',
+];
 export function getIcon(id: string): SVGSVGElement | null {
-  if (!getIconIds().includes(id)) return null;
+  const ids = getIconIds();
+  if (!ids.includes(id) && !ids.includes(`lucide-${id}`) && id !== 'enter') return null;
   const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   icon.setAttribute('data-icon', id);
   return icon;
