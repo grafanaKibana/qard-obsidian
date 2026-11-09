@@ -530,6 +530,119 @@ it('the course map opens on topics, drills into one, and routes across topics', 
   expect(host.querySelectorAll('.qard-objective')).toHaveLength(4);
 });
 
+it('keeps an active objective after following a cross-topic stub with an old selection', async () => {
+  files.set(
+    MASTERY,
+    `---\nqard-mastery: DS346\n---\n\n| Objective | ID | Group | State | Needs |\n| --- | --- | --- | --- | --- |\n| Bag of words | bow | Text mining | mastered | |\n| Parameter counts | params | Topic models | taught | bow |\n`,
+  );
+  await act(async () => root.render(<CourseView services={services} nav={nav} path={MASTERY} />));
+  await tick();
+  await click(host.querySelector('.qard-topic-node[aria-label^="Topic models"]'));
+  await click(host.querySelector('.qard-map-node[aria-label^="Parameter counts"]'));
+  expect(host.querySelector('.qard-map-node.is-selected')).not.toBeNull();
+  await click(host.querySelector('.qard-map-stub[aria-label="Builds on Text mining"]'));
+  const active = host.querySelectorAll('.qard-map-node:not(.qard-map-stub)[tabindex="0"]');
+  expect(active).toHaveLength(1);
+  expect(active[0]!.getAttribute('aria-label')).toContain('Bag of words');
+});
+
+it('removes the expanded map before opening an objective note', async () => {
+  files.set(
+    MASTERY,
+    newMasteryNote('DS346', [
+      {
+        id: 'params',
+        title: 'Parameter counts',
+        state: 'taught',
+        notes: ['Notes/Counts.md'],
+        needs: [],
+        evidence: [],
+        cells: {},
+      },
+    ]),
+  );
+  const outside = document.createElement('button');
+  document.body.append(outside);
+  const openNote = vi.mocked(services.app.workspace.openLinkText).mockImplementation(async () => {
+    expect(document.querySelector('.qard-map-overlay')).toBeNull();
+    expect(host.hasAttribute('inert')).toBe(false);
+    outside.focus();
+  });
+  try {
+    await act(async () =>
+      root.render(<CourseView services={services} nav={nav} path={MASTERY} objective="params" />),
+    );
+    await tick();
+    await click(host.querySelector('[aria-label="Full screen"]'));
+    const overlay = document.querySelector('.qard-map-overlay')!;
+    expect(host.hasAttribute('inert')).toBe(true);
+    await click(overlay.querySelector('.qard-map-note'));
+    expect(openNote).toHaveBeenCalledWith('Notes/Counts', MASTERY, true);
+    expect(document.activeElement).toBe(outside);
+  } finally {
+    outside.remove();
+  }
+});
+
+it.each([
+  { width: 360, toolsHeight: 56 },
+  { width: 1100, toolsHeight: 44 },
+])(
+  'Fit keeps a height-constrained graph below its floating controls ($width px canvas)',
+  async ({ width, toolsHeight }) => {
+    files.set(
+      MASTERY,
+      newMasteryNote(
+        'DS346',
+        Array.from({ length: 7 }, (_, i) => ({
+          id: `n${i}`,
+          title: `Objective ${i}`,
+          state: 'taught' as const,
+          notes: [],
+          needs: i ? [`n${i - 1}`] : [],
+          evidence: [],
+          cells: {},
+        })),
+      ),
+    );
+    await act(async () => root.render(<CourseView services={services} nav={nav} path={MASTERY} />));
+    await tick();
+    const frame = host.querySelector<HTMLElement>('.qard-map-frame')!;
+    Object.defineProperties(frame, {
+      clientWidth: { value: width, configurable: true },
+      clientHeight: { value: 360, configurable: true },
+    });
+    const bounds = vi
+      .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+      .mockImplementation(function (this: HTMLElement) {
+        if (this === frame) return new DOMRect(0, 100, width, 360);
+        if (this.matches('.qard-map-tools.is-right'))
+          return new DOMRect(12, 112, width - 24, toolsHeight);
+        if (this.matches('.qard-map-tools.is-left'))
+          return new DOMRect(12, width > 640 ? 112 : 30, 260, 34);
+        return new DOMRect();
+      });
+    try {
+      await click(host.querySelector('[aria-label="Fit"]'));
+      const graph = frame.querySelector<SVGGElement>('.qard-map > g')!;
+      const transform = graph.style.transform.match(
+        /translate\([^,]+, ([^)]+)px\) scale\(([^)]+)\)/,
+      )!;
+      const y = Number(transform[1]),
+        scale = Number(transform[2]);
+      const nodeTops = [...frame.querySelectorAll('.qard-map-node:not(.qard-map-stub)')].map(
+        (node) =>
+          100 +
+          y +
+          Number(node.getAttribute('transform')!.match(/translate\([^,]+,([^)]+)\)/)![1]) * scale,
+      );
+      expect(Math.min(...nodeTops)).toBeGreaterThanOrEqual(112 + toolsHeight + 12);
+    } finally {
+      bounds.mockRestore();
+    }
+  },
+);
+
 it('keeps expanded-map focus inside its dialog and exposes keyboard node focus', async () => {
   files.set(
     MASTERY,

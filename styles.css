@@ -901,7 +901,6 @@
   --qard-inset-compact: var(--qard-space-4);
   --qard-workspace-gutter: 28px;
   --qard-objective-actions-width: calc(var(--qard-font-control) * 10 + var(--qard-space-8));
-  --qard-objective-status-width: calc(14ch + var(--qard-space-4));
   --qard-shadow-segment: 0 1px 3px color-mix(in srgb, var(--qard-text) 10%, transparent);
 
   /* UI roles follow Obsidian's type settings; reading and data keep their own scale. */
@@ -1132,7 +1131,7 @@
 
 .qard-breadcrumb button {
   border: 0;
-  padding: 3px 0;
+  padding: var(--qard-control-padding);
   color: var(--qard-muted);
   font-size: var(--qard-font-control);
   text-align: left;
@@ -2620,7 +2619,16 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-library-heading > .qard-actions {
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 0;
+  max-width: 100%;
+  align-items: stretch;
+  gap: var(--qard-gap-actions);
+}
+
+.qard-app .qard-library-heading > .qard-actions > button {
+  min-height: var(--qard-control-height);
+  padding: var(--qard-control-padding);
 }
 
 .qard-tabs {
@@ -2635,7 +2643,7 @@ body.qard-focus-active .status-bar {
   border: 0;
   border-bottom: 2px solid transparent;
   border-radius: 0;
-  padding: 0 0 13px;
+  padding: var(--qard-space-1) var(--qard-space-3) var(--qard-space-3);
   margin-bottom: -1px;
   min-height: 38px;
   font-size: var(--qard-font-control);
@@ -2674,6 +2682,10 @@ body.qard-focus-active .status-bar {
   font-size: var(--qard-font-meta);
   color: var(--qard-muted);
   white-space: nowrap;
+}
+
+.qard-app .qard-test-row > svg {
+  margin-left: 0;
 }
 
 .qard-app .qard-link {
@@ -4079,10 +4091,29 @@ body.qard-focus-active .status-bar {
   min-width: 0;
 }
 
-.qard-objective-main strong .qard-state {
+.qard-objective-status,
+.qard-objective-status-size {
+  display: inline-grid;
+  grid-template-columns: max-content;
+  font-size: var(--qard-font-meta);
+  font-weight: var(--qard-weight-medium);
+  line-height: 1.5;
+}
+
+.qard-objective-status-size {
+  visibility: hidden;
+  padding: 2px var(--qard-gap-actions);
+}
+
+.qard-objective-status > *,
+.qard-objective-status-size > * {
+  grid-area: 1 / 1;
+}
+
+.qard-objective-status .qard-state {
   display: inline-flex;
   justify-content: center;
-  width: var(--qard-objective-status-width);
+  width: 100%;
 }
 
 .qard-objective-evidence {
@@ -4092,11 +4123,20 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-objective-meta {
+  grid-column: 1 / -1;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   flex-wrap: wrap;
   gap: var(--qard-gap-actions);
   min-width: 0;
+}
+
+.qard-objective-meta .qard-objective-evidence {
+  min-width: 0;
+  margin-left: auto;
+  text-align: right;
+  overflow-wrap: anywhere;
 }
 
 .qard-objective-due {
@@ -4242,6 +4282,14 @@ body.qard-focus-active .status-bar {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .qard-objective-title {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .qard-objective-status {
+    justify-self: start;
+  }
+
   .qard-objective-actions > button {
     flex: 1 1 100px;
   }
@@ -4311,36 +4359,27 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-course-footer {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: center;
-  gap: var(--qard-gap-fields);
+  text-align: center;
 }
 
-.qard-course-view {
-  justify-self: start;
+.qard-course-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--qard-gap-fields);
+  flex-wrap: wrap;
+}
+
+.qard-course-toolbar > .qard-actions {
+  margin-left: auto;
 }
 
 .qard-course-footer .qard-time-line {
-  grid-column: 2;
   margin: 0;
   text-align: center;
 }
 
 @container qard-workspace (max-width: 640px) {
-  .qard-course-footer {
-    grid-template-columns: minmax(0, 1fr);
-    justify-items: center;
-  }
-
-  .qard-course-view {
-    justify-self: center;
-  }
-
-  .qard-course-footer .qard-time-line {
-    grid-column: 1;
-  }
-
   .qard-course-view-label {
     display: none;
   }
@@ -4402,9 +4441,9 @@ body.qard-focus-active .status-bar {
 .qard-progress-legend {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 14px;
+  gap: var(--qard-gap-actions);
   font-size: var(--qard-font-meta);
   color: var(--qard-muted);
 }
@@ -4469,7 +4508,7 @@ body.qard-focus-active .status-bar {
 
 .qard-map-toolbar {
   min-width: 0;
-  padding: var(--qard-space-1) var(--qard-space-3);
+  padding: var(--qard-space-1);
   border: 1px solid var(--qard-border);
   border-radius: var(--qard-radius-floating);
   background: var(--qard-bg);
@@ -5115,6 +5154,8 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-app .qard-lesson-trail .qard-link {
+  min-height: var(--qard-control-height);
+  padding: var(--qard-control-padding);
   font-size: var(--qard-font-control);
 }
 
@@ -5853,10 +5894,19 @@ div.qard-ask-q {
 }
 
 .qard-jobs-role {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--qard-space-1);
   flex-shrink: 0;
   font-size: var(--qard-font-meta);
   font-weight: var(--qard-weight-medium);
   color: var(--qard-muted);
+}
+
+.qard-agent-info {
+  display: inline-flex;
+  align-items: center;
+  cursor: help;
 }
 
 .qard-jobs-time {
@@ -8109,7 +8159,7 @@ div.qard-ask-q {
 }
 
 .qard-time-line button.qard-text-button {
-  padding: 0;
+  padding: var(--qard-control-padding);
   font-size: var(--qard-font-control);
 }
 

@@ -1,7 +1,7 @@
 import { plural } from '../common/labels';
 import { UpdateCourse } from './UpdateCourse';
 import { teach } from './lesson-navigation';
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { ChevronRight, FileText, List, Network } from 'lucide-react';
 import type { QardServices } from '../../views/services';
 import type { Mastery, Objective } from '../../learn/mastery';
@@ -11,7 +11,7 @@ import { InlineMarkdown } from '../Markdown';
 import { NEEDS_LESSON, isoDay } from '../../learn/mastery';
 import type { LessonSummary } from '../../learn/learn-types';
 import { Waiting } from '../common/FeedbackStatus';
-import { StateChip, relativeDay } from './learning-status';
+import { STATE_LABEL, StateChip, relativeDay } from './learning-status';
 import { useLearn } from './useLearn';
 import { type LearnNav } from '../../views/navigation';
 import { StudyTimeLine } from '../usage/StudyTimeView';
@@ -29,19 +29,12 @@ export function CourseView({
 }) {
   const { revision, job } = useLearn(services);
   const tabsId = useId();
-  const focusTab = useRef(false);
   const [course, setCourse] = useState<Mastery>(),
     [error, setError] = useState(''),
     [busy, setBusy] = useState<string>();
   const [view, setView] = useState<'map' | 'list'>('map'),
     [filter, setFilter] = useState<Set<string>>(new Set()),
     [updating, setUpdating] = useState(false);
-  useEffect(() => {
-    if (focusTab.current) {
-      document.getElementById(`${tabsId}-${view}`)?.focus();
-      focusTab.current = false;
-    }
-  }, [tabsId, view]);
   const [lessons, setLessons] = useState<LessonSummary[]>([]);
   useEffect(() => {
     let live = true;
@@ -142,46 +135,49 @@ export function CourseView({
       }
       return next;
     });
+  const objectives = course.objectives.filter((o) => !filter.size || filter.has(o.state));
+  const presentStates = [...new Set(objectives.map((o) => o.state))];
+  const selector = (
+    <div className="qard-segmented qard-course-view" role="tablist" aria-label="Course view">
+      {(['map', 'list'] as const).map((mode, index) => (
+        <button
+          key={mode}
+          role="tab"
+          aria-label={mode === 'map' ? 'Map' : 'List'}
+          id={`${tabsId}-${mode}`}
+          aria-controls={`${tabsId}-panel`}
+          aria-selected={view === mode}
+          tabIndex={view === mode ? 0 : -1}
+          onClick={() => setView(mode)}
+          onKeyDown={(event) => {
+            const next =
+              event.key === 'ArrowRight' || event.key === 'ArrowLeft'
+                ? 1 - index
+                : event.key === 'Home'
+                  ? 0
+                  : event.key === 'End'
+                    ? 1
+                    : undefined;
+            if (next === undefined) {
+              return;
+            }
+            event.preventDefault();
+            setView(next === 0 ? 'map' : 'list');
+            const controls =
+              event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>(
+                '[role="tab"]',
+              );
+            controls?.[next]?.focus();
+          }}
+        >
+          {mode === 'map' ? <Network size={16} /> : <List size={16} />}
+          <span className="qard-course-view-label">{mode === 'map' ? 'Map' : 'List'}</span>
+        </button>
+      ))}
+    </div>
+  );
   const footer = (
     <footer className="qard-course-footer">
-      <div className="qard-segmented qard-course-view" role="tablist" aria-label="Course view">
-        {(['map', 'list'] as const).map((mode, index) => (
-          <button
-            key={mode}
-            role="tab"
-            aria-label={mode === 'map' ? 'Map' : 'List'}
-            id={`${tabsId}-${mode}`}
-            aria-controls={`${tabsId}-panel`}
-            aria-selected={view === mode}
-            tabIndex={view === mode ? 0 : -1}
-            onClick={() => setView(mode)}
-            onKeyDown={(event) => {
-              const next =
-                event.key === 'ArrowRight' || event.key === 'ArrowLeft'
-                  ? 1 - index
-                  : event.key === 'Home'
-                    ? 0
-                    : event.key === 'End'
-                      ? 1
-                      : undefined;
-              if (next === undefined) {
-                return;
-              }
-              event.preventDefault();
-              focusTab.current = (next === 0 ? 'map' : 'list') !== view;
-              setView(next === 0 ? 'map' : 'list');
-              const controls =
-                event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>(
-                  '[role="tab"]',
-                );
-              controls?.[next]?.focus();
-            }}
-          >
-            {mode === 'map' ? <Network size={16} /> : <List size={16} />}
-            <span className="qard-course-view-label">{mode === 'map' ? 'Map' : 'List'}</span>
-          </button>
-        ))}
-      </div>
       <StudyTimeLine services={services} course={course.course} days={30} open={nav.time} />
     </footer>
   );
@@ -204,6 +200,9 @@ export function CourseView({
           <span className="qard-muted">Course</span>
           <h1>{course.course}</h1>
         </div>
+      </header>
+      <div className="qard-course-toolbar">
+        {selector}
         <div className="qard-actions">
           <button onClick={() => setUpdating(true)}>Update</button>
           <button
@@ -215,7 +214,7 @@ export function CourseView({
             <FileText size={16} />
           </button>
         </div>
-      </header>
+      </div>
       <CourseProgress course={course} filter={filter} toggle={toggle} />
       {changed.length > 0 && (
         <button className="qard-resume" onClick={() => setUpdating(true)}>
@@ -250,29 +249,36 @@ export function CourseView({
           />
         ) : (
           <section>
-            {course.objectives
-              .filter((o) => !filter.size || filter.has(o.state))
-              .map((o) => (
-                <div key={o.id} className="qard-objective">
-                  <div className="qard-objective-main">
-                    {o.due && !['new', 'planned'].includes(o.state) && (
-                      <span className="qard-muted qard-objective-due">
-                        {relativeDay(o.due, day).replace(/^./, (first) => first.toUpperCase())}
-                      </span>
-                    )}
-                    <strong className="qard-objective-title">
-                      <StateChip state={o.state} />
-                      <span className="qard-objective-title-text">
-                        <InlineMarkdown text={o.title} path={path} services={services} />
-                      </span>
-                    </strong>
-                    <small className="qard-muted qard-objective-evidence">
-                      {o.evidence.at(-1) ?? 'No evidence yet'}
-                    </small>
-                  </div>
-                  {actions(o)}
+            {objectives.map((o) => (
+              <div key={o.id} className="qard-objective">
+                <div className="qard-objective-meta">
+                  {o.due && !['new', 'planned'].includes(o.state) && (
+                    <span className="qard-muted qard-objective-due">
+                      {relativeDay(o.due, day).replace(/^./, (first) => first.toUpperCase())}
+                    </span>
+                  )}
+                  <small className="qard-muted qard-objective-evidence">
+                    {o.evidence.at(-1) ?? 'No evidence yet'}
+                  </small>
                 </div>
-              ))}
+                <div className="qard-objective-main">
+                  <strong className="qard-objective-title">
+                    <span className="qard-objective-status">
+                      <span className="qard-objective-status-size" aria-hidden="true">
+                        {presentStates.map((state) => (
+                          <span key={state}>{STATE_LABEL[state]}</span>
+                        ))}
+                      </span>
+                      <StateChip state={o.state} />
+                    </span>
+                    <span className="qard-objective-title-text">
+                      <InlineMarkdown text={o.title} path={path} services={services} />
+                    </span>
+                  </strong>
+                </div>
+                {actions(o)}
+              </div>
+            ))}
           </section>
         )}
       </div>

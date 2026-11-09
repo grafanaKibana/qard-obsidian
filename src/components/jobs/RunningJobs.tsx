@@ -7,6 +7,7 @@ import { overdue, roleOf, timeLeft } from '../../jobs/job-clock';
 import { LoadingIndicator } from '../common/LoadingIndicator';
 import { InlineMarkdown } from '../Markdown';
 import type { GenerationSnapshot } from '../../cards/generation-service';
+import { AgentLabel } from './AgentLabel';
 
 export interface RunningJob {
   key: string;
@@ -232,6 +233,7 @@ export function RunningJobs({
                   <div className="qard-jobs-meta">
                     {showAgent && (
                       <span className="qard-jobs-role">
+                        <AgentLabel services={services} role={role} info />
                         {role.charAt(0).toUpperCase() + role.slice(1)}
                       </span>
                     )}

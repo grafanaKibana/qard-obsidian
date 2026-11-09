@@ -107,6 +107,7 @@ export function CourseMap({
     keyboardFocus = useRef<string | undefined>(undefined),
     search = useRef<HTMLInputElement>(null),
     expandButton = useRef<HTMLButtonElement>(null),
+    pendingNote = useRef<string | undefined>(undefined),
     wasExpanded = useRef(expanded),
     drag = useRef<{ x: number; y: number; vx: number; vy: number; moved: boolean } | undefined>(
       undefined,
@@ -126,7 +127,12 @@ export function CourseMap({
   const firstNode = atTopics
     ? topics[0]?.key
     : [...layout.nodes.keys()].find((id) => !id.startsWith('@'));
-  const activeNode = cursor ?? (atTopics ? undefined : selected) ?? firstNode;
+  const activeNode =
+    cursor && layout.nodes.has(cursor)
+      ? cursor
+      : !atTopics && selected && layout.nodes.has(selected)
+        ? selected
+        : firstNode;
   const topicOf = useCallback((id: string) => topicKey(byId.get(id)?.group), [byId]);
   const dependents = useMemo(() => {
     const m = new Map<string, string[]>();
@@ -170,7 +176,17 @@ export function CourseMap({
         minY = Math.min(...points.map((p) => p.y)) - 16;
       const maxX = Math.max(...points.map((p) => p.x + w)) + 16,
         maxY = Math.max(...points.map((p) => p.y + h)) + 16;
-      const top = 20,
+      const bounds = el.getBoundingClientRect(),
+        tools = el.closest('.qard-map-stage')?.querySelectorAll('.qard-map-tools') ?? [];
+      const top = Math.max(
+          20,
+          ...Array.from(tools, (tool) => {
+            const r = tool.getBoundingClientRect();
+            return r.bottom > bounds.top
+              ? r.bottom - bounds.top + Math.max(0, r.top - bounds.top)
+              : 0;
+          }),
+        ),
         width = el.clientWidth - 32,
         height = el.clientHeight - top - 20;
       const fitted = Math.min(1, width / (maxX - minX), height / (maxY - minY)),
@@ -307,6 +323,14 @@ export function CourseMap({
       expandButton.current?.focus();
     }
   }, [expanded]);
+
+  useEffect(() => {
+    if (!expanded && pendingNote.current) {
+      const note = pendingNote.current;
+      pendingNote.current = undefined;
+      actions.openNote(note);
+    }
+  }, [actions, expanded]);
 
   function dialogKey(event: KeyboardEvent) {
     if (event.key === 'Escape') {
@@ -1059,7 +1083,14 @@ export function CourseMap({
                   <button
                     key={n}
                     className="qard-link qard-map-note"
-                    onClick={() => actions.openNote(n)}
+                    onClick={() => {
+                      if (expanded) {
+                        pendingNote.current = n;
+                        setExpanded(false);
+                      } else {
+                        actions.openNote(n);
+                      }
+                    }}
                   >
                     {n}
                   </button>
