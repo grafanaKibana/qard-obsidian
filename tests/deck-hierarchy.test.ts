@@ -274,3 +274,12 @@ it('normalizes portable appearance independently of scheduling and rejects malfo
   });
   expect(withDeckOptions(all, 'A::B', {})).toEqual({});
 });
+
+it.each(['ri_terminal', 'pack:terminal', 'pack.terminal', 'pack/terminal'])(
+  'keeps portable icon-pack ID %s through save and reload',
+  (icon) => {
+    const choices = withDeckOptions({}, ' A :: B ', { icon });
+    expect(choices).toEqual({ 'A::B': { icon } });
+    expect(readSettings({ deckOptions: choices }).deckOptions).toEqual(choices);
+  },
+);

@@ -191,7 +191,9 @@ function readLearnSettings(raw: unknown): LearnSettings {
 }
 /** Keep registered IDs portable across devices with different icon registries. */
 export const readDeckIcon = (value: unknown): string | undefined =>
-  typeof value === 'string' && /^[a-z0-9-]{1,100}$/i.test(value.trim()) ? value.trim() : undefined;
+  typeof value === 'string' && /^[a-z0-9_.:/-]{1,100}$/i.test(value.trim())
+    ? value.trim()
+    : undefined;
 export const readDeckColor = (value: unknown): string | undefined =>
   typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value.trim())
     ? value.trim().toLowerCase()

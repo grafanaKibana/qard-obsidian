@@ -335,3 +335,22 @@ it.each([true, false])(
     expect(host.querySelector('h2')!.textContent).toContain('Biology::Cells');
   },
 );
+
+it('suggests, previews and saves registered icon-pack IDs', async () => {
+  const save = vi.fn(async (_options: unknown) => {});
+  act(() =>
+    root.render(<DeckOptions deck="A" settings={readSettings({})} save={save} close={vi.fn()} />),
+  );
+  expect(
+    [...host.querySelectorAll('datalist option')].map((option) => option.getAttribute('value')),
+  ).toContain('ri_terminal');
+  await typeAppearance('Icon', 'ri_terminal');
+  expect(
+    host.querySelector('.qard-deck-appearance-preview [data-icon]')?.getAttribute('data-icon'),
+  ).toBe('ri_terminal');
+  await action('Save options');
+  expect(save).toHaveBeenCalledWith({ A: { icon: 'ri_terminal' } });
+  expect(readSettings({ deckOptions: save.mock.calls[0]![0] }).deckOptions).toEqual({
+    A: { icon: 'ri_terminal' },
+  });
+});
