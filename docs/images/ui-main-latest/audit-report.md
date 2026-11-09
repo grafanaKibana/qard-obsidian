@@ -1,35 +1,28 @@
-# Qard PR #11 — three-pass visual audit
+# Final visual verification
 
-Scope: layout, spacing, colors, radii and typography across mobile, tablet, desktop and split panes. Keyboard accessibility was excluded as requested. Checks use stock Obsidian CSS, light/dark themes, 320–1280px panes, standard/enlarged UI text and 16/32px reading text. Native checks use the separate Qard test app/profile/vault.
+Source: `8ae6dba2dac331f23d3b436b950f150fc6881303`. Baseline: fork main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
 
-## Pass 1 — layout and spacing
+Scope: layout, spacing, color, radius and typography on narrow touch panes and desktop, in light and dark themes. Keyboard accessibility was outside the requested audit scope. No DESIGN.md was added.
 
-Fixed three verified issues:
+The prior three audit passes addressed nested-deck overflow, duplicate builder dividers, enlarged exam layouts, reading-size roles, selected-answer colors and Statistics typography. The latest user refinements supersede the earlier mobile treatments:
 
-- **P1: Nested decks widened the mobile library.** At 320px, content extended to 423px; enlarged UI text extended it to 494px. Deck nodes now shrink correctly, with related actions kept together and wrapped as a group. All eight nested-deck scenarios fit after the fix.
-- **P2: Exam steps and footer clipped with enlarged text.** The Continue button extended about 32px beyond a 320px pane. Steps and footer now wrap; step indicators retain their width. All six form scenarios fit.
-- **P3: The mobile builder drew two separators before Session.** Removed the redundant Session top border/inset, retaining the deck-list boundary and section gap.
+- Map navigation uses the full width above the canvas. Zoom controls float within the canvas.
+- Status pills stay inline with objective titles in compact panes.
+- Learn header actions share one full-width mobile row.
+- Plan readiness is hidden in compact panes and remains in the desktop header.
+- Deck actions use matching 16px icons and equal compact slots, wrap as a full-width group when needed, and place Study all last with a play-only compact control.
+- The exam editor uses three balanced compact steps and two equal footer buttons. Its representative screenshot includes the normal page gutters and default UI text.
+- Revealed basic cards demote the question context, retain readable answers and size to the active face. Cloze/image cards retain reading-size typography.
+- The background-marking helper sentence is removed. The primary test action fills the mobile footer width.
 
-## Pass 2 — color and typography tokens
+## Fresh validation
 
-Fixed three verified issues:
+- `npm run check`: 765 tests in 95 suites, formatting, TypeScript, ESLint, Stylelint, build and release checks passed.
+- 216 integrated scenes across light/dark themes and phone, tablet, desktop and narrow split panes: no runtime errors, horizontal overflow or out-of-bounds panels.
+- 72 focused assertions passed for toolbar geometry, inline status, action-row width, readiness visibility, deck order/icon dimensions, active study-face sizing and test-footer behavior.
+- 16 cloze/image cases passed across light/dark themes, 320/390px panes and 16/32px reading sizes.
+- 24 matched main-to-final screenshot pairs captured without runtime errors. The manifest records conditions and all 48 image hashes.
+- Native isolated Obsidian smoke checks passed for Learn controls, map width, inline objectives, hidden compact readiness, five deck action groups and revealed-card typography. Temporary width overrides were removed afterward.
+- The isolated plugin install matches the built source. DevBook plugin files, global Obsidian vault configuration and installed Obsidian app hashes remain unchanged. The separate test app remains open.
 
-- **P2: Selected-answer and native selection accents ignored the dark-theme token.** Both now use `--qard-blue`.
-- **P2: Study questions ignored the reading-size preference.** Front/back questions previously stayed at 25/18px while answer text grew to 32px. Their sizes now derive from `--qard-font-reading`, maintaining question/answer hierarchy.
-- **P2: Compact Statistics captions stayed at 9px.** Captions now use the metadata token; numeric sizes and the metric grid adapt to the UI font settings.
-
-All 30 targeted color/type scenarios passed. Radius roles were checked across controls, segmented controls, surfaces, badges, status pills and choice rows.
-
-## Pass 3 — integrated regression audit
-
-- **216 scenarios:** both themes; six device/pane arrangements; 18 states, including populated plans, nested decks, selected answers, revealed study cards and actual app course navigation.
-- **44 focused scenarios:** nested decks, exam forms and reading/metadata/selection scaling.
-- No runtime errors, horizontal overflow, out-of-pane panels or new verified visual regressions in these checks.
-- **765 tests in 95 suites passed**, along with formatting, TypeScript, ESLint, Stylelint, build and release checks.
-- Native Obsidian checks passed for nested decks, builder selection color, and exam-editor reflow. Only owned synthetic notes were added to the isolated test vault. DevBook's plugin, configuration and installed app hashes remain unchanged.
-
-## Evidence and limits
-
-The PR screenshot tables compare fork `main` to the final PR revision only. Each pair uses matching data, pane width, theme, input mode, typography settings, clock and interactions. The capture manifest records source commits and image hashes.
-
-Responsive coverage uses emulation and desktop split panes; physical iPhone/Safari testing was not performed. No development server was required; screenshots use local browser fixtures. The isolated test Obsidian app remains open.
+Phone coverage uses touch emulation and compact panes. Physical iPhone/Safari validation was not performed. No development server was required for the file-based fixtures.
