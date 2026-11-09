@@ -900,6 +900,7 @@
   --qard-gap-sections: var(--qard-space-6);
   --qard-inset-compact: var(--qard-space-4);
   --qard-workspace-gutter: 28px;
+  --qard-objective-actions-width: calc(var(--qard-font-control) * 10 + var(--qard-space-8));
   --qard-shadow-segment: 0 1px 3px color-mix(in srgb, var(--qard-text) 10%, transparent);
 
   /* UI roles follow Obsidian's type settings; reading and data keep their own scale. */
@@ -4045,7 +4046,7 @@ body.qard-focus-active .status-bar {
 
 .qard-objective {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) var(--qard-objective-actions-width);
   align-items: center;
   gap: var(--qard-gap-fields);
   padding: var(--qard-inset-compact) 0;
@@ -4095,6 +4096,7 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-app .qard-objective-actions button {
+  flex: 1;
   min-height: var(--qard-control-height);
   padding: var(--qard-control-padding);
   font-size: var(--qard-font-control);
@@ -4390,17 +4392,28 @@ body.qard-focus-active .status-bar {
 
 /* Course map controls, canvas and selected-objective detail. */
 .qard-map-layout {
+  --qard-map-controls-width: 260px;
+
   container-type: inline-size;
   container-name: qard-map;
   min-width: 0;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: var(--qard-gap-fields);
+}
+
+.qard-map-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
   gap: var(--qard-gap-fields);
 }
 
 .qard-map-toolbar {
   min-width: 0;
-  padding: 8px var(--qard-space-3);
+  padding: var(--qard-space-1) var(--qard-space-3);
   border: 1px solid var(--qard-border);
   border-radius: var(--qard-radius-floating);
   background: var(--qard-bg);
@@ -4632,9 +4645,10 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-map-tools.is-left {
+  min-height: var(--qard-control-height);
   flex: 1 1 280px;
   min-width: 0;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
   padding: 0;
 }
@@ -4737,6 +4751,7 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-app .qard-map-panel-actions button {
+  flex: 1 1 auto;
   min-height: 32px;
   padding: 5px 12px;
   font-size: var(--qard-font-control);
@@ -4800,6 +4815,28 @@ body.qard-focus-active .status-bar {
 
 .qard-map-link i {
   margin-top: 3px;
+}
+
+@container qard-map (min-width: 641px) {
+  .qard-map-toolbar {
+    position: absolute;
+    top: var(--qard-space-3);
+    left: var(--qard-space-3);
+    z-index: 3;
+    width: calc(
+      100% - 2 * var(--qard-space-3) - var(--qard-map-controls-width) - var(--qard-gap-actions)
+    );
+  }
+
+  .qard-map-tools.is-right {
+    left: auto;
+    width: var(--qard-map-controls-width);
+  }
+
+  .qard-map-crumb {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
 }
 
 @container qard-map (max-width: 640px) {
@@ -6283,8 +6320,14 @@ div.qard-ask-q {
 }
 
 .qard-exam-plan .qard-actions {
+  width: 100%;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: var(--qard-gap-actions);
+}
+
+.qard-exam-plan .qard-actions > button {
+  flex: 1 1 140px;
+  min-width: 0;
 }
 
 .qard-app button.qard-exam-details-toggle {
