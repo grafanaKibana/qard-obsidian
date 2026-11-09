@@ -112,12 +112,15 @@ ${q.rubric.map((r, i) => `${i + 1}. (${r.marks}) ${r.point}`).join('\n')}
 ${q.options?.length ? `<options>\n${q.options.map((o, i) => `${String.fromCharCode(65 + i)}. ${o}${i === q.answer ? ' (correct)' : ''}`).join('\n')}\n</options>\n` : ''}${q.source ? `<source>${q.source.path}${q.source.heading ? ` › ${q.source.heading}` : ''}</source>\n` : ''}<student_answer confidence="${a?.confidence ?? 'unstated'}">${studentAnswer(q, a)}</student_answer>
 </question>`;
 }
-export const MARKING = `Mark strictly against each rubric. awarded[i] is true only when the answer clearly makes point i; score is the sum of the awarded points' marks. A blank answer scores 0.
+/** Grading and annotation rules shared by Practice Tests and Learn. */
+export const MARKING = `Assess semantic completeness against each rubric claim independently. awarded[i] is true when the answer explicitly states point i or unambiguously expresses it in equivalent words; score is the sum of the existing awarded points' marks. Accept valid alternative solutions and terminology. A concise complete answer earns full marks. Never demand the model answer's wording or length, invent unasked requirements, or add partial points to fill a mark budget. A blank answer scores 0. A correct prediction alone does not show a requested explanation.
+If the question allows another reasonable reading and the answer is correct under it, award the rubric points that reading satisfies and say in feedback that the question was ambiguous.
 Annotate the answer the way a teacher marks a script:
 - quote: text copied exactly from the student's answer (one to twelve words).
-- kind: correct (earned a point), wrong (factually incorrect), vague (the right idea, stated imprecisely), insight (a good point beyond the rubric).
-- For every rubric point not awarded, add a "missing" annotation. Its quote is the exact answer text after which the point belongs, or "" for the end. Its note says what was needed.
-- Notes are one or two specific sentences addressed to the student ("you").
+- kind: correct (earned a point), wrong (an explicit claim contradicts the mechanism), missing (a requested claim is absent), vague (wording leaves the claim genuinely uncertain), or insight (a correct extra idea).
+- Add a missing annotation only for an omitted requested claim. Its quote is the exact answer text after which the point belongs, or "" for the end. Its note says what was needed. Do not also label the same contradicted claim as missing or describe one omission as multiple independent mistakes.
+- Notes are one or two specific sentences addressed to the student ("you"). Explain what was demonstrated before identifying the remaining gap.
+Confidence does not change factual correctness. Ignore language errors unless they change technical meaning.
 mistake is the main reason marks were lost: misconception, careless, imprecise, incomplete, or none. feedback is one sentence.
 You may read the source notes to check facts.`;
 export function markPrompt(test: PracticeTest, attempt: Attempt, ids: string[]) {

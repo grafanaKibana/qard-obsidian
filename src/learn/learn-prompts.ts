@@ -144,7 +144,8 @@ function answersBlock(questions: Question[], answers: Record<string, AnswerState
 }
 export function probeMapPrompt(lesson: Lesson, m?: Mastery, o?: Objective, sources?: string) {
   const probe = lesson.probe;
-  const typed = probe?.questions.filter((q) => q.type !== 'mcq') ?? [];
+  const typed =
+    probe?.questions.filter((q) => q.type !== 'mcq' && !probe.answers[q.id]?.unknown) ?? [];
   return `${TEACHING}
 
 The student wants to learn: ${lesson.topic}
@@ -212,7 +213,7 @@ Anticipated misconceptions:
 ${step.misconceptions.map((m, i) => `${i}. ${m.signs}`).join('\n') || '(none)'}
 
 ${MARKING}
-reply: speak to the student in at most 80 words. If they are right, confirm the key idea and move on. If not, point at the exact error and give a nudge, not the whole answer.
+${step.checkFirst && !retryOf ? 'This check was asked before the explanation, as a prediction. In reply, treat a wrong answer as a prediction to correct, not a failure.\n' : ''}reply: speak to the student in at most 80 words. If they are right, confirm the key idea and move on. If not, point at the exact error and give a nudge, not the whole answer.
 misconception: the index of the anticipated misconception the answer shows, or -1.`;
 }
 
