@@ -880,6 +880,14 @@
   --qard-blue: #4263dc;
   --qard-on-blue: #fff;
   --qard-tint: color-mix(in srgb, var(--qard-blue) 6%, var(--qard-bg));
+  --qard-action-bg: #4263dc;
+  --qard-action-text: #fff;
+  --qard-action-hover: #3554c5;
+  --qard-space-2: 8px;
+  --qard-space-5: 20px;
+  --qard-gap-actions: var(--qard-space-2);
+  --qard-inset-panel: var(--qard-space-5);
+  --qard-radius-surface: 12px;
 
   /* UI roles follow Obsidian's type settings; reading and data keep their own scale. */
   --qard-font-page: calc(var(--font-ui-large, 20px) * 1.2);
@@ -971,14 +979,14 @@
 }
 
 .qard-app button.qard-primary {
-  background: #4263dc;
-  border-color: #4263dc;
-  color: #fff;
+  background: var(--qard-action-bg);
+  border-color: var(--qard-action-bg);
+  color: var(--qard-action-text);
   padding-inline: 17px;
 }
 
 .qard-app button.qard-primary:hover {
-  background: #3554c5;
+  background: var(--qard-action-hover);
 }
 
 .qard-app button.qard-danger {
@@ -1148,7 +1156,7 @@
 .qard-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--qard-gap-actions);
   flex-wrap: wrap;
 }
 
@@ -2814,13 +2822,13 @@ body.qard-focus-active .status-bar {
   place-items: center;
   font-size: 10px;
   font-weight: 800;
-  color: #fff;
+  color: var(--qard-action-text);
   flex-shrink: 0;
 }
 
 .qard-check.is-on {
-  background: #4263dc;
-  border-color: #4263dc;
+  background: var(--qard-action-bg);
+  border-color: var(--qard-action-bg);
 }
 
 .is-full {
@@ -3760,7 +3768,7 @@ body.qard-focus-active .status-bar {
 .qard-action-group {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--qard-gap-actions);
   flex-wrap: wrap;
 }
 
@@ -3784,7 +3792,7 @@ body.qard-focus-active .status-bar {
   flex-direction: column;
   gap: 10px;
   padding: 18px 20px;
-  border-radius: 12px;
+  border-radius: var(--qard-radius-surface);
   background: var(--qard-soft);
 }
 
@@ -3805,7 +3813,7 @@ body.qard-focus-active .status-bar {
   min-width: 0;
   justify-content: flex-end;
   align-items: center;
-  gap: 8px;
+  gap: var(--qard-gap-actions);
 }
 
 .qard-panel-actions.is-split {
@@ -5062,9 +5070,9 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-wait-status {
-  padding: 20px;
+  padding: var(--qard-inset-panel);
   border: 1px solid var(--qard-border);
-  border-radius: 12px;
+  border-radius: var(--qard-radius-surface);
   background: var(--qard-bg);
   display: flex;
   flex-direction: column;
@@ -5175,7 +5183,7 @@ body.qard-focus-active .status-bar {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 20px;
+  padding: var(--qard-inset-panel);
   border: 1px solid var(--qard-border);
   border-radius: 14px;
   background: var(--qard-bg);
@@ -5633,7 +5641,7 @@ div.qard-ask-q {
   flex-wrap: wrap;
   min-width: 0;
   align-items: center;
-  gap: 8px;
+  gap: var(--qard-gap-actions);
   margin: 6px 0 10px;
   font-size: var(--qard-font-control);
 }
@@ -6087,7 +6095,7 @@ div.qard-ask-q {
   gap: 20px;
   padding: 22px;
   border: 1px solid var(--qard-border);
-  border-radius: 12px;
+  border-radius: var(--qard-radius-surface);
   min-width: 0;
 }
 
@@ -6287,8 +6295,8 @@ div.qard-ask-q {
 }
 
 .qard-exam-steps li[aria-current='step'] > span {
-  background: #4263dc;
-  color: #fff;
+  background: var(--qard-action-bg);
+  color: var(--qard-action-text);
 }
 
 .qard-exam-editor-layout {
@@ -6466,10 +6474,10 @@ div.qard-ask-q {
 }
 
 .qard-exam-summary {
-  padding: 20px;
+  padding: var(--qard-inset-panel);
   border: 1px solid var(--qard-border);
   background: var(--qard-soft);
-  border-radius: 12px;
+  border-radius: var(--qard-radius-surface);
   min-width: 0;
 }
 
