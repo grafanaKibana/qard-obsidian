@@ -3,6 +3,7 @@ import {
   GOAL_RULES,
   MARKING,
   MCQ_RULES,
+  formatHistory,
   questionBlock,
   studentAnswer,
 } from '../tests/test-prompts';
@@ -94,7 +95,13 @@ Propose how the objectives should grow. Never rename, merge or rewrite existing 
 Return empty lists when nothing changes.`;
 }
 
-export function checkPrompt(m: Mastery, o: Objective, goal: Goal, previous: CheckRecord[]) {
+export function checkPrompt(
+  m: Mastery,
+  o: Objective,
+  goal: Goal,
+  previous: CheckRecord[],
+  history?: readonly Pick<Question, 'type' | 'goal'>[],
+) {
   const past = previous.slice(-4).flatMap((c) =>
     c.questions.map((q) => {
       const mark = c.marks[q.id];
@@ -104,8 +111,9 @@ export function checkPrompt(m: Mastery, o: Objective, goal: Goal, previous: Chec
   return `Write a short check on one objective. It will be answered days from now to test whether the student still understands it.
 ${objectiveBlock(o)}
 Course: ${m.course}
+${formatHistory(history ?? previous.flatMap((record) => record.questions))}
 
-Goal: ${goal}. Write ONE or TWO focused, self-contained checks on this objective, not a broad curriculum. The FIRST is mcq. Add a second short or application check only when it gives useful evidence of a distinct gap within this objective. Usually use 1–2 marks for written checks and 1 for mcq. Use fresh wording and new cases; the student must not be able to pass by remembering an earlier question.
+Goal: ${goal}. Write ONE or TWO focused, self-contained checks on this objective, not a broad curriculum. Choose each format for the capability being assessed, using the recent history to balance equally suitable formats. Add a second check only when it gives useful evidence of a distinct gap within this objective; use another suitable format when that fits the task, without adding a question just for variety. Usually use 1–2 marks for written checks, 1 for mcq and 1 per cloze slot. Use fresh wording and new cases; the student must not be able to pass by remembering an earlier question.
 ${past.length ? `Earlier questions, answers and feedback on this objective (target actual gaps; do not repeat cases):\n${past.join('\n')}\n` : ''}${o.state === 'misconception' || o.state === 'slipping' ? 'The latest evidence shows a mistake. Aim at least one question at it.\n' : ''}
 Read the notes first. Question ids are c1 and, if needed, c2; set objective to "${o.id}" and goal on each.
 ${QUESTION_FORMAT}`;
@@ -118,13 +126,20 @@ export function markCheckPrompt(check: CheckRecord, ids: string[]) {
     .join('\n\n')}\n\n${MARKING}\nReturn one entry per question above, using its id.`;
 }
 
-export function probePrompt(lesson: Lesson, m?: Mastery, o?: Objective, sources?: string) {
+export function probePrompt(
+  lesson: Lesson,
+  m?: Mastery,
+  o?: Objective,
+  sources?: string,
+  history: readonly Pick<Question, 'type' | 'goal'>[] = [],
+) {
   return `The student wants to learn: ${lesson.topic}
 ${o ? objectiveBlock(o) : ''}Notes to teach from:
 ${notesList(lesson.notes)}
 ${sourcesBlock(sources)}${courseBlock(m)}
+${formatHistory(history)}
 Before planning the lesson, find the edge of what the student knows. List the prerequisite ideas the lesson depends on. Skip any the mastery file already shows as taught, right once or mastered.
-Write at most four quick probe questions, one per remaining prerequisite, each worth 1 mark. Prefer mcq or a focused short answer. Keep each to one substantive prerequisite task. Set objective to a mastery id when the prerequisite is one. Ids are p1, p2, …
+Write at most four quick probe questions, one per remaining prerequisite, each worth 1 mark. Choose the format that best reveals each prerequisite, balancing equally suitable formats against the recent history. Keep each to one substantive prerequisite task. Set objective to a mastery id when the prerequisite is one. Ids are p1, p2, …
 Return no questions if the evidence already shows where to start. note says in one sentence what the probe checks.
 ${QUESTION_FORMAT}`;
 }
@@ -163,7 +178,12 @@ export function reviseMapPrompt(lesson: Lesson, change: string) {
   return `${TEACHING}\n\nA lesson plan the student is reviewing:\n<map>\n${JSON.stringify(lesson.map, null, 2)}\n</map>\nProbe findings: ${lesson.probe?.findings ?? 'none'}\n\nThe student asks:\n<change>\n${change.trim()}\n</change>\n\nReturn the whole map with the change applied. Apply the student's change first; the rules below cover everything it does not ask for. Where the request conflicts with them, follow the request.\n${MAP_RULES}`;
 }
 
-export function stepPrompt(lesson: Lesson, map: LessonMap, index: number) {
+export function stepPrompt(
+  lesson: Lesson,
+  map: LessonMap,
+  index: number,
+  history?: readonly Pick<Question, 'type' | 'goal'>[],
+) {
   const steps = map.steps
     .map(
       (s, i) =>
@@ -178,6 +198,12 @@ Notes to teach from (read them):
 ${notesList(lesson.notes)}
 The plan: ${map.plan}
 Probe findings: ${lesson.probe?.findings ?? 'none'}
+${formatHistory(
+  history ?? [
+    ...(lesson.probe?.questions ?? []),
+    ...lesson.steps.flatMap((step) => (step ? [step.check] : [])),
+  ],
+)}
 The lesson's steps, written at the same time by other writers (planned scope, not evidence of demonstrated knowledge):
 ${steps}
 
@@ -185,8 +211,8 @@ Write step ${index + 1} of ${map.steps.length}: "${step.title}". Why it is neede
 - explain: establish the idea from what the student already accepts, recalling a known foundation in a sentence rather than re-teaching it. Use only the content needed to understand this idea, with a compact concrete example and verified source links; no minimum length.
 - connect: how it links to the previous step and the goal.
 - checkFirst: true only when the check follows from knowledge the student has already demonstrated, without facts introduced by this step's explanation. The check is then asked first, as a prediction. Otherwise false.
-- check: one question (id "k${index + 1}") that shows whether this step's idea landed, usually worth 1–2 marks for written answers or 1 for mcq. It asks for one coherent task: a prediction, a verdict, a piece of code or one explanation. Its rubric points are parts of that answer, not unrelated tasks chained together. State every fact, type and condition the answer depends on and the expected answer form. Leave the other steps' ideas to their own checks.${lesson.objective ? ` Set objective to "${lesson.objective}".` : ''}
-- Choose check.type to mix formats: ${index % 2 === 0 ? 'prefer mcq for this step' : 'prefer short for this step'}, so the lesson visibly mixes formats. Explicit learner requests and tasks that require producing code override this preference. Set goal for the thinking assessed and type for the response format; explain/apply goals may use scenario mcq. Keep their distinction clear in the task without adding learner-facing grading instructions.
+- check: one question (id "k${index + 1}") that shows whether this step's idea landed, usually worth 1–2 marks for written answers, 1 for mcq or 1 per cloze slot. It asks for one coherent task: a prediction, a verdict, a piece of code or one explanation. Its rubric points are parts of that answer, not unrelated tasks chained together. State every fact, type and condition the answer depends on and the expected answer form. Leave the other steps' ideas to their own checks.${lesson.objective ? ` Set objective to "${lesson.objective}".` : ''}
+- Choose check.type for this step's assessed capability. When several formats fit equally well, prefer one used less often in the recent history, considering the whole lesson's capabilities. Do not assign formats by step number or alternate mechanically. Explicit learner requests still take priority. Set goal for the thinking assessed and type for the response format; keep their distinction clear without adding learner-facing grading instructions.
 For a check that traces code, predicts an outcome or applies a mechanism, use a case not already solved in the notes or this explanation. Renaming variables, changing literal values or paraphrasing a worked question is not enough. Change a decision, dependency or operation order so it affects the reasoning or result. Keep the new case within this step's scope and supply every needed premise. Before returning, compare the check with the worked examples: the learner must apply the mechanism rather than copy a displayed answer.
 - misconceptions: the two or three likely wrong answers to the check, each with a short re-explanation aimed at that mistake.
 - figure: "" unless the step needs a figure drawn (see Visuals).
