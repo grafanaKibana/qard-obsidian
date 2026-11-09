@@ -989,7 +989,7 @@
 .qard-app button.qard-text-button {
   border: 0;
   color: var(--qard-muted);
-  padding: 5px 0;
+  padding: 5px 12px;
 }
 
 .qard-app :is(button, input, select, textarea, summary, a):focus-visible {
@@ -1370,8 +1370,7 @@
 }
 
 .qard-app .qard-setup-heading > button {
-  padding: 5px 0;
-  min-height: 28px;
+  padding: 5px 12px;
   flex-shrink: 0;
   font-size: var(--qard-font-control);
 }
@@ -1385,8 +1384,7 @@
 }
 
 .qard-app .qard-panel-heading button {
-  padding: 3px 0;
-  min-height: 24px;
+  padding: 3px 12px;
   font-size: var(--qard-font-control);
   color: var(--qard-blue);
 }
@@ -3815,6 +3813,8 @@ body.qard-focus-active .status-bar {
 
 .qard-panel-actions {
   display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
   justify-content: flex-end;
   align-items: center;
   gap: 8px;
@@ -4039,11 +4039,15 @@ body.qard-focus-active .status-bar {
 
 .qard-objective {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto 80px auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 12px;
   align-items: center;
   padding: 10px 0;
   border-top: 1px solid var(--qard-border);
+}
+
+.qard-objective > .qard-state {
+  place-self: start end;
 }
 
 .qard-objective-main {
@@ -4059,20 +4063,32 @@ body.qard-focus-active .status-bar {
   overflow-wrap: anywhere;
 }
 
-.qard-objective-main small {
+.qard-objective-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.qard-objective-meta small {
+  flex: 0 1 auto;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .qard-objective-due {
+  flex-shrink: 0;
   font-size: var(--qard-font-meta);
-  text-align: right;
+  white-space: nowrap;
 }
 
 .qard-objective-actions {
   display: flex;
-  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .qard-app .qard-objective-actions button {
@@ -4204,18 +4220,8 @@ body.qard-focus-active .status-bar {
     align-items: start;
   }
 
-  .qard-objective-due {
-    grid-column: 1;
-    text-align: left;
-    align-self: center;
-  }
-
-  .qard-objective > .qard-state {
-    justify-self: end;
-  }
-
   .qard-objective-actions {
-    grid-column: 2;
+    grid-column: 1 / -1;
     flex-wrap: wrap;
     justify-content: flex-end;
   }
@@ -4293,7 +4299,7 @@ body.qard-focus-active .status-bar {
 
 .qard-app .qard-segmented button {
   border: 0;
-  min-height: 28px;
+  min-height: 30px;
   padding: 3px 12px;
   font-size: var(--qard-font-control);
   background: transparent;
@@ -4594,6 +4600,7 @@ body.qard-focus-active .status-bar {
 .qard-map-tools {
   display: flex;
   align-items: center;
+  min-height: 44px;
   gap: 4px;
   padding: 4px;
   border-radius: 10px;
@@ -4608,7 +4615,7 @@ body.qard-focus-active .status-bar {
   min-width: 0;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 2px 10px 2px 8px;
+  padding: 4px 12px;
 }
 
 .qard-map-tools.is-right {
@@ -4881,8 +4888,6 @@ body.qard-focus-active .status-bar {
   display: inline-flex;
   align-items: center;
   gap: 2px;
-  min-height: 28px;
-  padding: 0 6px 0 2px;
   font-size: var(--qard-font-control);
   color: var(--qard-blue);
 }
@@ -5237,6 +5242,13 @@ body.qard-focus-active .status-bar {
 
 .qard-usage .qard-heading {
   align-items: flex-end;
+}
+
+.qard-confirmation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
 }
 
 .qard-usage-panel {
@@ -5623,8 +5635,10 @@ div.qard-ask-q {
 /* Cancelling and recovering stuck jobs */
 .qard-job-controls {
   display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   margin: 6px 0 10px;
   font-size: var(--qard-font-control);
 }
@@ -5638,6 +5652,8 @@ div.qard-ask-q {
 
 .qard-job-controls.is-stuck span {
   flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .qard-panel-actions .qard-job-controls,
@@ -5662,8 +5678,8 @@ div.qard-ask-q {
 
 .qard-app button.qard-jobs-cancel {
   flex-shrink: 0;
-  padding: 0;
-  min-height: 24px;
+  padding: 4px 12px;
+  min-height: 34px;
   font-size: var(--qard-font-control);
 }
 
@@ -7498,7 +7514,7 @@ div.qard-ask-q {
   justify-content: flex-start;
   border: 0;
   border-radius: 4px;
-  padding: 8px 0;
+  padding: 8px 12px;
   font-size: var(--qard-font-control);
 }
 
@@ -7676,7 +7692,8 @@ div.qard-ask-q {
 }
 
 @media (pointer: coarse) {
-  .qard-library-shell button {
+  .qard-library-shell button,
+  .qard-app button.qard-jobs-cancel {
     min-height: 44px;
   }
 

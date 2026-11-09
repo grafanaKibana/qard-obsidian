@@ -195,21 +195,23 @@ export function UsageView({ services }: { services: QardServices }) {
         </p>
         {!empty &&
           (confirm ? (
-            <p className="qard-small">
-              {'Clear all recorded usage? '}
-              <button
-                className="qard-text-button"
-                onClick={() => {
-                  void services.reviews.resetUsage();
-                  setConfirm(false);
-                }}
-              >
-                Clear
-              </button>
-              <button className="qard-text-button" onClick={() => setConfirm(false)}>
-                Cancel
-              </button>
-            </p>
+            <div className="qard-confirmation qard-small">
+              <span>Clear all recorded usage?</span>
+              <div className="qard-actions">
+                <button
+                  className="qard-text-button"
+                  onClick={() => {
+                    void services.reviews.resetUsage();
+                    setConfirm(false);
+                  }}
+                >
+                  Clear
+                </button>
+                <button className="qard-text-button" onClick={() => setConfirm(false)}>
+                  Cancel
+                </button>
+              </div>
+            </div>
           ) : (
             <button className="qard-text-button qard-small" onClick={() => setConfirm(true)}>
               Clear usage history

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { act } from 'preact/test-utils';
 import { createRoot } from 'react-dom/client';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   StudyClock,
   addStudy,
@@ -160,6 +160,28 @@ it('shows study time by course and activity', async () => {
   expect(tabs[0]!.getAttribute('aria-selected')).toBe('true');
   await key('End');
   expect(tabs[3]!.getAttribute('aria-selected')).toBe('true');
+  const resetStudy = vi.spyOn(store, 'resetStudy');
+  const action = (label: string) =>
+    [...host.querySelectorAll<HTMLButtonElement>('button')].find(
+      (button) => button.textContent?.trim() === label,
+    )!;
+  await act(async () => {
+    action('Clear study time').click();
+  });
+  await act(async () => {
+    action('Cancel').click();
+  });
+  expect(resetStudy).not.toHaveBeenCalled();
+  expect(host.querySelector('.qard-usage-total')!.textContent).toBe('50 minin total');
+  await act(async () => {
+    action('Clear study time').click();
+  });
+  await act(async () => {
+    action('Clear').click();
+    await store.flush();
+  });
+  expect(resetStudy).toHaveBeenCalledTimes(1);
+  expect(host.textContent).toContain('No study time');
   await act(async () => root.unmount());
   host.remove();
 });

@@ -241,12 +241,16 @@ export function CourseView({
                     <strong>
                       <InlineMarkdown text={o.title} path={path} services={services} />
                     </strong>
-                    <small className="qard-muted">{o.evidence.at(-1) ?? 'No evidence yet'}</small>
+                    <div className="qard-objective-meta">
+                      <small className="qard-muted">{o.evidence.at(-1) ?? 'No evidence yet'}</small>
+                      {o.due && !['new', 'planned'].includes(o.state) && (
+                        <span className="qard-muted qard-objective-due">
+                          {relativeDay(o.due, day)}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <StateChip state={o.state} />
-                  <span className="qard-muted qard-objective-due">
-                    {o.due && !['new', 'planned'].includes(o.state) ? relativeDay(o.due, day) : ''}
-                  </span>
                   {actions(o)}
                 </div>
               ))}
