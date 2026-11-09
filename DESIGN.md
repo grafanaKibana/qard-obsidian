@@ -25,7 +25,7 @@ The extraction preserves existing rendering. Gutter, floating-surface, badge and
 
 Keep `--qard-bg`, `--qard-soft`, `--qard-text`, `--qard-muted`, and `--qard-border` mapped to Obsidian variables. Keep `--qard-blue` as the theme-aware accent (light #4263dc, dark #9aafff) and `--qard-on-blue` as its paired foreground (light white, dark #182040). A glyph painted on the accent always consumes the paired foreground.
 
-Filled primary actions have a separate semantic pair: `--qard-action-bg` (#4263dc), `--qard-action-text` (#fff), and `--qard-action-hover` (#3554c 5). These currently stay the same in both themes. Do not replace filled-action backgrounds with the pale dark-theme accent. State foreground/background pairs (`--qard-ok`, `--qard-bad`, `--qard-vague`, `--qard-miss`, `--qard-good` and their `-bg` values) retain their existing theme mappings. Course identity colors remain data, not action colors.
+Filled primary actions have a separate semantic pair: `--qard-action-bg` (#4263dc), `--qard-action-text` (#fff), and `--qard-action-hover` (#3554c5). These currently stay the same in both themes. Do not replace filled-action backgrounds with the pale dark-theme accent. State foreground/background pairs (`--qard-ok`, `--qard-bad`, `--qard-vague`, `--qard-miss`, `--qard-good` and their `-bg` values) retain their existing theme mappings. Course identity colors remain data, not action colors.
 
 ## Type roles
 
