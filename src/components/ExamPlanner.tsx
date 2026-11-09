@@ -5,6 +5,7 @@ import { dayDistance, examTone } from '../exams/exam-calendar';
 import { LibraryHeader } from './library/LibraryHeader';
 import { ExamEditor } from './exams/ExamEditor';
 import { ExamCalendar } from './exams/ExamCalendar';
+import { plural } from './common/labels';
 import type { QardCard } from '../cards/card-types';
 import type { QardServices } from '../views/services';
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -172,7 +173,7 @@ export function ExamPlanner({
                     <span>{examDate.toLocaleDateString(undefined, { month: 'short' })}</span>
                     <strong>{examDate.getDate()}</strong>
                   </div>
-                  <div>
+                  <div className="qard-exam-plan-title">
                     <h2>{plan.name}</h2>
                     <p>
                       {days < 0
@@ -190,6 +191,15 @@ export function ExamPlanner({
                       })}
                     </p>
                   </div>
+                  <span className="qard-exam-readiness">
+                    {p.expired
+                      ? 'Revision period ended'
+                      : !p.isStudyDay
+                        ? 'Rest day'
+                        : p.queue.length
+                          ? `${plural(p.queue.length, 'card')} ready today`
+                          : 'Complete for today'}
+                  </span>
                 </header>
                 <div className="qard-exam-coverage">
                   <div>
@@ -203,20 +213,6 @@ export function ExamPlanner({
                     value={p.covered}
                     aria-label={`${plan.name} coverage`}
                   />
-                </div>
-                <div className="qard-exam-status">
-                  <span>
-                    {p.studyDays} study {p.studyDays === 1 ? 'day' : 'days'} left
-                  </span>
-                  <span>
-                    {p.expired
-                      ? 'Revision period ended'
-                      : !p.isStudyDay
-                        ? 'Rest day'
-                        : p.queue.length
-                          ? `${p.queue.length} cards ready today`
-                          : 'Complete for today'}
-                  </span>
                 </div>
                 {p.shortfall > 0 && (
                   <p className="qard-exam-warning" role="status">

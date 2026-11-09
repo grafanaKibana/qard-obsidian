@@ -4474,6 +4474,7 @@ body.qard-focus-active .status-bar {
   gap: var(--qard-gap-actions);
   font-size: var(--qard-font-meta);
   color: var(--qard-muted);
+  font-weight: var(--qard-weight-normal);
 }
 
 .qard-app .qard-progress-legend button {
@@ -4482,6 +4483,7 @@ body.qard-focus-active .status-bar {
   padding: 3px 8px;
   border-radius: 999px;
   font-size: var(--qard-font-control);
+  font-weight: var(--qard-weight-normal);
   color: var(--qard-muted);
   background: transparent;
 }
@@ -4924,16 +4926,21 @@ body.qard-focus-active .status-bar {
 
 .qard-map-dependency i {
   grid-column: 1;
-  grid-row: 2;
+  grid-row: 1;
   align-self: start;
   margin-top: var(--qard-space-1);
 }
 
 .qard-map-dependency > span {
   grid-column: 2;
-  grid-row: 2;
+  grid-row: 1;
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+.qard-map-dependency.has-group > span {
+  grid-column: 1 / -1;
+  grid-row: 2;
 }
 
 .qard-app button.qard-map-note {
@@ -6378,6 +6385,8 @@ div.qard-ask-q {
 }
 
 .qard-exam-plan {
+  container-type: inline-size;
+  container-name: qard-plan;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -6388,13 +6397,46 @@ div.qard-ask-q {
 }
 
 .qard-exam-plan-head {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--qard-gap-fields);
 }
 
-.qard-exam-plan-head > div:last-child {
+.qard-exam-plan-title {
   min-width: 0;
+}
+
+.qard-exam-readiness {
+  justify-self: end;
+  max-width: 12em;
+  color: var(--qard-muted);
+  font-size: var(--qard-font-meta);
+  line-height: 1.5;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+@container qard-plan (max-width: 360px) {
+  .qard-exam-plan-head {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: var(--qard-space-1) var(--qard-gap-fields);
+  }
+
+  .qard-exam-plan-head > .qard-exam-date {
+    grid-column: 1;
+    grid-row: 1 / 3;
+  }
+
+  .qard-exam-plan-title {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .qard-exam-readiness {
+    grid-column: 2;
+    grid-row: 1;
+  }
 }
 
 .qard-app .qard-exam-plan-head h2 {
@@ -6473,15 +6515,6 @@ div.qard-ask-q {
 .qard-exam-coverage progress::-moz-progress-bar {
   background: var(--qard-course);
   border-radius: 4px;
-}
-
-.qard-exam-status {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  font-size: var(--qard-font-meta);
-  color: var(--qard-muted);
 }
 
 .qard-exam-plan .qard-actions {
@@ -8193,6 +8226,7 @@ div.qard-ask-q {
 .qard-time-line button.qard-text-button {
   padding: var(--qard-control-padding);
   font-size: var(--qard-font-control);
+  font-weight: var(--qard-weight-normal);
 }
 
 /* Nested decks: children sit inside their parent, indented by one step per level. */

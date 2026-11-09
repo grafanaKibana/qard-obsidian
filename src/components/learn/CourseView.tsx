@@ -197,10 +197,10 @@ export function CourseView({
     <article className="qard-course">
       <header className="qard-course-head">
         <div>
-          <span className="qard-muted">Course</span>
           <h1>{course.course}</h1>
         </div>
         <div className="qard-course-toolbar">
+          {selector}
           <div className="qard-actions">
             <button onClick={() => setUpdating(true)}>Update</button>
             <button
@@ -212,7 +212,6 @@ export function CourseView({
               <FileText size={16} />
             </button>
           </div>
-          {selector}
         </div>
       </header>
       <CourseProgress course={course} filter={filter} toggle={toggle} />

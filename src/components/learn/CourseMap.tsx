@@ -583,7 +583,14 @@ export function CourseMap({
   const titleOf = (id: string) => byId.get(id)?.title ?? id;
   const links = (ids: string[]) =>
     ids.map((n) => (
-      <button key={n} className="qard-map-link qard-map-dependency" onClick={() => open(n, true)}>
+      <button
+        key={n}
+        className={
+          'qard-map-link qard-map-dependency' +
+          (grouped && topicOf(n) !== topic ? ' has-group' : '')
+        }
+        onClick={() => open(n, true)}
+      >
         {grouped && topicOf(n) !== topic ? (
           <small className="qard-muted">{byId.get(n)?.group}</small>
         ) : null}
