@@ -15,6 +15,7 @@ import {
 import { layoutGraph, layoutTopic, OBJECTIVE, routeTo, topicsOf } from '../src/learn/course-graph';
 import { courseUpdateSchema, firstSentences } from '../src/learn/learn-schema';
 import { LearnService } from '../src/learn/learn-service';
+import { stepReviewSchema } from '../src/learn/step-review';
 import { insertUnderHeading } from '../src/learn/note-edits';
 import { summarise } from '../src/learn/learning-evidence';
 import { type LearnStorage } from '../src/learn/learn-contracts';
@@ -34,6 +35,7 @@ import { readSettings } from '../src/settings/settings';
 import type { AgentRole, AgentTask } from '../src/agents/runner';
 import { OpenRouterRunner, type Http } from '../src/agents/openrouter-runner';
 import type { CardLink } from '../src/review/review-store';
+import type { CheckRecord } from '../src/learn/learn-types';
 import type { PracticeTest, Question } from '../src/tests/test-types';
 
 beforeAll(() => {
@@ -356,6 +358,20 @@ const mcq = (id: string): Question =>
     options: ['a', 'b'],
     answer: 1,
   });
+const checkRecord = (mastery: string, patch: Partial<CheckRecord> = {}): CheckRecord => ({
+  version: 1,
+  createdAt: 1,
+  mastery,
+  course: 'DS346',
+  objective: 'params',
+  title: 'Parameter counts',
+  goal: 'explain',
+  questions: [q('old')],
+  answers: {},
+  marks: {},
+  status: 'ready',
+  ...patch,
+});
 const markOf = (id: string, awarded: boolean[]) => ({
   id,
   score: 99,
@@ -403,6 +419,7 @@ function setup(python?: (script: string) => Promise<string>) {
     run: async (task: AgentTask) => {
       calls.push({ role, task });
       const found = replies.find((r) => r.schema === task.schema);
+      if (!found && task.schema === stepReviewSchema) return { issues: [] };
       if (!found) throw new Error('unexpected task');
       return found.reply(task);
     },
@@ -909,6 +926,72 @@ describe('learning service', () => {
     ]);
   });
 
+  it('saves only a repaired lesson step after the marker approves it', async () => {
+    const t = setup();
+    t.reply(probeSchema, () => ({ questions: [], note: 'None needed.' }));
+    t.reply(probeMapSchema, () => ({
+      marks: [],
+      findings: 'Start here.',
+      map: {
+        title: 'One step',
+        plan: 'Teach one idea.',
+        mermaid: 'graph TD; A-->B',
+        steps: [{ title: 'One idea', why: 'Needed now.' }],
+      },
+    }));
+    let writes = 0,
+      reviews = 0;
+    t.reply(stepSchema, () => ({
+      title: `Candidate ${++writes}`,
+      explain: 'An explanation.',
+      connect: 'A connection.',
+      checkFirst: false,
+      check: q('k1'),
+      misconceptions: [],
+    }));
+    let approve: ((value: { issues: string[] }) => void) | undefined;
+    t.reply(stepReviewSchema, (task) => {
+      if (!task.prompt.includes('Candidate')) return { issues: [] };
+      if (++reviews === 1) return { issues: ['Split the output and explanation.'] };
+      return new Promise((resolve) => {
+        approve = resolve;
+      });
+    });
+
+    const path = await t.learn.startLesson({
+      topic: 'Review this step',
+      notes: ['Notes/DS346/Topic Models.md'],
+    });
+    await vi.waitFor(() => expect(reviews).toBe(2));
+    expect(t.learn.lessonAt(path)!.steps).toEqual([null]);
+    expect(JSON.parse(t.files.get(path)!).steps).toEqual([null]);
+    expect(
+      t.calls.filter(
+        (c) => c.task.schema === stepReviewSchema && c.task.prompt.includes('Candidate'),
+      ),
+    ).toEqual([
+      expect.objectContaining({ role: 'marker' }),
+      expect.objectContaining({ role: 'marker' }),
+    ]);
+    expect(
+      t.calls.find(
+        (c) => c.task.schema === stepReviewSchema && c.task.prompt.includes('Candidate'),
+      )!.task,
+    ).toMatchObject({
+      vault: undefined,
+      effort: 'high',
+    });
+    expect(
+      t.calls.find(
+        (c) => c.task.schema === stepReviewSchema && c.task.prompt.includes('Candidate'),
+      )!.task.prompt,
+    ).toContain('# Topic Models');
+
+    approve!({ issues: [] });
+    await vi.waitFor(() => expect(t.learn.lessonAt(path)!.steps[0]?.title).toBe('Candidate 2'));
+    expect(writes).toBe(2);
+  });
+
   it('cancels a stuck job, which can then be tried again', async () => {
     const t = await mapped();
     let signal: AbortSignal | undefined;
@@ -1103,6 +1186,122 @@ describe('learning service', () => {
     );
   });
 
+  it('rewrites cached steps when only the plan scope or step rationale changes', async () => {
+    const t = setup();
+    const path = 'Qard/Lessons/scope.json';
+    const map = {
+      title: 'Same title',
+      plan: 'Explain the prior.',
+      mermaid: '',
+      steps: [{ title: 'Same step', why: 'Foundation.' }],
+    };
+    t.files.set(
+      path,
+      JSON.stringify({
+        version: 1,
+        createdAt: 1,
+        topic: 'Prior',
+        notes: [],
+        map,
+        accepted: true,
+        stepsFor: JSON.stringify([
+          map.title,
+          map.plan,
+          map.steps.map((step) => [step.title, step.why]),
+        ]),
+        steps: [
+          {
+            title: 'Old step',
+            explain: 'Old scope.',
+            connect: '',
+            checkFirst: false,
+            check: q('k1'),
+            misconceptions: [],
+          },
+        ],
+        state: [{ asks: [] }],
+        current: 0,
+      }),
+    );
+    await t.learn.loadLesson(path);
+    let revision = 0;
+    t.reply(mapSchema, () => ({
+      ...map,
+      plan: 'Apply the prior.',
+      steps: [
+        {
+          title: 'Same step',
+          why: ++revision === 1 ? 'Foundation.' : 'Use a different condition.',
+        },
+      ],
+    }));
+    let writes = 0;
+    t.reply(stepSchema, () => ({
+      title: `Rewritten ${++writes}`,
+      explain: 'New scope.',
+      connect: '',
+      checkFirst: false,
+      check: q('k1'),
+      misconceptions: [],
+    }));
+    await t.learn.reviseMap(path, 'Apply instead.');
+    await vi.waitFor(() => expect(t.learn.lessonAt(path)?.steps[0]?.title).toBe('Rewritten 1'));
+    await t.learn.reviseMap(path, 'Change only the condition.');
+    await vi.waitFor(() => expect(t.learn.lessonAt(path)?.steps[0]?.title).toBe('Rewritten 2'));
+    expect(t.learn.lessonAt(path)?.steps[0]?.check.goal).toBe('explain');
+  });
+
+  it('migrates legacy plan keys without resetting answered step history on reopen', async () => {
+    const t = setup();
+    const path = 'Qard/Lessons/legacy-plan.json';
+    const map = {
+      title: 'Priors',
+      plan: 'Explain priors.',
+      mermaid: '',
+      steps: [
+        { title: 'One', why: 'Recall.' },
+        { title: 'Two', why: 'Apply.' },
+      ],
+    };
+    const first = {
+      title: 'Original',
+      explain: 'Keep this.',
+      connect: '',
+      checkFirst: false,
+      check: q('k1'),
+      misconceptions: [],
+    };
+    const state = {
+      answer: { text: 'My saved answer' },
+      mark: { ...markOf('k1', [true, false]), score: 1 },
+      asks: [{ q: 'Why?', a: 'Because.' }],
+    };
+    t.files.set(
+      path,
+      JSON.stringify({
+        version: 1,
+        createdAt: 1,
+        topic: 'Priors',
+        probe: { questions: [], answers: {}, submitted: true },
+        notes: [],
+        map,
+        accepted: true,
+        stepsFor: JSON.stringify([map.title, map.steps.map((step) => step.title)]),
+        steps: [first, null],
+        state: [state, { asks: [] }],
+        current: 1,
+      }),
+    );
+    t.reply(stepSchema, () => ({ ...first, title: 'Second' }));
+    await t.learn.openLesson(path);
+    await vi.waitFor(() => expect(t.learn.lessonAt(path)?.steps[1]?.title).toBe('Second'));
+    expect(t.learn.lessonAt(path)?.steps[0]).toEqual(first);
+    expect(t.learn.lessonAt(path)?.state[0]).toEqual(state);
+    expect(t.learn.lessonAt(path)?.current).toBe(1);
+    expect(t.calls.filter((call) => call.task.schema === stepSchema)).toHaveLength(1);
+    expect(JSON.parse(t.files.get(path!)!).state[0]).toEqual(state);
+  });
+
   it('suggests at most three lessons a day, misconceptions first', async () => {
     const t = setup();
     t.reply(objectivesSchema, () => ({
@@ -1136,14 +1335,221 @@ describe('learning service', () => {
     t.settings.aiEnabled = true;
   });
 
+  it('shares concurrent check preparation and saves only after a repaired batch is approved', async () => {
+    const t = await mapped();
+    let writes = 0,
+      reviews = 0;
+    let approve!: (value: { issues: string[] }) => void;
+    t.reply(questionsSchema, () => ({ questions: [q(`candidate${++writes}`)] }));
+    t.reply(stepReviewSchema, () => {
+      if (++reviews === 1) return { issues: ['Specify the input.'] };
+      return new Promise((resolve) => {
+        approve = resolve;
+      });
+    });
+    const first = t.learn.ensureCheck(t.path, 'params');
+    const second = t.learn.ensureCheck(t.path, 'params');
+    expect(second).toBe(first);
+    await vi.waitFor(() => expect(reviews).toBe(2));
+    expect(t.storage.files('Qard/Checks', 'json')).toEqual([]);
+    expect(t.calls.filter((call) => call.task.schema === questionsSchema)).toHaveLength(2);
+    expect(
+      t.calls
+        .filter((call) => call.task.schema === questionsSchema)
+        .every((call) => call.task.prompt.includes('# Topic Models')),
+    ).toBe(true);
+    expect(
+      t.calls
+        .filter((call) => call.task.schema === stepReviewSchema)
+        .every((call) => call.role === 'marker' && call.task.prompt.includes('# Topic Models')),
+    ).toBe(true);
+    approve({ issues: [] });
+    const path = await first;
+    expect(await second).toBe(path);
+    expect(t.learn.checkAt(path!)!).toMatchObject({
+      questionPolicy: 1,
+      questions: [{ id: 'candidate2' }],
+    });
+    expect(JSON.parse(t.files.get(path!)!).questions[0].id).toBe('candidate2');
+  });
+
+  it('upgrades untouched old-policy checks on load but preserves any started or completed record', async () => {
+    const t = await mapped();
+    const path = `Qard/Checks/DS346/${DAY} params.json`;
+    t.files.set(path, JSON.stringify(checkRecord(t.path)));
+    t.reply(questionsSchema, () => ({ questions: [q('reviewed')] }));
+    const fresh = await t.learn.loadCheck(path);
+    expect(fresh).toMatchObject({ questionPolicy: 1, questions: [{ id: 'reviewed' }] });
+    const calls = t.calls.length;
+    for (const patch of [
+      { answers: { old: { text: 'Started' } } },
+      { answers: { old: { flagged: true } } },
+      {
+        marks: {
+          old: { ...markOf('old', [true, false]), score: 1, mistake: 'incomplete' as const },
+        },
+      },
+      { finishedAt: 0 },
+    ]) {
+      const original = JSON.stringify(checkRecord(t.path, patch));
+      t.files.set(path, original);
+      const restarted = t.restart();
+      expect(await restarted.loadCheck(path)).toEqual(JSON.parse(original));
+      expect(t.files.get(path)).toBe(original);
+    }
+    expect(t.calls).toHaveLength(calls);
+  });
+
+  it('opens answered history without requiring the original course file', async () => {
+    const t = setup();
+    const path = 'Qard/Checks/Archived/answered.json';
+    const record = {
+      version: 1,
+      createdAt: 1,
+      mastery: 'Missing Mastery.md',
+      course: 'Archived',
+      objective: 'archived',
+      title: 'Saved attempt',
+      goal: 'explain',
+      questions: [q('c1')],
+      answers: { c1: { text: 'My original answer' } },
+      marks: {},
+      status: 'marked',
+      finishedAt: 2,
+    };
+    const saved = JSON.stringify(record);
+    t.files.set(path, saved);
+    expect(await t.learn.loadCheck(path)).toEqual(record);
+    expect(t.files.get(path)).toBe(saved);
+    expect(t.calls).toHaveLength(0);
+  });
+
+  it('fails visibly after three failed reviews and keeps the old check unchanged', async () => {
+    const t = await mapped();
+    const path = `Qard/Checks/DS346/${DAY} params.json`;
+    const original = JSON.stringify(checkRecord(t.path));
+    t.files.set(path, original);
+    t.reply(questionsSchema, () => ({ questions: [q('rejected')] }));
+    t.reply(stepReviewSchema, () => ({ issues: ['The question gives away the answer.'] }));
+    await expect(t.learn.loadCheck(path)).rejects.toThrow(/after three attempts/);
+    expect(t.learn.job(`${t.path}#params`, 'check-write')?.error).toMatch(/gives away/);
+    expect(t.files.get(path)).toBe(original);
+    expect(t.learn.checkAt(path)).toEqual(JSON.parse(original));
+    expect(t.calls.filter((call) => call.task.schema === questionsSchema)).toHaveLength(3);
+  });
+
+  it('does not replace answers entered while a new check is being reviewed', async () => {
+    const t = await mapped();
+    const path = `Qard/Checks/DS346/${DAY} params.json`;
+    t.files.set(path, JSON.stringify(checkRecord(t.path)));
+    let approve!: (value: { issues: string[] }) => void;
+    t.reply(questionsSchema, () => ({ questions: [q('replacement')] }));
+    t.reply(
+      stepReviewSchema,
+      () =>
+        new Promise((resolve) => {
+          approve = resolve;
+        }),
+    );
+    const loading = t.learn.loadCheck(path);
+    await vi.waitFor(() => expect(approve).toBeDefined());
+    t.learn.answerCheck(path, 'old', { text: 'My own answer' });
+    approve({ issues: [] });
+    expect(await loading).toMatchObject({
+      questions: [{ id: 'old' }],
+      answers: { old: { text: 'My own answer' } },
+    });
+    await t.learn.flush();
+    expect(JSON.parse(t.files.get(path!)!).answers.old.text).toBe('My own answer');
+  });
+
+  it('deletes an old check during review without waiting or resurrecting it after a late reply', async () => {
+    const t = await mapped();
+    const path = `Qard/Checks/DS346/${DAY} params.json`;
+    t.files.set(path, JSON.stringify(checkRecord(t.path)));
+    let approve!: (value: { issues: string[] }) => void;
+    t.reply(questionsSchema, () => ({ questions: [q('late')] }));
+    t.reply(
+      stepReviewSchema,
+      () =>
+        new Promise((resolve) => {
+          approve = resolve;
+        }),
+    );
+    const loading = t.learn.loadCheck(path);
+    const rejected = expect(loading).rejects.toThrow(/deleted/);
+    await vi.waitFor(() => expect(approve).toBeDefined());
+    await t.learn.removeCheck(path);
+    await rejected;
+    expect(t.files.has(path)).toBe(false);
+    approve({ issues: [] });
+    await settle();
+    await t.learn.flush();
+    expect(t.files.has(path)).toBe(false);
+    expect(t.learn.checkAt(path)).toBeUndefined();
+  });
+
+  it('keeps answered same-day check files when preparing the next check', async () => {
+    const t = await mapped();
+    const path = `Qard/Checks/DS346/${DAY} params.json`;
+    const original = JSON.stringify(
+      checkRecord(t.path, { answers: { old: { text: 'Saved answer' } }, finishedAt: 5 }),
+    );
+    t.files.set(path, original);
+    t.reply(questionsSchema, () => ({ questions: [q('next')] }));
+    const next = await t.learn.ensureCheck(t.path, 'params');
+    expect(next).toBe(`Qard/Checks/DS346/${DAY} params 2.json`);
+    expect(t.files.get(path)).toBe(original);
+    expect(t.learn.checkAt(next!)?.questions[0]?.id).toBe('next');
+  });
+
+  it('reviews probes before display, preserves their note, and reports rejected probes', async () => {
+    const t = setup();
+    let writes = 0;
+    t.reply(probeSchema, () => ({
+      questions: [mcq(`p${++writes}`)],
+      note: 'Recall the prerequisites.',
+    }));
+    let reviews = 0;
+    t.reply(stepReviewSchema, () => ({
+      issues: ++reviews === 1 ? ['Remove the answer clue.'] : [],
+    }));
+    const path = await t.learn.startLesson({
+      topic: 'Priors',
+      notes: ['Notes/DS346/Topic Models.md'],
+    });
+    await vi.waitFor(() => expect(t.learn.lessonAt(path)?.probe).toBeDefined());
+    expect(t.learn.lessonAt(path)?.probe).toMatchObject({
+      questions: [{ id: 'p2', goal: 'explain' }],
+      note: 'Recall the prerequisites.',
+    });
+    expect(JSON.parse(t.files.get(path!)!).probe.note).toBe('Recall the prerequisites.');
+    expect(
+      t.calls
+        .filter((call) => call.task.schema === probeSchema)
+        .every((call) => call.role === 'writer'),
+    ).toBe(true);
+    t.replies.length = 0;
+    t.reply(probeSchema, () => ({ questions: [mcq('bad')], note: 'Rejected.' }));
+    t.reply(stepReviewSchema, () => ({ issues: ['Still reveals the answer.'] }));
+    const failed = await t.learn.startLesson({ topic: 'Rejected probe', notes: [] });
+    await vi.waitFor(() =>
+      expect(t.learn.job(failed, 'probe')?.error).toMatch(/after three attempts/),
+    );
+    expect(t.learn.lessonAt(failed)?.probe).toBeUndefined();
+    expect(JSON.parse(t.files.get(failed!)!).probe).toBeUndefined();
+  });
+
   it('runs a check: written ahead by the writer, marked by the tutor, recorded as evidence', async () => {
     const t = await mapped();
     await t.learn.setState(t.path, 'params', 'taught', DAY);
     t.reply(questionsSchema, () => ({ questions: [mcq('c1'), q('c2')] }));
     const check = (await t.learn.ensureCheck(t.path, 'params'))!;
     expect(check).toBe(`Qard/Checks/DS346/${DAY} params.json`);
-    expect(t.calls.at(-1)).toMatchObject({ role: 'writer' });
-    expect(t.calls.at(-1)!.task.prompt).toContain('Goal: explain');
+    expect(t.calls.at(-1)).toMatchObject({ role: 'marker' });
+    expect(
+      [...t.calls].reverse().find((c) => c.task.schema === questionsSchema)!.task.prompt,
+    ).toContain('Goal: explain');
     // A second request reuses the waiting check.
     expect(await t.learn.ensureCheck(t.path, 'params')).toBe(check);
     expect((await t.learn.todayList()).checks).toMatchObject([{ objective: 'params', check }]);
@@ -1193,8 +1599,8 @@ describe('learning service', () => {
     });
     await settle();
     await settle();
-    // The objective's notes are inlined, so the live tutor needs no tools.
-    expect(t.calls.at(-1)).toMatchObject({ role: 'tutor', task: { vault: false } });
+    // The objective's notes are inlined for both generation and review.
+    expect(t.calls.at(-1)).toMatchObject({ role: 'marker', task: { vault: undefined } });
     expect(t.calls.at(-1)!.task.prompt).toContain(
       '<note path="Notes/DS346/Topic Models.md">\n# Topic Models',
     );
@@ -1485,6 +1891,7 @@ describe('deleting learning material', () => {
         version: 1,
         mastery: t.path,
         objective: 'params',
+        questionPolicy: 1,
         answers: {},
         marks: {},
         questions: [],
