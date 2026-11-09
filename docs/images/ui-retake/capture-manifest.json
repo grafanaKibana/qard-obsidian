@@ -1,0 +1,2704 @@
+{
+  "fixedTime": "2026-11-09T11:00:00Z",
+  "timezone": "Europe/Budapest",
+  "locale": "en-US",
+  "scale": 2,
+  "hostStylesheetSHA256": "6245db88b65b1728ef136cc79b3ce3ef85ab860944abbe5198e9d6bd9abe9bea",
+  "fixtureSHA256": "fc2ffa5a72cb795317d3f943063e9baceb7e04b620400c888d05bd766f8d6560",
+  "browser": "156.0.8078.81",
+  "stages": {
+    "adapt": [
+      "7005682",
+      "a109382"
+    ],
+    "harden": [
+      "a109382",
+      "fbb88e1"
+    ],
+    "typeset": [
+      "fbb88e1",
+      "d5eab93"
+    ],
+    "layout": [
+      "d5eab93",
+      "1a47ae3"
+    ],
+    "polish": [
+      "1a47ae3",
+      "6e8a38c"
+    ]
+  },
+  "captures": [
+    {
+      "name": "responsive-desktop-map",
+      "stage": "adapt",
+      "phase": "before",
+      "revision": "7005682",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 400,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 350,
+        "y": 0,
+        "width": 400,
+        "height": 900
+      },
+      "errors": [],
+      "state": {
+        "focus": "Explain reliable transport and acknowledgment mechanismsreliable transport and acknowledgment\u2026Compar",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "70056821914f0dae910b52a20f1fa3329b04d0ac",
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        800,
+        1800
+      ],
+      "imageSHA256": "319f377da6a13fa07a5fc6ec72286083025daece925ca68ae551f39ef424852e"
+    },
+    {
+      "name": "responsive-desktop-map",
+      "stage": "adapt",
+      "phase": "after",
+      "revision": "a109382",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 400,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 350,
+        "y": 0,
+        "width": 400,
+        "height": 900
+      },
+      "errors": [],
+      "state": {
+        "focus": "TopicsTransport protocols100%Explain reliable transport and acknowledgment mechanismsreliable transp",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "a109382366138ccd862836f5abcb45c16004f054",
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        800,
+        1800
+      ],
+      "imageSHA256": "ca431ec649e8bf6a1a145e837c0eddff0285ee8f003e7aa95e2674cb91642c19"
+    },
+    {
+      "name": "responsive-phone-map",
+      "stage": "adapt",
+      "phase": "before",
+      "revision": "7005682",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "pane": 390,
+      "theme": "light",
+      "touch": true,
+      "scale": 2,
+      "clip": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 900
+      },
+      "errors": [],
+      "state": {
+        "focus": "Explain reliable transport and acknowledgment mechanismsreliable transport and acknowledgment\u2026Compar",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "70056821914f0dae910b52a20f1fa3329b04d0ac",
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        780,
+        1800
+      ],
+      "imageSHA256": "759bacad2ddd937128aa8e35794a884f4346e1dae5fc714abd90eba614db69b1"
+    },
+    {
+      "name": "responsive-phone-map",
+      "stage": "adapt",
+      "phase": "after",
+      "revision": "a109382",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "pane": 390,
+      "theme": "light",
+      "touch": true,
+      "scale": 2,
+      "clip": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 900
+      },
+      "errors": [],
+      "state": {
+        "focus": "TopicsTransport protocols100%Explain reliable transport and acknowledgment mechanismsreliable transp",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "a109382366138ccd862836f5abcb45c16004f054",
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        780,
+        1800
+      ],
+      "imageSHA256": "44075380b4410af641eba43c5202ab8d3924d88f36d922ce12a48c7f59259b5a"
+    },
+    {
+      "name": "responsive-list",
+      "stage": "adapt",
+      "phase": "before",
+      "revision": "7005682",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 400,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 350,
+        "y": 0,
+        "width": 400,
+        "height": 900
+      },
+      "errors": [],
+      "state": {
+        "focus": "List",
+        "focusTag": "BUTTON",
+        "focusInsideMap": false,
+        "tabs": [
+          "List"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "70056821914f0dae910b52a20f1fa3329b04d0ac",
+      "actions": [
+        "Click List"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        800,
+        1800
+      ],
+      "imageSHA256": "4ac96f26e275daaaa0c409a3260bd52f32cad1e972109c6454c5ab2b2224d780"
+    },
+    {
+      "name": "responsive-list",
+      "stage": "adapt",
+      "phase": "after",
+      "revision": "a109382",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 400,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 350,
+        "y": 0,
+        "width": 400,
+        "height": 900
+      },
+      "errors": [],
+      "state": {
+        "focus": "List",
+        "focusTag": "BUTTON",
+        "focusInsideMap": false,
+        "tabs": [
+          "List"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "a109382366138ccd862836f5abcb45c16004f054",
+      "actions": [
+        "Click List"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        800,
+        1800
+      ],
+      "imageSHA256": "d8777ad8254f75951fd5740503858f6de2b00596b0798a2a0c7607b9cb5178e7"
+    },
+    {
+      "name": "type-lesson",
+      "stage": "typeset",
+      "phase": "before",
+      "revision": "fbb88e1",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 182,
+        "y": 153,
+        "width": 736,
+        "height": 213
+      },
+      "errors": [],
+      "state": {
+        "focus": "1. Recovering lost packetsStep 1 of 1Recovering lost packetsConnect acknowledgments and retransmissi",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "fbb88e127e325b42da61d54bae016b09b3e07a8d",
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        1472,
+        426
+      ],
+      "imageSHA256": "3b458fce7accb04cf9ced9106684d29b40cd6cf2a5779c186a595a7ea80ae0fc"
+    },
+    {
+      "name": "type-lesson",
+      "stage": "typeset",
+      "phase": "after",
+      "revision": "d5eab93",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 182,
+        "y": 153,
+        "width": 736,
+        "height": 213
+      },
+      "errors": [],
+      "state": {
+        "focus": "1. Recovering lost packetsStep 1 of 1Recovering lost packetsConnect acknowledgments and retransmissi",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "d5eab935502ce712843f53d74747cf749f30675d",
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        1472,
+        426
+      ],
+      "imageSHA256": "49326b0407ee9fb5b849c54040f6c7b90bb3336efdd5c968480bb1f94c461596"
+    },
+    {
+      "name": "type-builder",
+      "stage": "typeset",
+      "phase": "before",
+      "revision": "fbb88e1",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 784,
+        "y": 145,
+        "width": 246,
+        "height": 459
+      },
+      "errors": [],
+      "state": {
+        "focus": "QardStudyStatisticsStudyChoose the decks and topics you want to study.CancelDecks & topicsSelect all",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "fbb88e127e325b42da61d54bae016b09b3e07a8d",
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        492,
+        918
+      ],
+      "imageSHA256": "f1aa2561512099901a1afa0d525aecaf689a7ba204b078e3db197ff3d6dcf80f"
+    },
+    {
+      "name": "type-builder",
+      "stage": "typeset",
+      "phase": "after",
+      "revision": "d5eab93",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 784,
+        "y": 146,
+        "width": 246,
+        "height": 459
+      },
+      "errors": [],
+      "state": {
+        "focus": "QardStudyStatisticsStudyChoose the decks and topics you want to study.CancelDecks & topicsSelect all",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "d5eab935502ce712843f53d74747cf749f30675d",
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        492,
+        918
+      ],
+      "imageSHA256": "364e6cbab993046317dcdcb064a607c81dd070094af1479981fb4d7ea1c461bf"
+    },
+    {
+      "name": "type-usage",
+      "stage": "typeset",
+      "phase": "before",
+      "revision": "fbb88e1",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 148,
+        "y": 98,
+        "width": 804,
+        "height": 97
+      },
+      "errors": [],
+      "state": {
+        "focus": "QardToken usageStatisticsToken usageEvery call Qard makes to Claude Code, Codex, the Anthropic API o",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [
+          "7 days"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "fbb88e127e325b42da61d54bae016b09b3e07a8d",
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        1608,
+        194
+      ],
+      "imageSHA256": "f033a5d0f22895c8ef07ce252a0270b6ef964f3693302622974dfbf665ea8f9c"
+    },
+    {
+      "name": "type-usage",
+      "stage": "typeset",
+      "phase": "after",
+      "revision": "d5eab93",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 148,
+        "y": 98,
+        "width": 804,
+        "height": 97
+      },
+      "errors": [],
+      "state": {
+        "focus": "QardToken usageStatisticsToken usageEvery call Qard makes to Claude Code, Codex, the Anthropic API o",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [
+          "7 days"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "d5eab935502ce712843f53d74747cf749f30675d",
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        1608,
+        194
+      ],
+      "imageSHA256": "452db14fceec3b725b23cad91b91026bf3cb03aa4b0d3bf2f83de0220f29b8a3"
+    },
+    {
+      "name": "layout-confirmation",
+      "stage": "layout",
+      "phase": "before",
+      "revision": "d5eab93",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 148,
+        "y": 814,
+        "width": 299,
+        "height": 50
+      },
+      "errors": [],
+      "state": {
+        "focus": "QardToken usageStatisticsToken usageEvery call Qard makes to Claude Code, Codex, the Anthropic API o",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [
+          "7 days"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "d5eab935502ce712843f53d74747cf749f30675d",
+      "actions": [
+        "Seed 1234 input / 456 output tokens for 2026-11-09",
+        "Click Clear usage history"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        598,
+        100
+      ],
+      "imageSHA256": "e7a128456229fcf0c6f2653283c7af33a61403b10a9245900dc1e944d0478b18"
+    },
+    {
+      "name": "layout-confirmation",
+      "stage": "layout",
+      "phase": "after",
+      "revision": "1a47ae3",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 148,
+        "y": 814,
+        "width": 299,
+        "height": 50
+      },
+      "errors": [],
+      "state": {
+        "focus": "QardToken usageStatisticsToken usageEvery call Qard makes to Claude Code, Codex, the Anthropic API o",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [
+          "7 days"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "1a47ae3c9fbf1d766b5a80f32541d52434c34255",
+      "actions": [
+        "Seed 1234 input / 456 output tokens for 2026-11-09",
+        "Click Clear usage history"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        598,
+        100
+      ],
+      "imageSHA256": "2e3c06cc4a020b7cb2f9fa70dab6ddbbcbf8aec460fae4b0e8c134a469922158"
+    },
+    {
+      "name": "layout-desk-actions",
+      "stage": "layout",
+      "phase": "before",
+      "revision": "d5eab93",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 817,
+        "y": 331,
+        "width": 213,
+        "height": 165
+      },
+      "errors": [],
+      "state": {
+        "focus": "QardStatisticsDecksTestsLearnPlansYour decks1 deck \u00b7 2 cardsAll decksComputer Networks2 cards \u00b7 2 to",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [
+          "Decks"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "d5eab935502ce712843f53d74747cf749f30675d",
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        426,
+        330
+      ],
+      "imageSHA256": "8ef4b82f1abd15e5014061bd0c942b99ec7676836a87fd36c8053d6cb63c8fa7"
+    },
+    {
+      "name": "layout-desk-actions",
+      "stage": "layout",
+      "phase": "after",
+      "revision": "1a47ae3",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 817,
+        "y": 331,
+        "width": 213,
+        "height": 165
+      },
+      "errors": [],
+      "state": {
+        "focus": "QardStatisticsDecksTestsLearnPlansYour decks1 deck \u00b7 2 cardsAll decksComputer Networks2 cards \u00b7 2 to",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [
+          "Decks"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "1a47ae3c9fbf1d766b5a80f32541d52434c34255",
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        426,
+        330
+      ],
+      "imageSHA256": "2ced3c5402a21c809efb086ca2fcebc31e3d524bc50e51eefd93bc74ba7369f3"
+    },
+    {
+      "name": "layout-job-cancel",
+      "stage": "layout",
+      "phase": "before",
+      "revision": "d5eab93",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 634,
+        "y": 45,
+        "width": 396,
+        "height": 275
+      },
+      "errors": [],
+      "state": {
+        "focus": "1 running",
+        "focusTag": "BUTTON",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ]
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "d5eab935502ce712843f53d74747cf749f30675d",
+      "actions": [
+        "Open background jobs"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        792,
+        550
+      ],
+      "imageSHA256": "65d812082ebc470243cb4c2aed7ee459e6da0f3552359307bd97d823644d572f"
+    },
+    {
+      "name": "layout-job-cancel",
+      "stage": "layout",
+      "phase": "after",
+      "revision": "1a47ae3",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 634,
+        "y": 45,
+        "width": 396,
+        "height": 275
+      },
+      "errors": [],
+      "state": {
+        "focus": "1 running",
+        "focusTag": "BUTTON",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ]
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "1a47ae3c9fbf1d766b5a80f32541d52434c34255",
+      "actions": [
+        "Open background jobs"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        792,
+        550
+      ],
+      "imageSHA256": "28db177e2d65fdfb4e24fc807c502eab8086a9116027ac8fe26791cfbb0ae124"
+    },
+    {
+      "name": "layout-toolbar",
+      "stage": "layout",
+      "phase": "before",
+      "revision": "d5eab93",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 706,
+        "y": 36,
+        "width": 352,
+        "height": 51
+      },
+      "errors": [],
+      "state": {
+        "focus": "CourseComputer NetworksMapListUpdate objectivesOpen file1 mastered1 taught1 shaky1 gap1 new2 ready t",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [
+          "Map"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "d5eab935502ce712843f53d74747cf749f30675d",
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        704,
+        102
+      ],
+      "imageSHA256": "7aec26133b156005094c625bd0181da014396bcef89ff24ea0b5ef2762f8676d"
+    },
+    {
+      "name": "layout-toolbar",
+      "stage": "layout",
+      "phase": "after",
+      "revision": "1a47ae3",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 682,
+        "y": 36,
+        "width": 352,
+        "height": 51
+      },
+      "errors": [],
+      "state": {
+        "focus": "CourseComputer NetworksMapListUpdate objectivesOpen file1 mastered1 taught1 shaky1 gap1 new2 ready t",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [
+          "Map"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "1a47ae3c9fbf1d766b5a80f32541d52434c34255",
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        704,
+        102
+      ],
+      "imageSHA256": "6b5a9fa69e13cbc90a7fd460736d2c645c7829ec8b288d319435dc4fbcf3ab9b"
+    },
+    {
+      "name": "layout-objective-row",
+      "stage": "layout",
+      "phase": "before",
+      "revision": "d5eab93",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 400,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 366,
+        "y": 359,
+        "width": 368,
+        "height": 144
+      },
+      "errors": [],
+      "state": {
+        "focus": "List",
+        "focusTag": "BUTTON",
+        "focusInsideMap": false,
+        "tabs": [
+          "List"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "d5eab935502ce712843f53d74747cf749f30675d",
+      "actions": [
+        "Click List"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        736,
+        288
+      ],
+      "imageSHA256": "3965ddaf71bb20a01f31afd792e5b1abc523fcea3a4fa0b0b9bbe958cd60c39c"
+    },
+    {
+      "name": "layout-objective-row",
+      "stage": "layout",
+      "phase": "after",
+      "revision": "1a47ae3",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 400,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 366,
+        "y": 359,
+        "width": 368,
+        "height": 144
+      },
+      "errors": [],
+      "state": {
+        "focus": "List",
+        "focusTag": "BUTTON",
+        "focusInsideMap": false,
+        "tabs": [
+          "List"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "1a47ae3c9fbf1d766b5a80f32541d52434c34255",
+      "actions": [
+        "Click List"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        736,
+        288
+      ],
+      "imageSHA256": "936e38f067f01e45ea56f7b29cb3b327ea65d5fc7c1fb94d97a12463f07cf9c3"
+    },
+    {
+      "name": "polish-session-controls",
+      "stage": "polish",
+      "phase": "before",
+      "revision": "1a47ae3",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 784,
+        "y": 146,
+        "width": 246,
+        "height": 461
+      },
+      "errors": [],
+      "state": {
+        "focus": "QardStudyStatisticsStudyChoose the decks and topics you want to study.CancelDecks & topicsSelect all",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "1a47ae3c9fbf1d766b5a80f32541d52434c34255",
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        492,
+        922
+      ],
+      "imageSHA256": "c82d3f7a6ce12f42571c816c8f131ff902a174dcec8aaca3712c3c73eff5f978"
+    },
+    {
+      "name": "polish-session-controls",
+      "stage": "polish",
+      "phase": "after",
+      "revision": "6e8a38c",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 784,
+        "y": 146,
+        "width": 246,
+        "height": 461
+      },
+      "errors": [],
+      "state": {
+        "focus": "QardStudyStatisticsStudyChoose the decks and topics you want to study.CancelDecks & topicsSelect all",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "6e8a38c27603a67b435fdfc722ec8d97cadf8f39",
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        492,
+        922
+      ],
+      "imageSHA256": "59462ad47d78ca4f13123ed33b032db404507fc89fed32df86ae82de7d736246"
+    },
+    {
+      "name": "polish-dark-controls",
+      "stage": "polish",
+      "phase": "before",
+      "revision": "1a47ae3",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "pane": 390,
+      "theme": "dark",
+      "touch": true,
+      "scale": 2,
+      "clip": {
+        "x": 10,
+        "y": 381,
+        "width": 370,
+        "height": 449
+      },
+      "errors": [],
+      "state": {
+        "focus": "QardStudyStatisticsStudyChoose the decks and topics you want to study.CancelDecks & topicsSelect all",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "1a47ae3c9fbf1d766b5a80f32541d52434c34255",
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        740,
+        898
+      ],
+      "imageSHA256": "dfbe67cdb9037913e5f8ff7a5ac422c3c6934bce7678f6dbece4f8597094045f"
+    },
+    {
+      "name": "polish-dark-controls",
+      "stage": "polish",
+      "phase": "after",
+      "revision": "6e8a38c",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "pane": 390,
+      "theme": "dark",
+      "touch": true,
+      "scale": 2,
+      "clip": {
+        "x": 10,
+        "y": 381,
+        "width": 370,
+        "height": 449
+      },
+      "errors": [],
+      "state": {
+        "focus": "QardStudyStatisticsStudyChoose the decks and topics you want to study.CancelDecks & topicsSelect all",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "6e8a38c27603a67b435fdfc722ec8d97cadf8f39",
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        740,
+        898
+      ],
+      "imageSHA256": "6f45e5da7b2dbac22897da383cadf6c8b8660bfeb677a93896084e7ac301d881"
+    },
+    {
+      "name": "polish-plans-controls",
+      "stage": "polish",
+      "phase": "before",
+      "revision": "1a47ae3",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 70,
+        "y": 192,
+        "width": 203,
+        "height": 58
+      },
+      "errors": [],
+      "state": {
+        "focus": "QardExam plansStatisticsDecksTestsLearnPlansPlansNew examExamsCalendarNo exam plansAdd an exam date ",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [
+          "Plans"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "1a47ae3c9fbf1d766b5a80f32541d52434c34255",
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        406,
+        116
+      ],
+      "imageSHA256": "5d42aa7db588d11234cf184adf94d7a1b41324f141810909e0a69001accb0d6d"
+    },
+    {
+      "name": "polish-plans-controls",
+      "stage": "polish",
+      "phase": "after",
+      "revision": "6e8a38c",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 70,
+        "y": 192,
+        "width": 203,
+        "height": 58
+      },
+      "errors": [],
+      "state": {
+        "focus": "QardExam plansStatisticsDecksTestsLearnPlansPlansNew examExamsCalendarNo exam plansAdd an exam date ",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [
+          "Plans"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "6e8a38c27603a67b435fdfc722ec8d97cadf8f39",
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        406,
+        116
+      ],
+      "imageSHA256": "3c473f179781a05cb2c843a136b65e30c8111ee045e5b80f0c022b66a2a61e8d"
+    },
+    {
+      "name": "polish-answer-field",
+      "stage": "polish",
+      "phase": "before",
+      "revision": "1a47ae3",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 182,
+        "y": 348,
+        "width": 736,
+        "height": 259
+      },
+      "errors": [],
+      "state": {
+        "focus": "1. Recovering lost packetsStep 1 of 1Recovering lost packetsConnect acknowledgments and retransmissi",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "1a47ae3c9fbf1d766b5a80f32541d52434c34255",
+      "actions": [
+        "Type: It identifies the bytes the receiver has already acknowledged.",
+        "Blur answer field"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        1472,
+        518
+      ],
+      "imageSHA256": "0b5a9b7e9d284102f2fd8fad507f8bf938759261b3d82c6be0ec1a1ad3d44ce0"
+    },
+    {
+      "name": "polish-answer-field",
+      "stage": "polish",
+      "phase": "after",
+      "revision": "6e8a38c",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 182,
+        "y": 348,
+        "width": 736,
+        "height": 259
+      },
+      "errors": [],
+      "state": {
+        "focus": "1. Recovering lost packetsStep 1 of 1Recovering lost packetsConnect acknowledgments and retransmissi",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "6e8a38c27603a67b435fdfc722ec8d97cadf8f39",
+      "actions": [
+        "Type: It identifies the bytes the receiver has already acknowledged.",
+        "Blur answer field"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        1472,
+        518
+      ],
+      "imageSHA256": "c11614e102c6576f5ddc871a05f954e1308edb22d5d5fb2367cab019bc894976"
+    },
+    {
+      "name": "polish-ask-field",
+      "stage": "polish",
+      "phase": "before",
+      "revision": "1a47ae3",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "dark",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 182,
+        "y": 665,
+        "width": 736,
+        "height": 61
+      },
+      "errors": [],
+      "state": {
+        "focus": "1. Recovering lost packetsStep 1 of 1Recovering lost packetsConnect acknowledgments and retransmissi",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "1a47ae3c9fbf1d766b5a80f32541d52434c34255",
+      "actions": [
+        "Type: Why does TCP retransmit after a timeout?",
+        "Blur question field"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        1472,
+        122
+      ],
+      "imageSHA256": "3887b54baab96f64f1d6b08d3e3f5c1b552a6222201df09894b2b9be0fc1a772"
+    },
+    {
+      "name": "polish-ask-field",
+      "stage": "polish",
+      "phase": "after",
+      "revision": "6e8a38c",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "dark",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 182,
+        "y": 665,
+        "width": 736,
+        "height": 61
+      },
+      "errors": [],
+      "state": {
+        "focus": "1. Recovering lost packetsStep 1 of 1Recovering lost packetsConnect acknowledgments and retransmissi",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "6e8a38c27603a67b435fdfc722ec8d97cadf8f39",
+      "actions": [
+        "Type: Why does TCP retransmit after a timeout?",
+        "Blur question field"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        1472,
+        122
+      ],
+      "imageSHA256": "3fc1298929b55758b500e291f3d81acc1d41ae0f3fe449e6f6eef74c47337c3e"
+    },
+    {
+      "name": "expanded-map-focus",
+      "stage": "harden",
+      "phase": "before",
+      "revision": "a109382",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 0,
+        "y": 0,
+        "width": 1100,
+        "height": 900
+      },
+      "errors": [],
+      "state": {
+        "focus": "document.write('<script src=\"'+revision+'.js\"><'+'/script>')TopicsTransport protocols100%Explain rel",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "a109382366138ccd862836f5abcb45c16004f054",
+      "actions": [
+        "Click Full screen",
+        "Focus last detail-panel button",
+        "Press Tab"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        2200,
+        1800
+      ],
+      "imageSHA256": "742d6333a00f317955fa185697508c58853436b750fe81bc1afb5942d7e06fdf"
+    },
+    {
+      "name": "expanded-map-focus",
+      "stage": "harden",
+      "phase": "after",
+      "revision": "fbb88e1",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 0,
+        "y": 0,
+        "width": 1100,
+        "height": 900
+      },
+      "errors": [],
+      "state": {
+        "focus": "Topics",
+        "focusTag": "BUTTON",
+        "focusInsideMap": true,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "fbb88e127e325b42da61d54bae016b09b3e07a8d",
+      "actions": [
+        "Click Full screen",
+        "Focus last detail-panel button",
+        "Press Tab"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        2200,
+        1800
+      ],
+      "imageSHA256": "8fe9f6ca4d1d937cd994e305a4823881a0c0625c93adbf91573f2695bd5f2282"
+    },
+    {
+      "name": "usage-keyboard",
+      "stage": "harden",
+      "phase": "before",
+      "revision": "a109382",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 673,
+        "y": 124,
+        "width": 279,
+        "height": 48
+      },
+      "errors": [],
+      "state": {
+        "focus": "Today",
+        "focusTag": "BUTTON",
+        "focusInsideMap": false,
+        "tabs": [
+          "Today"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "a109382366138ccd862836f5abcb45c16004f054",
+      "actions": [
+        "Click and focus Today",
+        "Press ArrowRight"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        558,
+        96
+      ],
+      "imageSHA256": "e8ab4148a3163b06e0037f1df4f8e415206dee30a741022d8c0acc34142a6a9e"
+    },
+    {
+      "name": "usage-keyboard",
+      "stage": "harden",
+      "phase": "after",
+      "revision": "fbb88e1",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 673,
+        "y": 124,
+        "width": 279,
+        "height": 48
+      },
+      "errors": [],
+      "state": {
+        "focus": "7 days",
+        "focusTag": "BUTTON",
+        "focusInsideMap": false,
+        "tabs": [
+          "7 days"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "fbb88e127e325b42da61d54bae016b09b3e07a8d",
+      "actions": [
+        "Click and focus Today",
+        "Press ArrowRight"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        558,
+        96
+      ],
+      "imageSHA256": "87468a813d51178e6749da8f0e3e2d72c4d5da3c894535a955daf7f122338e67"
+    },
+    {
+      "name": "study-time-keyboard",
+      "stage": "harden",
+      "phase": "before",
+      "revision": "a109382",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 673,
+        "y": 124,
+        "width": 279,
+        "height": 48
+      },
+      "errors": [],
+      "state": {
+        "focus": "Today",
+        "focusTag": "BUTTON",
+        "focusInsideMap": false,
+        "tabs": [
+          "Today"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "a109382366138ccd862836f5abcb45c16004f054",
+      "actions": [
+        "Click and focus Today",
+        "Press ArrowRight"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        558,
+        96
+      ],
+      "imageSHA256": "e8ab4148a3163b06e0037f1df4f8e415206dee30a741022d8c0acc34142a6a9e"
+    },
+    {
+      "name": "study-time-keyboard",
+      "stage": "harden",
+      "phase": "after",
+      "revision": "fbb88e1",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 673,
+        "y": 124,
+        "width": 279,
+        "height": 48
+      },
+      "errors": [],
+      "state": {
+        "focus": "7 days",
+        "focusTag": "BUTTON",
+        "focusInsideMap": false,
+        "tabs": [
+          "7 days"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "fbb88e127e325b42da61d54bae016b09b3e07a8d",
+      "actions": [
+        "Click and focus Today",
+        "Press ArrowRight"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        558,
+        96
+      ],
+      "imageSHA256": "b7a811b59bafb608c3b41ac08528f654384084b17c7f580408a8a2649879a575"
+    },
+    {
+      "name": "course-view-keyboard",
+      "stage": "harden",
+      "phase": "before",
+      "revision": "a109382",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 713,
+        "y": 37,
+        "width": 115,
+        "height": 48
+      },
+      "errors": [],
+      "state": {
+        "focus": "Map",
+        "focusTag": "BUTTON",
+        "focusInsideMap": false,
+        "tabs": [
+          "Map"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "a109382366138ccd862836f5abcb45c16004f054",
+      "actions": [
+        "Click and focus Map",
+        "Press ArrowRight"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        230,
+        96
+      ],
+      "imageSHA256": "14b24f59cd83e61fff6a3e37c2b9873e78ec72af4d5807bb2add6eff95c4e110"
+    },
+    {
+      "name": "course-view-keyboard",
+      "stage": "harden",
+      "phase": "after",
+      "revision": "fbb88e1",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 713,
+        "y": 37,
+        "width": 115,
+        "height": 48
+      },
+      "errors": [],
+      "state": {
+        "focus": "List",
+        "focusTag": "BUTTON",
+        "focusInsideMap": false,
+        "tabs": [
+          "List"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "fbb88e127e325b42da61d54bae016b09b3e07a8d",
+      "actions": [
+        "Click and focus Map",
+        "Press ArrowRight"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        230,
+        96
+      ],
+      "imageSHA256": "560fef24bfb752e9d3debb93497166dd40ac4c96bcacc9a943e4c8936ffc859a"
+    },
+    {
+      "name": "mcq-keyboard",
+      "stage": "harden",
+      "phase": "before",
+      "revision": "a109382",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 170,
+        "y": 189,
+        "width": 760,
+        "height": 152
+      },
+      "errors": [],
+      "state": {
+        "focus": "UDP",
+        "focusTag": "BUTTON",
+        "focusInsideMap": false,
+        "tabs": [],
+        "radio": "UDP\n",
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "a109382366138ccd862836f5abcb45c16004f054",
+      "actions": [
+        "Click and focus UDP",
+        "Press ArrowRight"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        1520,
+        304
+      ],
+      "imageSHA256": "fce179d0947ddfc5c76ed3eff80c737ce3850e790a13a9beeb6e90bf8ed65cd1"
+    },
+    {
+      "name": "mcq-keyboard",
+      "stage": "harden",
+      "phase": "after",
+      "revision": "fbb88e1",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "clip": {
+        "x": 170,
+        "y": 189,
+        "width": 760,
+        "height": 152
+      },
+      "errors": [],
+      "state": {
+        "focus": "TCP",
+        "focusTag": "BUTTON",
+        "focusInsideMap": false,
+        "tabs": [],
+        "radio": "TCP\n",
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "fbb88e127e325b42da61d54bae016b09b3e07a8d",
+      "actions": [
+        "Click and focus UDP",
+        "Press ArrowRight"
+      ],
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        1520,
+        304
+      ],
+      "imageSHA256": "b86e5785df866481a5fb0bf4abdd1009ef917ad013185f20e7c99f32bca6ef49"
+    },
+    {
+      "name": "type-library",
+      "stage": "typeset",
+      "phase": "before",
+      "revision": "fbb88e1",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 400,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "clip": {
+        "x": 360,
+        "y": 68,
+        "width": 380,
+        "height": 319
+      },
+      "errors": [],
+      "state": {
+        "focus": "QardStatisticsDecksTestsLearnPlansYour decks1 deck \u00b7 2 cardsAll decksComputer Networks2 cards \u00b7 2 to",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [
+          "Decks"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "fbb88e127e325b42da61d54bae016b09b3e07a8d",
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        760,
+        638
+      ],
+      "imageSHA256": "74a81f89f1e16f8343e0087cf2937a11aa6615286aa868aef5d24c39680fd221"
+    },
+    {
+      "name": "type-library",
+      "stage": "typeset",
+      "phase": "after",
+      "revision": "d5eab93",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 400,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "clip": {
+        "x": 360,
+        "y": 68,
+        "width": 380,
+        "height": 319
+      },
+      "errors": [],
+      "state": {
+        "focus": "QardStatisticsDecksTestsLearnPlansYour decks1 deck \u00b7 2 cardsAll decksComputer Networks2 cards \u00b7 2 to",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [
+          "Decks"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "d5eab935502ce712843f53d74747cf749f30675d",
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        760,
+        638
+      ],
+      "imageSHA256": "3d8152e7380860c0a7339496135641532ca966c83cf02e5595e5f18e20694846"
+    },
+    {
+      "name": "type-statistics",
+      "stage": "typeset",
+      "phase": "before",
+      "revision": "fbb88e1",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "clip": {
+        "x": 148,
+        "y": 275,
+        "width": 263,
+        "height": 170
+      },
+      "errors": [],
+      "state": {
+        "focus": "QardStatisticsStatistics Back to decksStatistics2 cards \u00b7 1 deckStudy timeStudy cards Last 30 days7 ",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "fbb88e127e325b42da61d54bae016b09b3e07a8d",
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        526,
+        340
+      ],
+      "imageSHA256": "9af331e761ca12e0ac1b366e3dab4b8bb6375c400ebd5167aa9df00d32b4fdda"
+    },
+    {
+      "name": "type-statistics",
+      "stage": "typeset",
+      "phase": "after",
+      "revision": "d5eab93",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "clip": {
+        "x": 148,
+        "y": 274,
+        "width": 263,
+        "height": 170
+      },
+      "errors": [],
+      "state": {
+        "focus": "QardStatisticsStatistics Back to decksStatistics2 cards \u00b7 1 deckStudy timeStudy cards Last 30 days7 ",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "d5eab935502ce712843f53d74747cf749f30675d",
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        526,
+        340
+      ],
+      "imageSHA256": "365a47d48b251e30fe3e3033c415cad052bbb150d8008db9b6d2d42563da2b6b"
+    },
+    {
+      "name": "type-course",
+      "stage": "typeset",
+      "phase": "before",
+      "revision": "fbb88e1",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "clip": {
+        "x": 66,
+        "y": 16,
+        "width": 239,
+        "height": 72
+      },
+      "errors": [],
+      "state": {
+        "focus": "CourseComputer NetworksMapListUpdate objectivesOpen file1 mastered1 taught1 shaky1 gap1 new2 ready t",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [
+          "Map"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "fbb88e127e325b42da61d54bae016b09b3e07a8d",
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        478,
+        144
+      ],
+      "imageSHA256": "a5e3da248c5e6555b2140fa5137fda442904457d42ad6f3d344efcac4e1d2bcd"
+    },
+    {
+      "name": "type-course",
+      "stage": "typeset",
+      "phase": "after",
+      "revision": "d5eab93",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "actions": [
+        "Open stated screen; no interaction"
+      ],
+      "clip": {
+        "x": 66,
+        "y": 16,
+        "width": 239,
+        "height": 72
+      },
+      "errors": [],
+      "state": {
+        "focus": "CourseComputer NetworksMapListUpdate objectivesOpen file1 mastered1 taught1 shaky1 gap1 new2 ready t",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [
+          "Map"
+        ],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "d5eab935502ce712843f53d74747cf749f30675d",
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        478,
+        144
+      ],
+      "imageSHA256": "10c93d582bcfc599e76f2e84572bf7e3d70ec54e93c134dfe8d77b262993a79f"
+    },
+    {
+      "name": "route-contrast",
+      "stage": "harden",
+      "phase": "before",
+      "revision": "a109382",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "dark",
+      "touch": false,
+      "scale": 2,
+      "actions": [
+        "Click Route here"
+      ],
+      "clip": {
+        "x": 503,
+        "y": 204,
+        "width": 201,
+        "height": 69
+      },
+      "errors": [],
+      "state": {
+        "focus": "Route here",
+        "focusTag": "BUTTON",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "a109382366138ccd862836f5abcb45c16004f054",
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        402,
+        138
+      ],
+      "imageSHA256": "6423f1a9bd3c9fb08b81f2a9705b3899f7c5b08d9f913a0ec9adc36a9c36c337"
+    },
+    {
+      "name": "route-contrast",
+      "stage": "harden",
+      "phase": "after",
+      "revision": "fbb88e1",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "dark",
+      "touch": false,
+      "scale": 2,
+      "actions": [
+        "Click Route here"
+      ],
+      "clip": {
+        "x": 503,
+        "y": 204,
+        "width": 201,
+        "height": 69
+      },
+      "errors": [],
+      "state": {
+        "focus": "Route here",
+        "focusTag": "BUTTON",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "fbb88e127e325b42da61d54bae016b09b3e07a8d",
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        402,
+        138
+      ],
+      "imageSHA256": "c0a65198558ec8897f08274f697eabe93e7820bf1facfb905e17b05ed9e975f7"
+    },
+    {
+      "name": "mask-creation",
+      "stage": "harden",
+      "phase": "before",
+      "revision": "a109382",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 640,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "actions": [
+        "Wait until the same network.svg image is ready",
+        "Focus Add mask and press Enter when available; control is absent in before version"
+      ],
+      "clip": {
+        "x": 246,
+        "y": 16,
+        "width": 608,
+        "height": 587
+      },
+      "errors": [],
+      "unavailable": "Add mask control does not exist",
+      "state": {
+        "focus": "Image masksVault imageChoose an image\u2026network.svgAdd image0 masks \u00b7 Drag to draw, move, or resizeUnd",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "a109382366138ccd862836f5abcb45c16004f054",
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        1216,
+        1174
+      ],
+      "imageSHA256": "80a63262838810556a0c3eeb6546c318c3d0251ec7a6de9ef4a6e488088faa65"
+    },
+    {
+      "name": "mask-creation",
+      "stage": "harden",
+      "phase": "after",
+      "revision": "fbb88e1",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 640,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "actions": [
+        "Wait until the same network.svg image is ready",
+        "Focus Add mask and press Enter when available; control is absent in before version"
+      ],
+      "clip": {
+        "x": 246,
+        "y": 16,
+        "width": 608,
+        "height": 587
+      },
+      "errors": [],
+      "state": {
+        "focus": "Mask 1",
+        "focusTag": "BUTTON",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 1,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "fbb88e127e325b42da61d54bae016b09b3e07a8d",
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        1216,
+        1174
+      ],
+      "imageSHA256": "49761b1ab43f1a973df349a53e19c78fb4b3b8680ffd600c7b4f99ebc7984539"
+    },
+    {
+      "name": "map-node-keyboard",
+      "stage": "harden",
+      "phase": "before",
+      "revision": "a109382",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "actions": [
+        "Focus map frame",
+        "Press ArrowDown"
+      ],
+      "clip": {
+        "x": 307,
+        "y": 262,
+        "width": 486,
+        "height": 248
+      },
+      "errors": [],
+      "state": {
+        "focus": "Computer Networks course map. Arrow keys move, Enter opens a topic, / searches, Escape goes back.",
+        "focusTag": "DIV",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "a109382366138ccd862836f5abcb45c16004f054",
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        972,
+        496
+      ],
+      "imageSHA256": "dbe18b910b65cf4b906bec80f3286b1930615131acb0c176b31edef7d8e31803"
+    },
+    {
+      "name": "map-node-keyboard",
+      "stage": "harden",
+      "phase": "after",
+      "revision": "fbb88e1",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "actions": [
+        "Focus map frame",
+        "Press ArrowDown"
+      ],
+      "clip": {
+        "x": 307,
+        "y": 262,
+        "width": 486,
+        "height": 248
+      },
+      "errors": [],
+      "state": {
+        "focus": "Application protocols: 1 of 1 learned, 0 mastered",
+        "focusTag": "g",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "fbb88e127e325b42da61d54bae016b09b3e07a8d",
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        972,
+        496
+      ],
+      "imageSHA256": "159668bef0b84ee32ce12aaa91159ff064258da0ed22b32b5a09076585d772b2"
+    },
+    {
+      "name": "picker-restoration",
+      "stage": "harden",
+      "phase": "before",
+      "revision": "a109382",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "actions": [
+        "Click Link a source",
+        "Press Escape in Find a note to link"
+      ],
+      "clip": {
+        "x": 66,
+        "y": 17,
+        "width": 231,
+        "height": 137
+      },
+      "errors": [],
+      "state": {
+        "focus": "Linked notesPress Escape to close the note picker.Link a sourceContinuedocument.write('<script src=\"",
+        "focusTag": "BODY",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "a109382366138ccd862836f5abcb45c16004f054",
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        462,
+        274
+      ],
+      "imageSHA256": "e5aecebd5ee4fdf4fc2e665c81420485bd31a0eb297c0d95dbaf61d676fc1f5c"
+    },
+    {
+      "name": "picker-restoration",
+      "stage": "harden",
+      "phase": "after",
+      "revision": "fbb88e1",
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "pane": 1000,
+      "theme": "light",
+      "touch": false,
+      "scale": 2,
+      "actions": [
+        "Click Link a source",
+        "Press Escape in Find a note to link"
+      ],
+      "clip": {
+        "x": 66,
+        "y": 17,
+        "width": 231,
+        "height": 137
+      },
+      "errors": [],
+      "state": {
+        "focus": "Link a source",
+        "focusTag": "BUTTON",
+        "focusInsideMap": false,
+        "tabs": [],
+        "masks": 0,
+        "scroll": {
+          "window": [
+            0,
+            0
+          ],
+          "main": 0
+        },
+        "font": "\"??\", \"??\", \"??\", ui-sans-serif, -apple-system, \"system-ui\", system-ui, \"Segoe UI\", \"Google Sans Flex\", Roboto, \"Inter Variable\", Inter, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", sans-serif"
+      },
+      "revisionFull": "fbb88e127e325b42da61d54bae016b09b3e07a8d",
+      "cropAlignment": "Same semantic top-left anchor, identical CSS-pixel dimensions, 8px padding on detail crops; no image rescaling",
+      "pngDimensions": [
+        462,
+        274
+      ],
+      "imageSHA256": "995ff8960c1c7af1f16aec993fbaafc09acf83bf97e66d56a5f0eb8d82a3e0e7"
+    }
+  ],
+  "stagesFull": {
+    "adapt": [
+      "70056821914f0dae910b52a20f1fa3329b04d0ac",
+      "a109382366138ccd862836f5abcb45c16004f054"
+    ],
+    "harden": [
+      "a109382366138ccd862836f5abcb45c16004f054",
+      "fbb88e127e325b42da61d54bae016b09b3e07a8d"
+    ],
+    "typeset": [
+      "fbb88e127e325b42da61d54bae016b09b3e07a8d",
+      "d5eab935502ce712843f53d74747cf749f30675d"
+    ],
+    "layout": [
+      "d5eab935502ce712843f53d74747cf749f30675d",
+      "1a47ae3c9fbf1d766b5a80f32541d52434c34255"
+    ],
+    "polish": [
+      "1a47ae3c9fbf1d766b5a80f32541d52434c34255",
+      "6e8a38c27603a67b435fdfc722ec8d97cadf8f39"
+    ]
+  }
+}
