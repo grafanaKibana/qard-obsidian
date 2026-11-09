@@ -1,11 +1,11 @@
 {
   "before": "70056821914f0dae910b52a20f1fa3329b04d0ac",
-  "after": "c3c6013950630b85cb7e334fe687fe719a826015",
-  "comparisons": 14,
+  "after": "e2d20b8ca2151efb707c57d2d07c50af0899be07",
+  "comparisons": 17,
   "deviceScaleFactor": 2,
   "clock": "2026-11-09T12:00Z",
-  "capture": "Same synthetic content, pane, theme, input, clock, and interactions. Only main compared with latest PR revision. Cross-topic dependency and study time seeded identically. Scroll position reset before capture.",
-  "maximumExamplesPerGroup": 2,
+  "capture": "Identical synthetic content, theme, input, pane, clock, interactions and crop. Only fork main compared to latest. Tall-graph Fit and lesson breadcrumbs use same fixtures on both sides.",
+  "maximumExamplesPerGroup": 3,
   "scenes": [
     {
       "name": "map-phone",
@@ -80,6 +80,26 @@
       "strip": true
     },
     {
+      "name": "learn-phone",
+      "screen": "app",
+      "request": "learn",
+      "width": 390,
+      "touch": true
+    },
+    {
+      "name": "learn-desktop",
+      "screen": "app",
+      "request": "learn",
+      "width": 1000
+    },
+    {
+      "name": "map-fit",
+      "screen": "course",
+      "width": 390,
+      "touch": true,
+      "variant": "tall"
+    },
+    {
       "name": "tasks",
       "screen": "jobs",
       "width": 375,
@@ -101,31 +121,38 @@
       "crop": ".qard-desk-library"
     },
     {
-      "name": "session-controls",
-      "screen": "app",
-      "request": "builder",
-      "width": 1000,
-      "crop": ".qard-session-options"
+      "name": "lesson-trail",
+      "screen": "lesson",
+      "width": 390,
+      "touch": true,
+      "crop": ".qard-lesson-trail"
     }
   ],
   "hashes": {
     "after-decks-desktop.png": "a98c3f84f2ef8bba0697ffac4c9d63f3f1014ac5932f4fee7094ef41e1adc2df",
     "after-decks-phone.png": "a42160dcb73b0dc7016fec246765f32d2ec469b39104cb212bc22a627f8e2591",
-    "after-map-desktop.png": "424e22b7d5c9da9f71cbc055865df7d97cfed312274ab80134f79f4091b812e3",
-    "after-map-phone.png": "6bfce25e9501b514fc29128ce8750854b6c0365dfe719fa7cb27eef7ed972b53",
+    "after-learn-desktop.png": "6f8d9e5c81f5b8ba4fc3aafe2d7914d65743c549a730c807ece375917e14ddf5",
+    "after-learn-phone.png": "1657e404705f9501b5eb710ec6d2696878c49584ad94d59dd833958f8251ca54",
+    "after-lesson-trail.png": "3a823d28c9c55131a9ab3a98ae9784d0769e3976aad5aca97b0c724dd9da23b6",
+    "after-map-desktop.png": "11f94e2049989da55e21d1ab877239154499b45debaa1d9b5ed70198ef88846e",
+    "after-map-fit.png": "a6240f750b589167e3944a599365742806877fe88c787e213ec03294047aa231",
+    "after-map-phone.png": "44da45e7865919721eb63ce69731bac8da8ec27f8282e0d64a99b2e9bdeb20f1",
     "after-masks-desktop.png": "015672dde84295f4c833d5f645b575c67a35431d14057447dab0b7e374039e80",
     "after-masks-phone.png": "2ce267748f59cb8fffa36bc10c7899567caf3af551c2ce794fc9688fd833711e",
-    "after-objectives-desktop.png": "3f795664dd1e76a5a334ffb56abeec88621fd0d7dd4e475cecbd28abd1d6342b",
-    "after-objectives-phone.png": "6428a95c140b2c62fa445aed45c5d56eb3e369b32058278675ab1d963dfb7ea0",
+    "after-objectives-desktop.png": "bba39fb2f642bdf549c19b5b10d1b8dddd6c9e31d607166463c6454b2dc67145",
+    "after-objectives-phone.png": "f3a0b2f980e937224a060ba81ce167f0ea219212b57f44934de335797d9cebd6",
     "after-plans-desktop.png": "2039183ee0347edfa209e07f0e4e4978fb8544b93021861cd264ebdf79d9d711",
     "after-plans-phone.png": "e7ea7f493493d6e6037bc849e44734109e1e04a470e1a570e240f765b48e53c7",
-    "after-session-controls.png": "562907e123b202b6b2c4ba5a7c644486555237e15dd369a34fd1e0f3d4f1a5c3",
-    "after-tasks.png": "9f378c5e9966a50c1806bd2f10835f72c04d96ce81eab1d3008c12b155071d88",
+    "after-tasks.png": "99917669b4f484cf2c5838e4d2dfc62bf0bcee15a01d07e8a21bebf854337e62",
     "after-types-desktop.png": "f76e1f8865c3b7f5be23d924f454855d26b573a280b1a955496de1409fa9b6cc",
     "after-types-phone.png": "cb7835a4a2c2182fe7bf8207441d509733b16c28c4ccc78cafc464f03fb8d21f",
     "before-decks-desktop.png": "6e0f5cd8969c85b8eba5ab826b3ccbc5cd56d38b73454a87799a666926f86e3d",
     "before-decks-phone.png": "c533cb2a8050f2c356cd2379a66f36c37c9abb21b9220453927411b483bbd437",
+    "before-learn-desktop.png": "aa3b44125d9d44b9ca355a07e8365f8815181d5ebaacac351ae307f2ff1ea70e",
+    "before-learn-phone.png": "894c503afdc043bebc0b8e3d9e688841ccac40796cb0f6862a58c89690587da0",
+    "before-lesson-trail.png": "7ac68a382b0169fd97a6cdd1c98d5a9e68699861be40f87da1790a674b66b62e",
     "before-map-desktop.png": "dabd4f2071995164113877da77fc765986a67f67b4a91019932ce7ab55026520",
+    "before-map-fit.png": "aff0331b5eb31d81e21d24d48b26ccb8cab3fb2f6a0aa8ffe16f2725f395f9e3",
     "before-map-phone.png": "91069ab949a3b4e709f9d51027b203e0e149ea47ca1f6dcd46c9b0f7c01a108a",
     "before-masks-desktop.png": "dc15032780e8e9f4165a2f18033e92d20e7601eed71dc1db6a26a0c124437725",
     "before-masks-phone.png": "ad7b2cb6068db49297aad3b4e31560fcdf0c3ca36a7a13f637c57bd1d203ddfa",
@@ -133,7 +160,6 @@
     "before-objectives-phone.png": "25644a5fb72c9e6a5362244ace7aa05ce5618f00662643cbf3399a5b370d6862",
     "before-plans-desktop.png": "a6441c1f23e611cef116df544650a9d7cb57616f1896d5246b4c46d9fffb97b9",
     "before-plans-phone.png": "57a10290a0c0768cd55c212259da29e355763af7ac5c8a23105086b176cc02f3",
-    "before-session-controls.png": "38050c5a0a829e0fd21fab6ed83b8f9f0418dffed5255a03085761610318fbbb",
     "before-tasks.png": "79c199f6cbaf0dde04628635078487558c486fdb661b7036d4777991822a4d78",
     "before-types-desktop.png": "677d72b135e064f35c210b20bae1e4330dedfbae164bf2624f1cec10d940789f",
     "before-types-phone.png": "58a7b806b65396a8b553b13f8a06bf57e3317f2798d484140f46bc6f68f05462"
