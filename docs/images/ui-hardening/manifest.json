@@ -1,0 +1,26 @@
+{
+  "before_commit": "a109382366138ccd862836f5abcb45c16004f054",
+  "after_branch": "fix/ui-hardening",
+  "capture": "Real Qard components with synthetic fixtures and installed Obsidian base CSS. Matching viewport and keyboard actions.",
+  "images": {
+    "after-course-view-keyboard.png": "0e7c5a581ee7fbddd7ece6e0f9780a984c8f05276f2c078cf5ef9ea5f6357a5c",
+    "after-expanded-map-focus.png": "94b780f9fa8f718762b298b64e748d776f52a888ff2f0bc2be48c4761dc15a0d",
+    "after-map-node-keyboard.png": "083c24bd9280e3d590b0565ac4906f2320543312b3085e74112f32eaa8a3a292",
+    "after-mask-creation.png": "726e9cd543b88f39ee42caff303772a789dd7a891b4c29824c2413c0a7767e0c",
+    "after-mcq-keyboard.png": "f5ab58d57f4f5b6d6a685613a484c92c8de3f9540fea64bfccf94fe08e57c0ea",
+    "after-picker-restoration.png": "7385195b630f7088a3e8cc831386048a3e47dc76ab1224464da1c5afa1a63afa",
+    "after-route-contrast.png": "3f3d7bd5afc0cdd03e306e871f1bab7b198e546a7a2700a03bd16f3479bdef2e",
+    "after-study-time-keyboard.png": "dcecd5d184afba4aa0f90d9ea01bccc8cca6ea4a341ffb810434b4131c50a0cc",
+    "after-usage-keyboard.png": "4bdef5c2268d6052768143699e95f40e642798f5dfc6bd164fabe1454289b191",
+    "before-course-view-keyboard.png": "45b54736da97a318029ec95a182f738a025bd68818e8084d9c9414c3dcc6d9c3",
+    "before-expanded-map-focus.png": "36327ca740a9aa225ace91315c6e36d7de792497a4f34c8f1b55feb0dd7d939b",
+    "before-map-node-keyboard.png": "21dde63ed4141d1cace1520258f280abce900ab5aa8eecc3ba75720e3a26cf38",
+    "before-mask-creation.png": "50976ceb309a76640fe7fcb75ec39b9ea3eedac8782d780526d2c336c4ab3300",
+    "before-mcq-keyboard.png": "d6dde03490880653fc350f64f7f82b66244274384a9c57332ca27bbd73dc1e80",
+    "before-picker-restoration.png": "a24e42a37868ada87a8a3573d0c096aa3d4df67acbb2740dbea91de2854713d6",
+    "before-route-contrast.png": "ffb1d2bb548e23c61b5c08040adf6cd3b4c045d5f779696f3ce2e2722caf45ee",
+    "before-study-time-keyboard.png": "f9c2fe52ca56f08be095af60ca0bc5d0765c57441bacc7858766347f4a32e222",
+    "before-usage-keyboard.png": "782e4018e84489e60ee5ecb099eb332eca964713da9f134a155df56ffa4fb476"
+  },
+  "after_commit": "fbb88e127e325b42da61d54bae016b09b3e07a8d"
+}
