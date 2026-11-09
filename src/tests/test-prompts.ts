@@ -28,11 +28,22 @@ export const MCQ_RULES = `Multiple choice: four options with exactly one correct
 export const GOAL_RULES = `Choose the goal independently of the question's format:
 - recognise: tell ideas apart.
 - recall: retrieve a fact, name or formula.
-- explain: identify or express why or how something works; a scenario mcq can assess this.
-- apply: use knowledge on a new case; a scenario mcq can assess this too.
-Use mcq often, short for a concise written answer, long only when an extended response is necessary, calc for a calculation. A definition needs only a plain definition, without padding.
+- explain: identify or express why or how something works.
+- apply: use knowledge on a new case.
+Choose only formats available in the response schema, selecting the format that best measures the assessed capability. No available format has priority by default or because of its position in a list. Use mcq to discriminate between plausible alternatives or choose a justified outcome; cloze to retrieve unambiguous missing terms or compact factual values; short when the learner must formulate a concise answer in their own words; calc to work through a numerical method; long only for necessary extended reasoning or code. A definition needs only a plain definition, without padding. Do not turn an explanation into a term gap or a code-writing task into answer choices.
+When several available formats fit equally well, give them comparable exposure across the recent questions: prefer an equally suitable format that has been used less often. Consider cloze as a real candidate for suitable retrieval tasks rather than always falling back to short or mcq. Fit takes priority over variety. Do not impose percentages, quotas, a fixed rotation or a required format at a particular position; do not add questions merely to fill a format mix.
 Every question is self-contained and asks one substantive task. State the target, inputs, units and relevant conditions, including what is predicted, for which entity and time period, and what is known at that time. Define unfamiliar terms. Do not rely on another question or worked example for context. Omit irrelevant numbers and independent extra subtasks.
 Use 1–2 marks for a written check unless its necessary scope justifies more. Never add requirements to fill a mark budget. Do not ask for a sentence or word count, padding, or visible grading instructions. Score semantic completeness: a concise complete answer earns full marks.`;
+/** Prepared format history, without question or answer contents. */
+export function formatHistory(history: readonly Pick<Question, 'type' | 'goal'>[]) {
+  const recent = history.slice(-12);
+  return recent.length
+    ? `Recent prepared question formats: ${recent
+        .map((question) => `${question.type}${question.goal ? ` (${question.goal})` : ''}`)
+        .join(', ')}.`
+    : 'Recent prepared question formats: none supplied. No format has priority by default.';
+}
+
 const objectivesBlock = (objectives?: string) =>
   objectives?.trim()
     ? `
@@ -62,7 +73,7 @@ Draft a short test plan for the student to approve. Do not write the questions y
 - title: at most eight words.
 - goal: two to four sentences that restate the request precisely, including any emphasis.
 - sources: keep every note the student chose; add others you found, each with a few words of reason. Read enough to be sure they fit.
-- sections: two to four groups of related questions. Each has a one-sentence focus, the question mix (short answer, long answer, calculation, multiple choice) and its marks.
+- sections: two to four groups of related questions. Each has a one-sentence focus, the question mix (short answer, long answer, calculation, multiple choice) and its marks. Choose formats by the assessed capability, with comparable exposure for equally suitable formats rather than quotas or fixed positions.
 - Aim for about ${d.questions} questions unless the request says otherwise. Estimate minutes realistically.
 Keep it brief: this is a plan, not the test.`;
 }
