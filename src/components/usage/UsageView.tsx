@@ -226,33 +226,35 @@ function UsageTable({ title, rows }: { title: string; rows: UsageRow[] }) {
   return (
     <section>
       <div className="qard-label">{title}</div>
-      <table className="qard-usage-table">
-        <thead>
-          <tr>
-            <th />
-            <th>Runs</th>
-            <th>Input</th>
-            <th>Output</th>
-            <th>Cache</th>
-            <th>Cost</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={r.label + (r.detail ?? '')}>
-              <td>
-                <strong>{r.label}</strong>
-                {r.detail && <small className="qard-muted">{r.detail}</small>}
-              </td>
-              <td>{r.totals.calls}</td>
-              <td>{compact(r.totals.input)}</td>
-              <td>{compact(r.totals.output)}</td>
-              <td>{compact(r.totals.cacheRead + r.totals.cacheWrite)}</td>
-              <td>{money(r.totals)}</td>
+      <div className="qard-table-scroll">
+        <table className="qard-usage-table">
+          <thead>
+            <tr>
+              <th />
+              <th>Runs</th>
+              <th>Input</th>
+              <th>Output</th>
+              <th>Cache</th>
+              <th>Cost</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.label + (r.detail ?? '')}>
+                <td>
+                  <strong>{r.label}</strong>
+                  {r.detail && <small className="qard-muted">{r.detail}</small>}
+                </td>
+                <td>{r.totals.calls}</td>
+                <td>{compact(r.totals.input)}</td>
+                <td>{compact(r.totals.output)}</td>
+                <td>{compact(r.totals.cacheRead + r.totals.cacheWrite)}</td>
+                <td>{money(r.totals)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }

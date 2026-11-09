@@ -126,31 +126,33 @@ export function TopicBrowser({
             <Play size={16} />
             Study
           </button>
-          {options && (
-            <button
-              className="qard-icon-button"
-              aria-label="Deck options"
-              disabled={busy}
-              onClick={options}
-            >
-              <Settings2 size={16} />
-            </button>
-          )}
-          {renameDeck && !busy && (
-            <RenameItem
-              label={`Rename deck ${deck.name}`}
-              current={deck.name}
-              description="Every note holding these cards is updated, and subdecks move with it. Review history, deck options and exam plans are kept. An existing deck's name merges the two."
-              rename={renameDeck}
-            />
-          )}
-          {removeDeck && !busy && (
-            <DeleteItem
-              label={`Delete deck ${deck.name}`}
-              description="All flashcards in this deck, across every note, will be removed. Other note content stays. This cannot be undone from Qard."
-              remove={removeDeck}
-            />
-          )}
+          <span className="qard-deck-management">
+            {options && (
+              <button
+                className="qard-icon-button"
+                aria-label="Deck options"
+                disabled={busy}
+                onClick={options}
+              >
+                <Settings2 size={16} />
+              </button>
+            )}
+            {renameDeck && !busy && (
+              <RenameItem
+                label={`Rename deck ${deck.name}`}
+                current={deck.name}
+                description="Every note holding these cards is updated, and subdecks move with it. Review history, deck options and exam plans are kept. An existing deck's name merges the two."
+                rename={renameDeck}
+              />
+            )}
+            {removeDeck && !busy && (
+              <DeleteItem
+                label={`Delete deck ${deck.name}`}
+                description="All flashcards in this deck, across every note, will be removed. Other note content stays. This cannot be undone from Qard."
+                remove={removeDeck}
+              />
+            )}
+          </span>
         </div>
       </div>
       {resume}

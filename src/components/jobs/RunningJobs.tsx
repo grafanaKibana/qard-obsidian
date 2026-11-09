@@ -225,26 +225,21 @@ export function RunningJobs({
                   role="listitem"
                   className={`qard-jobs-row${stuck ? ' is-stuck' : ''}`}
                 >
-                  <button
-                    className="qard-jobs-item"
-                    onClick={() => {
-                      setOpen(false);
-                      j.open();
-                    }}
-                  >
-                    <strong>{j.label}</strong>
-                    {j.detail && (
-                      <span className="qard-jobs-detail">
-                        <InlineMarkdown text={j.detail} path={''} services={services} />
-                      </span>
-                    )}
-                    <AgentLabel services={services} role={roleOf(j.kind)} />
-                  </button>
-                  <div className="qard-jobs-meta">
-                    <span className={stuck ? 'qard-jobs-stuck' : 'qard-muted'}>
-                      {j.startedAt ? `${clock(now - j.startedAt)} elapsed` : 'Running'}
-                      {left ? ` · ${left}` : ''}
-                    </span>
+                  <div className="qard-jobs-row-head">
+                    <button
+                      className="qard-jobs-item"
+                      onClick={() => {
+                        setOpen(false);
+                        j.open();
+                      }}
+                    >
+                      <strong>{j.label}</strong>
+                      {j.detail && (
+                        <span className="qard-jobs-detail">
+                          <InlineMarkdown text={j.detail} path={''} services={services} />
+                        </span>
+                      )}
+                    </button>
                     <button
                       className="qard-text-button qard-jobs-cancel"
                       aria-label={`Cancel ${j.label.toLowerCase()}`}
@@ -252,6 +247,19 @@ export function RunningJobs({
                     >
                       Cancel
                     </button>
+                  </div>
+                  <div className="qard-jobs-meta">
+                    <span className="qard-jobs-agent">
+                      <AgentLabel services={services} role={roleOf(j.kind)} />
+                    </span>
+                    <span
+                      className={
+                        stuck ? 'qard-jobs-time qard-jobs-stuck' : 'qard-jobs-time qard-muted'
+                      }
+                    >
+                      {j.startedAt ? `${clock(now - j.startedAt)} elapsed` : 'Running'}
+                      {left ? ` · ${left}` : ''}
+                    </span>
                   </div>
                 </div>
               );
