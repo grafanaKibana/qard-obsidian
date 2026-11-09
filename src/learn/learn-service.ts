@@ -105,7 +105,7 @@ import type {
 } from './learn-types';
 
 const LESSONS_PER_DAY = 3;
-const QUESTION_POLICY = 1;
+const QUESTION_POLICY = 2;
 /** Lesson steps are written this many at a time, so the whole lesson is ready soon after the plan. */
 const STEP_WRITERS = 3;
 const SOURCE_BUDGET = 60_000;
@@ -939,6 +939,51 @@ export class LearnService {
     }
     return paths.map((p) => this.checks.get(p)).filter((c): c is CheckRecord => !!c);
   }
+  /** Prepared formats are optional context, not evidence that the learner understands them. */
+  private async recentQuestions(mastery?: string, omitLesson?: string) {
+    const summaries = await this.listLessons();
+    const records = summaries
+      .filter((summary) => summary.path !== omitLesson && (!mastery || summary.mastery === mastery))
+      .flatMap((summary) => {
+        const lesson = this.lessons.get(summary.path);
+        if (!lesson || this.isRemoved(summary.path)) {
+          return [];
+        }
+        return [
+          {
+            createdAt: Number.isFinite(lesson.createdAt) ? lesson.createdAt : 0,
+            questions: [
+              ...(Array.isArray(lesson.probe?.questions) ? lesson.probe.questions : []),
+              ...(Array.isArray(lesson.steps)
+                ? lesson.steps.flatMap((step) => (step?.check ? [step.check] : []))
+                : []),
+            ],
+          },
+        ];
+      });
+    records.push(
+      ...(await this.loadChecks())
+        .filter((record) => !mastery || record.mastery === mastery)
+        .map((record) => ({
+          createdAt: Number.isFinite(record.createdAt) ? record.createdAt : 0,
+          questions: Array.isArray(record.questions) ? record.questions : [],
+        })),
+    );
+    return records
+      .sort((a, b) => a.createdAt - b.createdAt)
+      .flatMap((record) => record.questions)
+      .filter(
+        (question) =>
+          question &&
+          typeof question === 'object' &&
+          ['short', 'long', 'mcq', 'calc', 'cloze'].includes(question.type),
+      )
+      .slice(-12)
+      .map(({ type, goal }) => ({
+        type,
+        goal: ['recognise', 'recall', 'explain', 'apply'].includes(goal ?? '') ? goal : undefined,
+      }));
+  }
   checkAt(path: string) {
     return this.checks.get(path);
   }
@@ -1042,7 +1087,7 @@ export class LearnService {
         {
           signal,
           prompt:
-            checkPrompt(m, o, goal, previous) +
+            checkPrompt(m, o, goal, previous, await this.recentQuestions(mastery)) +
             (sources ? `\n<source_text>\n${sources}\n</source_text>` : ''),
           schema: questionsSchema,
         },
@@ -1432,7 +1477,7 @@ export class LearnService {
         this.activeRunner('marker', signal),
         {
           signal,
-          prompt: probePrompt(lesson, m, o, sources),
+          prompt: probePrompt(lesson, m, o, sources, await this.recentQuestions(lesson.mastery)),
           schema: probeSchema,
           effort: 'low',
         },
@@ -1618,10 +1663,23 @@ export class LearnService {
             return;
           }
           busy.add(`${plan}#${index}`);
+          const history = await this.recentQuestions(lesson.mastery, path);
+          const current = this.lesson(path);
+          if (current.stepsFor !== plan) {
+            continue;
+          }
+          const prepared = [
+            ...(current.probe?.questions ?? []),
+            ...current.steps.flatMap((step) => (step ? [step.check] : [])),
+          ];
           const step = await writeReviewedStep(
             this.activeRunner('writer', signal),
             this.activeRunner('marker', signal),
-            { signal, prompt: stepPrompt(lesson, lesson.map, index), schema: stepSchema },
+            {
+              signal,
+              prompt: stepPrompt(current, current.map!, index, [...history, ...prepared]),
+              schema: stepSchema,
+            },
             await this.sources(lesson.notes),
           );
           const latest = this.lesson(path);

@@ -84,7 +84,7 @@ beforeEach(() => {
         objective: 'params',
         title: 'Parameter counts',
         goal: 'explain',
-        questionPolicy: 1,
+        questionPolicy: 2,
         questions: [
           q('c1', {
             type: 'mcq',
