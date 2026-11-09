@@ -531,7 +531,9 @@ export function QardApp({ services, request }: { services: QardServices; request
                       ? 'qard-page qard-page-wide'
                       : ['library', 'tests', 'learn', 'exams'].includes(screen.kind)
                         ? 'qard-page qard-page-library'
-                        : 'qard-page'
+                        : screen.kind === 'course'
+                          ? 'qard-page qard-page-course'
+                          : 'qard-page'
           }
         >
           {deskShell && (

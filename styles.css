@@ -905,6 +905,8 @@
 
   /* UI roles follow Obsidian's type settings; reading and data keep their own scale. */
   --qard-font-page: calc(var(--font-ui-large, 20px) * 1.2);
+  --qard-font-navigation: var(--font-ui-large, 20px);
+  --qard-course-max-width: 1100px;
   --qard-font-section: var(--font-ui-medium, 15px);
   --qard-font-body: var(--font-ui-medium, 15px);
   --qard-font-meta: var(--font-ui-smaller, 12px);
@@ -1123,7 +1125,7 @@
 .qard-breadcrumb {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0;
   min-width: 0;
   color: var(--qard-muted);
   font-size: var(--qard-font-meta);
@@ -1135,6 +1137,16 @@
   color: var(--qard-muted);
   font-size: var(--qard-font-control);
   text-align: left;
+}
+
+.qard-breadcrumb > span {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--qard-control-height);
+  padding: var(--qard-control-padding);
+  font-size: var(--qard-font-control);
+  font-weight: var(--qard-weight-medium);
+  line-height: 1.4;
 }
 
 .qard-breadcrumb > span,
@@ -1249,7 +1261,7 @@
 .qard-deck-row {
   border: 1px solid var(--qard-border);
   border-radius: 12px;
-  padding-right: 10px;
+  padding: var(--qard-inset-compact);
   transition: background 0.12s;
 }
 
@@ -1259,6 +1271,7 @@
 
 .qard-app .qard-deck-row > button.qard-deck {
   border: 0;
+  padding: 0;
   background: transparent;
 }
 
@@ -2593,6 +2606,10 @@ body.qard-focus-active .status-bar {
   padding: var(--qard-space-6) var(--qard-workspace-gutter) var(--qard-space-12);
 }
 
+.qard-page-course {
+  max-width: calc(var(--qard-course-max-width) + 2 * var(--qard-workspace-gutter));
+}
+
 .qard-page-setup {
   padding-top: var(--qard-space-6);
   padding-bottom: var(--qard-space-12);
@@ -2643,12 +2660,12 @@ body.qard-focus-active .status-bar {
   border: 0;
   border-bottom: 2px solid transparent;
   border-radius: 0;
-  padding: var(--qard-space-1) var(--qard-space-3) var(--qard-space-3);
+  padding: 0 0 13px;
   margin-bottom: -1px;
   min-height: 38px;
-  font-size: var(--qard-font-control);
-  font-weight: var(--qard-weight-strong);
-  letter-spacing: normal;
+  font-size: var(--qard-font-navigation);
+  font-weight: var(--qard-weight-medium);
+  letter-spacing: -0.02em;
   color: var(--qard-muted);
   background: transparent;
 }
@@ -2670,6 +2687,10 @@ body.qard-focus-active .status-bar {
 @container qard-workspace (max-width: 500px) {
   .qard-tabs {
     gap: 8px 20px;
+  }
+
+  .qard-app .qard-tabs button {
+    font-size: calc(var(--qard-font-navigation) * 0.9);
   }
 
   .qard-page-review {
@@ -3916,7 +3937,7 @@ body.qard-focus-active .status-bar {
   width: 100%;
   justify-content: flex-start;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
   padding: 12px 16px;
   border-radius: 10px;
   border-color: color-mix(in srgb, var(--qard-blue) 25%, var(--qard-border));
@@ -4134,12 +4155,13 @@ body.qard-focus-active .status-bar {
 
 .qard-objective-meta .qard-objective-evidence {
   min-width: 0;
-  margin-left: auto;
-  text-align: right;
+  flex: 1 1 180px;
+  text-align: left;
   overflow-wrap: anywhere;
 }
 
 .qard-objective-due {
+  margin-left: auto;
   flex-shrink: 0;
   font-size: var(--qard-font-meta);
   white-space: nowrap;
@@ -4339,7 +4361,7 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-course {
-  max-width: 1100px;
+  max-width: var(--qard-course-max-width);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -4358,6 +4380,11 @@ body.qard-focus-active .status-bar {
   margin: 2px 0 0;
 }
 
+.qard-course-head > div:first-child {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
 .qard-course-footer {
   text-align: center;
 }
@@ -4365,13 +4392,14 @@ body.qard-focus-active .status-bar {
 .qard-course-toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: var(--qard-gap-fields);
   flex-wrap: wrap;
+  margin-left: auto;
 }
 
 .qard-course-toolbar > .qard-actions {
-  margin-left: auto;
+  margin-left: 0;
 }
 
 .qard-course-footer .qard-time-line {
@@ -4416,7 +4444,7 @@ body.qard-focus-active .status-bar {
 .qard-progress {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--qard-space-4);
 }
 
 .qard-progress-bar {
@@ -4524,7 +4552,7 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-map-layout.is-panel-open .qard-map-body {
-  grid-template-columns: minmax(0, 1fr) 312px;
+  grid-template-columns: minmax(0, 1fr) clamp(260px, 30%, 312px);
 }
 
 .qard-map-canvas {
@@ -4784,6 +4812,10 @@ body.qard-focus-active .status-bar {
   color: var(--qard-muted);
 }
 
+.qard-map-tools.is-left > .qard-map-search:first-child {
+  padding-left: var(--qard-space-3);
+}
+
 .qard-app .qard-map-tools .qard-map-search input {
   appearance: none;
   border: 0;
@@ -4978,7 +5010,7 @@ body.qard-focus-active .status-bar {
   }
 }
 
-@container qard-map (max-width: 960px) {
+@container qard-map (max-width: 767px) {
   .qard-map-layout.is-panel-open .qard-map-body {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -5130,7 +5162,7 @@ body.qard-focus-active .status-bar {
 .qard-resume.is-static {
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 0;
   padding: 10px 16px;
   border-radius: 10px;
   background: var(--qard-soft);
@@ -7748,7 +7780,7 @@ div.qard-ask-q {
 .qard-study-desk .qard-deck-row {
   border: 0;
   border-radius: 0;
-  padding-right: 0;
+  padding: var(--qard-inset-compact);
 }
 
 .qard-study-desk .qard-deck-node + .qard-deck-node > .qard-deck-row,
@@ -7757,7 +7789,7 @@ div.qard-ask-q {
 }
 
 .qard-app .qard-study-desk .qard-deck-row > button.qard-deck {
-  padding: 17px 0;
+  padding: 0;
   gap: 14px;
   border-radius: 0;
 }

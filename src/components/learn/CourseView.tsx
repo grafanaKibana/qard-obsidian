@@ -200,21 +200,21 @@ export function CourseView({
           <span className="qard-muted">Course</span>
           <h1>{course.course}</h1>
         </div>
-      </header>
-      <div className="qard-course-toolbar">
-        {selector}
-        <div className="qard-actions">
-          <button onClick={() => setUpdating(true)}>Update</button>
-          <button
-            className="qard-icon-button"
-            aria-label="Open file"
-            title="Open file"
-            onClick={() => void services.app.workspace.openLinkText(path, '', true)}
-          >
-            <FileText size={16} />
-          </button>
+        <div className="qard-course-toolbar">
+          <div className="qard-actions">
+            <button onClick={() => setUpdating(true)}>Update</button>
+            <button
+              className="qard-icon-button"
+              aria-label="Open file"
+              title="Open file"
+              onClick={() => void services.app.workspace.openLinkText(path, '', true)}
+            >
+              <FileText size={16} />
+            </button>
+          </div>
+          {selector}
         </div>
-      </div>
+      </header>
       <CourseProgress course={course} filter={filter} toggle={toggle} />
       {changed.length > 0 && (
         <button className="qard-resume" onClick={() => setUpdating(true)}>
@@ -252,14 +252,14 @@ export function CourseView({
             {objectives.map((o) => (
               <div key={o.id} className="qard-objective">
                 <div className="qard-objective-meta">
+                  <small className="qard-muted qard-objective-evidence">
+                    {o.evidence.at(-1) ?? 'No evidence yet'}
+                  </small>
                   {o.due && !['new', 'planned'].includes(o.state) && (
                     <span className="qard-muted qard-objective-due">
                       {relativeDay(o.due, day).replace(/^./, (first) => first.toUpperCase())}
                     </span>
                   )}
-                  <small className="qard-muted qard-objective-evidence">
-                    {o.evidence.at(-1) ?? 'No evidence yet'}
-                  </small>
                 </div>
                 <div className="qard-objective-main">
                   <strong className="qard-objective-title">
