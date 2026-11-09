@@ -1,26 +1,12 @@
 {
   "before": "70056821914f0dae910b52a20f1fa3329b04d0ac",
-  "after": "d3753ae12d37b11e89cf10b5668fa759f9d78b1c",
+  "after": "cdb39a861a67798e63a2ea8f4a02cc3e0f231a31",
   "comparisons": 18,
   "deviceScaleFactor": 2,
   "clock": "2026-11-09T12:00Z",
-  "capture": "Identical synthetic content, input, theme, pane, clock, interactions and semantic crop; only fork main versus latest PR revision. Desktop map uses real app Learn-to-course navigation and objective selection. Changed-note notice seeded on both builds to demonstrate resume spacing.",
+  "capture": "Same content, theme, input, pane, clock, interaction and crop. Only fork main versus latest PR revision. Main baseline source/fixtures unchanged from prior round; before images reused byte-for-byte. Desktop map uses real app navigation; changed-note notice and study time seeded identically.",
   "maximumExamplesPerGroup": 3,
   "scenes": [
-    {
-      "name": "map-phone",
-      "screen": "course",
-      "width": 390,
-      "touch": true
-    },
-    {
-      "name": "map-desktop",
-      "screen": "app",
-      "request": "learn",
-      "width": 1100,
-      "theme": "dark",
-      "openCourse": true
-    },
     {
       "name": "objectives-phone",
       "screen": "course",
@@ -33,23 +19,6 @@
       "screen": "course",
       "width": 1000,
       "list": true
-    },
-    {
-      "name": "plans-phone",
-      "screen": "app",
-      "request": "exams",
-      "width": 375,
-      "touch": true,
-      "plans": true,
-      "crop": ".qard-exam-plan"
-    },
-    {
-      "name": "plans-desktop",
-      "screen": "app",
-      "request": "exams",
-      "width": 1000,
-      "plans": true,
-      "crop": ".qard-exam-plan"
     },
     {
       "name": "masks-phone",
@@ -95,6 +64,14 @@
       "width": 1000
     },
     {
+      "name": "map-root",
+      "screen": "course",
+      "width": 390,
+      "touch": true,
+      "topics": true,
+      "crop": ".qard-map-tools.is-left"
+    },
+    {
       "name": "map-fit",
       "screen": "course",
       "width": 390,
@@ -130,12 +107,35 @@
       "crop": ".qard-lesson-trail"
     },
     {
-      "name": "map-root",
+      "name": "map-phone",
       "screen": "course",
       "width": 390,
+      "touch": true
+    },
+    {
+      "name": "map-desktop",
+      "screen": "app",
+      "request": "learn",
+      "width": 1100,
+      "theme": "dark",
+      "openCourse": true
+    },
+    {
+      "name": "plans-phone",
+      "screen": "app",
+      "request": "exams",
+      "width": 375,
       "touch": true,
-      "topics": true,
-      "crop": ".qard-map-tools.is-left"
+      "plans": true,
+      "crop": ".qard-exam-plan"
+    },
+    {
+      "name": "plans-desktop",
+      "screen": "app",
+      "request": "exams",
+      "width": 1000,
+      "plans": true,
+      "crop": ".qard-exam-plan"
     }
   ],
   "hashes": {
@@ -144,16 +144,16 @@
     "after-learn-desktop.png": "dcb009b5533ad521e3c4b61a72cac4545d8b972e669904705d4bf259dd664fcb",
     "after-learn-phone.png": "4a65bb0a67b87ace1173c5c6e147b5c18a4f6dca3508bcde86a4f849995efa47",
     "after-lesson-trail.png": "3a823d28c9c55131a9ab3a98ae9784d0769e3976aad5aca97b0c724dd9da23b6",
-    "after-map-desktop.png": "996fa3bc15ad5737c6e9b832dce8d5bb857a0752990f505ff32020ee0168877a",
-    "after-map-fit.png": "b977b5989471d4345d29a118777a6285d025c0e0dbe9c3f5d142027e6f8bb5a9",
-    "after-map-phone.png": "5a3a211572f5ab4b073625a7172a1a02c3f3eb4aa194e08d8603bed4d0a25f5d",
-    "after-map-root.png": "f403d2a590ac9b406fe8d7dd81ca518682019e8882ce66ee21ff730e5bd747fc",
-    "after-masks-desktop.png": "015672dde84295f4c833d5f645b575c67a35431d14057447dab0b7e374039e80",
+    "after-map-desktop.png": "020a7085ad20e619b3db61852fca541564351508ed085913a5ca838667f3b611",
+    "after-map-fit.png": "1de6cdfefaca863e9007f9a3436c10640de1f2c7dd475c9f2c79a51afcd5bdc9",
+    "after-map-phone.png": "95cf23bfbf16a2308b0607d6281435e8695e77f73e04523cafe206f5d3894b96",
+    "after-map-root.png": "086322ae42d0abf1a1d18de3e6871586e2a778c79f538a55b37eb79c03b7bd24",
+    "after-masks-desktop.png": "8d292a8f639c60041e66bca725decf4f0b3d9d80d05cc77c2a0da8664369d1b3",
     "after-masks-phone.png": "2ce267748f59cb8fffa36bc10c7899567caf3af551c2ce794fc9688fd833711e",
-    "after-objectives-desktop.png": "9f895376ef7d52786506d3a4d7185b0d53b2846430ccf0d1bb58c33d7bee4080",
-    "after-objectives-phone.png": "9fc4a0f9d75e925391d55d698ae1b945f63c016d1835cbf70cddb021a2239b82",
-    "after-plans-desktop.png": "2039183ee0347edfa209e07f0e4e4978fb8544b93021861cd264ebdf79d9d711",
-    "after-plans-phone.png": "a55af9b41227d878047737431c80d51c04628b7ee577fe73857e5ead872a68f8",
+    "after-objectives-desktop.png": "5300c15557e6280611588a614010cded598b156c862e307c1eb98070b3b5c17b",
+    "after-objectives-phone.png": "502863753f217fda86c45ecaa5707021ce5d042708316e98050bdd400a17c7d9",
+    "after-plans-desktop.png": "8dbe58e595fd7d8d0a974ad6393261d932e5cae61ef4d788ad3d80454040a115",
+    "after-plans-phone.png": "d1cbd52af2501fdefdef797452da81c077fa75eec63d688534eed1b16744a8b9",
     "after-tasks.png": "99917669b4f484cf2c5838e4d2dfc62bf0bcee15a01d07e8a21bebf854337e62",
     "after-types-desktop.png": "f76e1f8865c3b7f5be23d924f454855d26b573a280b1a955496de1409fa9b6cc",
     "after-types-phone.png": "cb7835a4a2c2182fe7bf8207441d509733b16c28c4ccc78cafc464f03fb8d21f",
