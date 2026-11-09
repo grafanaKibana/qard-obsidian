@@ -230,7 +230,7 @@ export function AskThread({
         )}
       </div>
       <form
-        className="qard-ask-input"
+        className="qard-panel-actions qard-ask-input"
         onSubmit={(e) => {
           e.preventDefault();
           send(text);

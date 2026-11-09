@@ -1,7 +1,7 @@
 import { plural } from '../common/labels';
 import { DeleteLearnItem } from './DeleteLearnItem';
 import { useEffect, useState } from 'react';
-import { ChevronRight, FileText, Plus } from 'lucide-react';
+import { ChartColumn, ChevronRight, Clock, FileText, Plus } from 'lucide-react';
 import type { QardServices } from '../../views/services';
 import type { Mastery } from '../../learn/mastery';
 import { InlineMarkdown } from '../Markdown';
@@ -68,13 +68,18 @@ export function LearnBrowser({
         description="Build understanding one topic at a time, with lessons and checks."
       >
         {nav.usage && (
-          <button className="qard-text-button" onClick={nav.usage}>
-            Usage
+          <button className="qard-icon-button" aria-label="Usage" title="Usage" onClick={nav.usage}>
+            <ChartColumn size={16} />
           </button>
         )}
         {nav.time && (
-          <button className="qard-text-button" onClick={nav.time}>
-            Study time
+          <button
+            className="qard-icon-button"
+            aria-label="Study time"
+            title="Study time"
+            onClick={nav.time}
+          >
+            <Clock size={16} />
           </button>
         )}
         <button onClick={nav.today}>Today</button>

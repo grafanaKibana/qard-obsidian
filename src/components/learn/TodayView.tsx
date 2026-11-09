@@ -114,7 +114,7 @@ export function TodayView({ services, nav }: { services: QardServices; nav: Lear
   const open = (item: TodayItem) => (item.check ? nav.check(item.check) : undefined);
   const presentStates = [...new Set([...today.checks, ...today.lessons].map((item) => item.state))];
   const objectiveTitle = (item: TodayItem) => (
-    <span className="qard-objective-title">
+    <span className="qard-objective-title qard-today-row-copy">
       <span className="qard-objective-status">
         <span className="qard-objective-status-size" aria-hidden="true">
           {presentStates.map((state) => (
@@ -126,6 +126,7 @@ export function TodayView({ services, nav }: { services: QardServices; nav: Lear
       <span className="qard-objective-title-text">
         <InlineMarkdown text={item.title} path={item.mastery} services={services} />
       </span>
+      <span className="qard-muted qard-learning-row-course">{item.course}</span>
     </span>
   );
   return (
@@ -152,16 +153,17 @@ export function TodayView({ services, nav }: { services: QardServices; nav: Lear
               return (
                 <div key={c.mastery + c.objective} className="qard-doc-item">
                   <button
-                    className="qard-doc-row qard-row-button qard-learning-row"
+                    className="qard-doc-row qard-row-button qard-learning-row qard-today-learning-row"
                     disabled={!c.check}
                     onClick={() => open(c)}
                   >
                     {objectiveTitle(c)}
-                    <span className="qard-muted qard-learning-row-course">{c.course}</span>
                     {c.check ? (
-                      <ChevronRight size={15} />
+                      <ChevronRight className="qard-learning-row-action" size={15} />
                     ) : (
-                      <span className="qard-muted">{writing?.error ? '' : 'Writing…'}</span>
+                      <span className="qard-muted qard-learning-row-action">
+                        {writing?.error ? '' : 'Writing…'}
+                      </span>
                     )}
                   </button>
                   <JobError
@@ -254,14 +256,13 @@ export function TodayView({ services, nav }: { services: QardServices; nav: Lear
             {today.lessons.map((l) => (
               <button
                 key={l.mastery + l.objective}
-                className="qard-doc-row qard-row-button qard-learning-row"
+                className="qard-doc-row qard-row-button qard-learning-row qard-today-learning-row"
                 onClick={() =>
                   void teach(services, nav, l).catch((e) => setError((e as Error).message))
                 }
               >
                 {objectiveTitle(l)}
-                <span className="qard-muted qard-learning-row-course">{l.course}</span>
-                <span className="qard-link">Teach</span>
+                <span className="qard-link qard-learning-row-action">Teach</span>
               </button>
             ))}
             {today.moreLessons > 0 && (

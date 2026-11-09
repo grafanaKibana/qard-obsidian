@@ -1292,7 +1292,7 @@
 .qard-app .qard-deck-row > button.qard-deck {
   border: 0;
   padding: 0;
-  flex: 1 1 160px;
+  flex: 1 1 calc(var(--qard-font-body) * 7 + var(--qard-space-2));
   background: transparent;
 }
 
@@ -3206,15 +3206,31 @@ body.qard-focus-active .status-bar {
 
 .qard-test-steps {
   display: flex;
-  gap: 16px;
+  align-items: center;
+  gap: var(--qard-gap-actions);
   flex-wrap: wrap;
   margin-bottom: 18px;
 }
 
+.qard-test-step,
+.qard-lesson-crumb {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: var(--qard-gap-actions);
+  min-width: 0;
+}
+
+.qard-test-step > svg,
+.qard-lesson-crumb > svg {
+  flex-shrink: 0;
+}
+
 .qard-app .qard-test-steps button {
+  min-width: 0;
   border: 0;
-  padding: 0;
-  min-height: 0;
+  padding: var(--qard-control-padding);
+  min-height: var(--qard-control-height);
   font-size: var(--qard-font-control);
   color: var(--qard-muted);
   background: transparent;
@@ -3985,9 +4001,11 @@ body.qard-focus-active .status-bar {
   justify-content: flex-start;
   flex-wrap: wrap;
   gap: var(--qard-gap-actions);
-  margin-bottom: 0;
-  padding: 12px 16px;
-  border-radius: 10px;
+  margin-bottom: var(--qard-gap-actions);
+  padding: var(--qard-space-3) var(--qard-space-4);
+  border-radius: var(--qard-radius-floating);
+  font-size: var(--qard-font-control);
+  line-height: 1.5;
   border-color: color-mix(in srgb, var(--qard-blue) 25%, var(--qard-border));
   background: var(--qard-tint);
   text-align: left;
@@ -4019,11 +4037,12 @@ body.qard-focus-active .status-bar {
   color: var(--qard-muted);
 }
 
-/* Learn: today, courses, checks and lessons. State colours reuse the marking palette. */
-.qard-app button.qard-today-row {
-  margin-bottom: 8px;
+.qard-app .qard-resume > .qard-muted {
+  font-size: inherit;
+  line-height: inherit;
 }
 
+/* Learn: today, courses, checks and lessons. State colours reuse the marking palette. */
 .qard-app button.qard-today-row + .qard-resume {
   margin-top: 0;
 }
@@ -5240,6 +5259,8 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-app .qard-lesson-trail .qard-link {
+  min-width: 0;
+  white-space: normal;
   min-height: var(--qard-control-height);
   padding: var(--qard-control-padding);
   font-size: var(--qard-font-control);
@@ -5890,20 +5911,22 @@ div.qard-ask-q {
 
 .qard-ask-input {
   display: flex;
-  align-items: flex-end;
-  gap: 8px;
-  margin-top: 4px;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: var(--qard-gap-actions);
+  margin-top: var(--qard-space-1);
 }
 
 .qard-app .qard-ask-input textarea {
   flex: 1;
-  min-height: 38px;
+  min-width: 0;
+  min-height: var(--qard-control-height);
   max-height: 180px;
   field-sizing: content;
   resize: none;
-  padding: 8px 12px;
-  font-size: var(--qard-font-reading);
-  line-height: 1.65;
+  padding: var(--qard-control-padding);
+  font-size: var(--qard-font-control);
+  line-height: 1.4;
 }
 
 .qard-panel-ask {
@@ -8365,7 +8388,7 @@ div.qard-ask-q {
   }
 
   .qard-app .qard-study-desk .qard-deck-row > button.qard-deck {
-    flex-basis: calc(var(--qard-font-control) * 10 + var(--qard-space-3));
+    flex-basis: calc(var(--qard-font-body) * 7 + var(--qard-space-2));
     gap: var(--qard-gap-actions);
   }
 
@@ -8493,8 +8516,12 @@ div.qard-ask-q {
 
 .qard-deck-options-footer {
   justify-content: flex-end;
-  padding-top: var(--qard-space-4);
-  border-top: 1px solid var(--qard-border);
+}
+
+.qard-deck-options-info {
+  display: inline-flex;
+  margin-right: auto;
+  color: var(--qard-muted);
 }
 
 @container qard-deck-settings (max-width: 480px) {
@@ -8585,5 +8612,90 @@ div.qard-ask-q {
 
   .qard-resume-label-compact {
     display: inline;
+  }
+}
+
+/* Lesson controls share the field/control geometry and trailing navigation. */
+.qard-lesson-plan-actions {
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: var(--qard-gap-actions);
+}
+
+.qard-lesson-plan-actions > input {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.qard-lesson-plan-actions > button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.qard-lesson-start {
+  margin-left: auto;
+}
+
+.qard-panel form.qard-ask-input {
+  flex-direction: row;
+  align-items: stretch;
+}
+
+.qard-ask-input > button {
+  align-self: stretch;
+}
+
+.qard-lesson-navigation > button:last-child {
+  margin-left: auto;
+  flex: 0 1 auto;
+  width: auto;
+}
+
+.qard-app .qard-today-row-copy {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+@container qard-workspace (max-width: 640px) {
+  .qard-app button.qard-today-learning-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--qard-gap-actions);
+    align-items: center;
+  }
+
+  .qard-app .qard-today-learning-row > .qard-objective-title {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'state course'
+      'title title';
+    gap: var(--qard-space-1) var(--qard-gap-actions);
+    align-items: center;
+  }
+
+  .qard-today-learning-row .qard-objective-status {
+    grid-area: state;
+  }
+
+  .qard-app .qard-today-learning-row .qard-objective-title-text {
+    grid-area: title;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .qard-app .qard-today-learning-row .qard-learning-row-course {
+    grid-area: course;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .qard-learning-row-action {
+    place-self: center end;
+  }
+
+  .qard-today .qard-doc-footer > button {
+    width: 100%;
   }
 }

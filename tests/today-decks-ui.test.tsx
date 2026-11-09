@@ -294,6 +294,9 @@ it('leads learning rows with their present states and groups the Today summary',
       row.querySelector('.qard-objective-status'),
     );
     expect(row.querySelector('.qard-objective-status-size')?.textContent).toBe('TaughtGapNew');
+    expect(row.classList.contains('qard-today-learning-row')).toBe(true);
+    expect(row.querySelector('.qard-learning-row-course')?.textContent).toBe('Networks');
+    expect(row.lastElementChild?.classList.contains('qard-learning-row-action')).toBe(true);
   }
   expect(host.querySelectorAll('.qard-doc-rows > .qard-doc-item')).toHaveLength(2);
   const summary = host.querySelector('.qard-today-summary')!;

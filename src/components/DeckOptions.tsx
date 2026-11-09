@@ -1,5 +1,5 @@
 import { useId, useState } from 'react';
-import { X } from 'lucide-react';
+import { Info, X } from 'lucide-react';
 import { canonicalDeck, deckLineage } from '../decks/deck-index';
 import { deckLimits, deckRetention, withDeckOptions } from '../decks/deck-options';
 import type { DeckOptions as Options, QardSettings } from '../settings/settings';
@@ -69,9 +69,6 @@ export function DeckOptions({
           <X size={16} />
         </button>
       </header>
-      <p className="qard-muted qard-small">
-        These apply to this deck and the decks nested under it, unless a nested deck sets its own.
-      </p>
       <fieldset className="qard-deck-settings-section">
         <legend>Scheduling</legend>
         <div className="qard-deck-setting">
@@ -129,6 +126,13 @@ export function DeckOptions({
         </p>
       )}
       <footer className="qard-actions qard-deck-options-footer">
+        <span
+          className="qard-deck-options-info"
+          title="These apply to this deck and the decks nested under it, unless a nested deck sets its own."
+          aria-label="These apply to this deck and the decks nested under it, unless a nested deck sets its own."
+        >
+          <Info size={16} />
+        </span>
         <button disabled={busy} onClick={close}>
           Cancel
         </button>

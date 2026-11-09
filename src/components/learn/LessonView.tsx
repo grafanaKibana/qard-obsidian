@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronRight } from 'lucide-react';
 import type { QardServices } from '../../views/services';
 import type { Lesson } from '../../learn/learn-types';
 import type { Objective } from '../../learn/mastery';
@@ -57,19 +57,21 @@ function LessonTrail({
         {lesson.course ?? 'Course'}
       </button>
       {objective?.group && (
-        <>
-          <span aria-hidden="true">›</span>
+        <span className="qard-lesson-crumb">
+          <ChevronRight size={14} aria-hidden="true" />
           <button className="qard-link" onClick={open}>
             {objective.group}
           </button>
-        </>
+        </span>
       )}
       {objective && (
         <>
-          <span aria-hidden="true">›</span>
-          <button className="qard-link" onClick={open}>
-            {objective.label || objective.title}
-          </button>
+          <span className="qard-lesson-crumb">
+            <ChevronRight size={14} aria-hidden="true" />
+            <button className="qard-link" onClick={open}>
+              {objective.label || objective.title}
+            </button>
+          </span>
           <StateChip state={objective.state} />
         </>
       )}
@@ -367,7 +369,7 @@ function LessonMapView({
       </section>
       <JobError job={revising} dismiss={() => services.learn.dismiss(path, 'revise')} />
       <form
-        className="qard-doc-footer"
+        className="qard-doc-footer qard-lesson-plan-actions"
         onSubmit={(e) => {
           e.preventDefault();
           if (change.trim()) {
@@ -388,7 +390,7 @@ function LessonMapView({
         </button>
         <button
           type="button"
-          className="qard-primary"
+          className="qard-primary qard-lesson-start"
           disabled={busy}
           onClick={() => void services.learn.acceptMap(path)}
         >
@@ -434,16 +436,18 @@ function LessonSteps({
     <div className="qard-test qard-lesson">
       <div className="qard-test-steps" aria-label="Steps">
         {lesson.map!.steps.map((s, i) => (
-          <button
-            key={i}
-            className={i === index ? 'is-current' : lesson.state[i]?.mark ? 'is-done' : ''}
-            disabled={!lesson.steps[i]}
-            aria-current={i === index ? 'step' : undefined}
-            onClick={() => void services.learn.go(path, i)}
-          >
-            {i + 1}. <InlineMarkdown text={s.title} path={where} services={services} />
-            {lesson.state[i]?.mark ? ' ✓' : ''}
-          </button>
+          <span className="qard-test-step" key={i}>
+            {i > 0 && <ChevronRight size={14} aria-hidden="true" />}
+            <button
+              className={i === index ? 'is-current' : lesson.state[i]?.mark ? 'is-done' : ''}
+              disabled={!lesson.steps[i]}
+              aria-current={i === index ? 'step' : undefined}
+              onClick={() => void services.learn.go(path, i)}
+            >
+              {i + 1}. <InlineMarkdown text={s.title} path={where} services={services} />
+              {lesson.state[i]?.mark ? ' ✓' : ''}
+            </button>
+          </span>
         ))}
       </div>
       <div className="qard-test-heading">
@@ -665,7 +669,7 @@ function LessonSteps({
           />
         </>
       )}
-      <div className="qard-test-footer">
+      <div className="qard-test-footer qard-lesson-navigation">
         {index > 0 && (
           <button
             className="qard-text-button"

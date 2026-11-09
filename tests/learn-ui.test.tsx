@@ -790,7 +790,10 @@ it('a lesson links to its place on the map, and the map continues it rather than
   await tick();
   await tick();
   const trail = host.querySelector('.qard-lesson-trail')!;
-  expect(trail.textContent).toContain('DS346›Topic models›LDA story');
+  expect(
+    [...trail.querySelectorAll('button')].slice(0, 3).map((button) => button.textContent),
+  ).toEqual(['DS346', 'Topic models', 'LDA story']);
+  expect(trail.querySelectorAll('.lucide-chevron-right')).toHaveLength(2);
   await click(buttons('Show on map')[0]);
   expect(nav.course).toHaveBeenCalledWith(MASTERY, 'lda');
 

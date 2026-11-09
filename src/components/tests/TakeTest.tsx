@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Flag } from 'lucide-react';
+import { ChevronRight, Flag } from 'lucide-react';
 import type { QardServices } from '../../views/services';
 import type { Confidence, Question, SectionStatus } from '../../tests/test-types';
 import { scoreOf } from '../../tests/test-types';
@@ -109,25 +109,27 @@ export function TakeTest({
         {test.sections.map((s, i) => {
           const st = attempt?.sections[s.id]?.status ?? 'open';
           return (
-            <button
-              key={s.id}
-              className={
-                i === index
-                  ? 'is-current'
-                  : st === 'marked' && marking === 'section'
-                    ? 'is-done'
-                    : ''
-              }
-              onClick={() => setIndex(i)}
-              aria-current={i === index ? 'step' : undefined}
-            >
-              <InlineMarkdown text={s.title} path={folder} services={services} />
-              {marking === 'section' && st === 'marked'
-                ? ' ✓'
-                : st === 'marking'
-                  ? ' · marking'
-                  : ''}
-            </button>
+            <span className="qard-test-step" key={s.id}>
+              {i > 0 && <ChevronRight size={14} aria-hidden="true" />}
+              <button
+                className={
+                  i === index
+                    ? 'is-current'
+                    : st === 'marked' && marking === 'section'
+                      ? 'is-done'
+                      : ''
+                }
+                onClick={() => setIndex(i)}
+                aria-current={i === index ? 'step' : undefined}
+              >
+                <InlineMarkdown text={s.title} path={folder} services={services} />
+                {marking === 'section' && st === 'marked'
+                  ? ' ✓'
+                  : st === 'marking'
+                    ? ' · marking'
+                    : ''}
+              </button>
+            </span>
           );
         })}
       </div>
