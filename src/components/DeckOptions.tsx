@@ -1,7 +1,7 @@
 import { useId, useMemo, useState } from 'react';
 import { getIcon, getIconIds } from 'obsidian';
 import { X } from 'lucide-react';
-import { canonicalDeck, deckLineage } from '../decks/deck-index';
+import { canonicalDeck, deckLineage, deckPath } from '../decks/deck-index';
 import { deckLimits, deckRetention, withDeckOptions } from '../decks/deck-options';
 import {
   readDeckColor,
@@ -14,11 +14,13 @@ import { DeckBadge } from './DeckBadge';
 /** Scheduling overrides and independent appearance choices for one deck. */
 export function DeckOptions({
   deck,
+  badgeName,
   settings,
   save,
   close,
 }: {
   deck: string;
+  badgeName?: string;
   settings: QardSettings;
   save: (deckOptions: Record<string, Options>) => Promise<void>;
   close: () => void;
@@ -144,7 +146,11 @@ export function DeckOptions({
         </small>
       </label>
       <div className="qard-deck-appearance-preview">
-        <DeckBadge name={name} icon={icon.trim()} color={color} />
+        <DeckBadge
+          name={badgeName ?? deckPath(name).at(-1) ?? name}
+          icon={icon.trim()}
+          color={color}
+        />
         <span>Appearance for this deck only</span>
       </div>
       <div className="qard-deck-appearance-control">

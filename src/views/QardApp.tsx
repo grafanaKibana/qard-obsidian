@@ -150,12 +150,13 @@ export function QardApp({ services, request }: { services: QardServices; request
   };
   const builder = (selection: Selection = { decks: [], topics: [], cards: [] }) =>
     setScreen({ kind: 'builder', selection });
-  const [optionsFor, setOptionsFor] = useState<string>();
+  const [optionsFor, setOptionsFor] = useState<{ name: string; badgeName: string }>();
   const deckOptions = optionsFor !== undefined &&
     (screen.kind === 'library' || screen.kind === 'deck') && (
       <DeckOptions
-        key={optionsFor}
-        deck={optionsFor}
+        key={optionsFor.name}
+        deck={optionsFor.name}
+        badgeName={optionsFor.badgeName}
         settings={reviews.settings}
         close={() => setOptionsFor(undefined)}
         save={(options) =>
@@ -578,7 +579,7 @@ export function QardApp({ services, request }: { services: QardServices; request
               hideNavigation
               nested={!search.trim() && !repairOnly}
               studyDecks={(names) => builder({ decks: names, topics: [], cards: [] })}
-              options={setOptionsFor}
+              options={(name, badgeName) => setOptionsFor({ name, badgeName })}
               dueCount={dueCount}
               viewToday={learnNav.today}
               remove={(name) => services.writer.deleteGroup(name)}
@@ -639,7 +640,7 @@ export function QardApp({ services, request }: { services: QardServices; request
                   repairDays={repairDays}
                   key={deck.name}
                   deck={deck}
-                  options={() => setOptionsFor(deck.name)}
+                  options={() => setOptionsFor({ name: deck.name, badgeName: deck.name })}
                   management={{
                     decks: index.decks,
                     move: async (cards, destination) => {

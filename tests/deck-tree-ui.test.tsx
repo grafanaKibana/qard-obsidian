@@ -73,7 +73,7 @@ it('nests decks under their parents, opens real decks and studies a whole subtre
     expect.arrayContaining(['Biology', 'Biology::Cells', 'Biology::Genetics::DNA']),
   );
   await click(button('Deck options for Biology'));
-  expect(options).toHaveBeenCalledWith('Biology');
+  expect(options).toHaveBeenCalledWith('Biology', 'Biology');
   // Leaves have nothing beneath them to study together.
   expect(host.querySelector('button[aria-label="Study Chemistry and its subdecks"]')).toBeNull();
 
@@ -196,7 +196,7 @@ it('configures exact-deck appearance in nested/filtered rows and opens options f
       .map((row) => row.querySelector('svg[data-icon]')?.getAttribute('data-icon')),
   ).toEqual(['terminal', 'network']);
   await click(button('Deck options for Chemistry'));
-  expect(options).toHaveBeenCalledWith('Chemistry');
+  expect(options).toHaveBeenCalledWith('Chemistry', 'Chemistry');
   library(false, { decks: all, deckOptions: choices, options });
   expect(host.querySelectorAll('.qard-deck-badge [data-icon]')).toHaveLength(2);
   expect(
@@ -307,3 +307,31 @@ it('retains an unavailable saved icon on color edits and Cancel never saves', as
   await action('Cancel');
   expect(save).not.toHaveBeenCalled();
 });
+
+it.each([true, false])(
+  'previews the same automatic badge as its library row (nested=%s)',
+  async (nested) => {
+    const options = vi.fn();
+    library(nested, { options });
+    const row = button('Deck options for Biology::Cells').closest('.qard-deck-row')!;
+    const expected = row.querySelector('.qard-deck-badge')!.outerHTML;
+    await click(button('Deck options for Biology::Cells'));
+    expect(options).toHaveBeenCalledWith('Biology::Cells', nested ? 'Cells' : 'Biology::Cells');
+    const [deck, badgeName] = options.mock.calls[0]!;
+    act(() =>
+      root.render(
+        <DeckOptions
+          deck={deck}
+          badgeName={badgeName}
+          settings={readSettings({})}
+          save={vi.fn()}
+          close={vi.fn()}
+        />,
+      ),
+    );
+    expect(host.querySelector('.qard-deck-appearance-preview .qard-deck-badge')!.outerHTML).toBe(
+      expected,
+    );
+    expect(host.querySelector('h2')!.textContent).toContain('Biology::Cells');
+  },
+);

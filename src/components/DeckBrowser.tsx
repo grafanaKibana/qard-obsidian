@@ -45,7 +45,7 @@ export function DeckBrowser({
   /** Group decks named `Parent::Child` under their parents. Off while searching or filtering. */
   nested?: boolean;
   studyDecks?: (decks: string[]) => void;
-  options?: (deck: string) => void;
+  options?: (deck: string, badgeName: string) => void;
   repairFilter?: { active: boolean; count: number; toggle: () => void };
   decks: Deck[];
   search: string;
@@ -109,7 +109,7 @@ export function DeckBrowser({
             <button
               className="qard-icon-button"
               aria-label={`Deck options for ${node.name}`}
-              onClick={() => options(node.name)}
+              onClick={() => options(node.name, node.label)}
             >
               <Settings2 size={16} />
             </button>
