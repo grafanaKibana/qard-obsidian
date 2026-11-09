@@ -1757,9 +1757,30 @@
   max-width: 100%;
 }
 
+.qard-markdown :is(h1, h2, h3, h4, h5, h6) {
+  line-height: 1.4;
+  margin: 1.2em 0 0.5em;
+}
+
+.qard-markdown h1 {
+  font-size: 1.5em;
+}
+
+.qard-markdown h2 {
+  font-size: 1.25em;
+}
+
+.qard-markdown :is(h3, h4, h5, h6) {
+  font-size: 1.125em;
+}
+
 .qard-markdown pre {
   overflow: auto;
-  font-size: 13px;
+  font-size: 1em;
+}
+
+.qard-markdown pre code {
+  font-size: 0.875em;
 }
 
 .qard-markdown .math-block {
@@ -3962,7 +3983,8 @@ body.qard-focus-active .status-bar {
   display: flex;
   width: 100%;
   justify-content: flex-start;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: var(--qard-gap-actions);
   margin-bottom: 0;
   padding: 12px 16px;
   border-radius: 10px;
@@ -3978,9 +4000,19 @@ body.qard-focus-active .status-bar {
   white-space: nowrap;
 }
 
+.qard-resume > span:first-child {
+  flex: 1 1 160px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .qard-resume > span:nth-of-type(2) {
   margin-left: auto;
-  white-space: nowrap;
+  white-space: normal;
+}
+
+.qard-resume-label-compact {
+  display: none;
 }
 
 .qard-resume > svg {
@@ -4062,7 +4094,7 @@ body.qard-focus-active .status-bar {
   background: var(--qard-soft);
 }
 
-.qard-row-button > span:first-of-type:not(.qard-check) {
+.qard-row-button > span:first-of-type:not(.qard-check, .qard-objective-title) {
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -4399,7 +4431,7 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-course-head > div:first-child {
-  flex: 1 1 260px;
+  flex: 999 1 260px;
   min-width: 0;
 }
 
@@ -4409,6 +4441,8 @@ body.qard-focus-active .status-bar {
 
 .qard-course-toolbar {
   display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
   align-items: center;
   justify-content: flex-end;
   gap: var(--qard-gap-fields);
@@ -4417,7 +4451,11 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-course-toolbar > .qard-actions {
-  margin-left: 0;
+  margin-left: auto;
+}
+
+.qard-course-toolbar > .qard-course-view {
+  flex: 1 1 auto;
 }
 
 .qard-course-footer .qard-time-line {
@@ -4489,7 +4527,7 @@ body.qard-focus-active .status-bar {
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  gap: var(--qard-gap-actions);
+  gap: 0 var(--qard-gap-actions);
   font-size: var(--qard-font-meta);
   color: var(--qard-muted);
   font-weight: var(--qard-weight-normal);
@@ -7650,8 +7688,9 @@ div.qard-ask-q {
 }
 
 .qard-app .qard-repair-filter[aria-pressed='true'] {
-  color: var(--text-on-accent);
-  background: var(--interactive-accent);
+  color: var(--qard-action-text);
+  background: var(--qard-action-bg);
+  border-color: var(--qard-action-bg);
 }
 
 /* Today makes the deck and its review queue explicit before studying. */
@@ -8010,7 +8049,7 @@ div.qard-ask-q {
   .qard-study-desk {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: var(--qard-space-4);
   }
 
   .qard-desk-library,
@@ -8049,8 +8088,8 @@ div.qard-ask-q {
   .qard-desk-create {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px 14px;
-    padding: 8px 0 0;
+    gap: var(--qard-space-1);
+    padding: var(--qard-space-2) 0 0;
   }
 
   .qard-desk-create h2 {
@@ -8058,7 +8097,9 @@ div.qard-ask-q {
   }
 
   .qard-app .qard-desk-create button {
+    flex: 1 1 auto;
     width: auto;
+    padding-inline: var(--qard-space-2);
   }
 
   .qard-app .qard-library-search input[type='search'] {
@@ -8244,9 +8285,7 @@ div.qard-ask-q {
 /* Nested decks: children sit inside their parent, indented by one step per level. */
 .qard-deck-children {
   display: grid;
-  margin-left: 22px;
-  border-left: 1px solid var(--qard-border);
-  padding-left: 12px;
+  margin-left: var(--qard-inset-compact);
 }
 
 .qard-app .qard-deck-row > button.qard-deck-toggle,
@@ -8263,7 +8302,7 @@ div.qard-ask-q {
 .qard-app .qard-deck-actions > button.qard-deck-study {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--qard-gap-actions);
   white-space: nowrap;
   font-size: var(--qard-font-control);
 }
@@ -8276,11 +8315,11 @@ div.qard-ask-q {
 @container qard-workspace (max-width: 640px) {
   .qard-learn-header .qard-library-heading > .qard-actions {
     width: 100%;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
   }
 
   .qard-app .qard-learn-header .qard-library-heading > .qard-actions > button {
-    flex: 1 1 auto;
+    flex: 1 1 min-content;
     min-width: min-content;
     padding: var(--qard-space-1) var(--qard-gap-actions);
   }
@@ -8320,11 +8359,22 @@ div.qard-ask-q {
     display: none;
   }
 
-  .qard-app .qard-deck-actions > button.qard-deck-study {
-    min-width: var(--qard-control-height);
-    padding: 7px;
-    border-color: transparent;
-    color: var(--qard-muted);
+  .qard-study-desk .qard-deck-row {
+    padding: var(--qard-space-3);
+    gap: var(--qard-gap-actions);
+  }
+
+  .qard-app .qard-study-desk .qard-deck-row > button.qard-deck {
+    flex-basis: calc(var(--qard-font-control) * 10 + var(--qard-space-3));
+    gap: var(--qard-gap-actions);
+  }
+
+  .qard-deck-children {
+    margin-left: var(--qard-gap-actions);
+  }
+
+  .qard-deck-actions {
+    gap: var(--qard-space-1);
   }
 
   .qard-exam-steps {
@@ -8364,46 +8414,176 @@ div.qard-ask-q {
   }
 }
 
+/* Deck settings reuse the label/help/control rhythm of other Qard forms. */
 .qard-deck-options {
+  container: qard-deck-settings / inline-size;
   display: grid;
-  gap: 12px;
-  margin: 0 0 18px;
-  padding: 16px 18px;
+  gap: var(--qard-gap-sections);
+  margin: 0 0 var(--qard-gap-sections);
+  padding: var(--qard-inset-panel);
   border: 1px solid var(--qard-border);
-  border-radius: 12px;
-  background: var(--qard-soft);
+  border-radius: var(--qard-radius-surface);
+  background: var(--qard-bg);
 }
 
 .qard-deck-options > header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--qard-gap-fields);
 }
 
-.qard-deck-options h2 {
-  margin: 0;
-  overflow-wrap: anywhere;
+.qard-deck-options > header > div {
+  min-width: 0;
 }
 
+.qard-deck-options h2,
 .qard-deck-options p {
   margin: 0;
 }
 
-.qard-deck-options label {
+.qard-deck-options p.qard-deck-options-name {
+  margin-top: var(--qard-space-1);
+  overflow-wrap: anywhere;
+  color: var(--qard-muted);
+  font-size: var(--qard-font-meta);
+}
+
+.qard-deck-settings-section {
+  min-width: 0;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.qard-deck-settings-section > legend {
+  padding: 0 0 var(--qard-gap-fields);
+  font-size: var(--qard-font-section);
+  font-weight: var(--qard-weight-medium);
+}
+
+.qard-deck-setting {
   display: grid;
-  gap: 4px;
-  font-size: var(--qard-font-control);
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 160px);
+  gap: var(--qard-gap-fields);
+  align-items: center;
+  padding-block: var(--qard-space-4);
 }
 
-.qard-deck-options label > span {
-  font-weight: var(--qard-weight-strong);
+.qard-deck-setting + .qard-deck-setting {
+  border-top: 1px solid var(--qard-border);
 }
 
-.qard-deck-options input {
-  max-width: 180px;
+.qard-deck-setting-copy {
+  display: grid;
+  gap: var(--qard-space-1);
+  min-width: 0;
 }
 
-.qard-deck-options .qard-actions {
+.qard-deck-setting-copy > label {
+  font-size: var(--qard-font-body);
+  font-weight: var(--qard-weight-medium);
+}
+
+.qard-deck-setting-copy > p {
+  font-size: var(--qard-font-meta);
+  color: var(--qard-muted);
+  overflow-wrap: anywhere;
+}
+
+.qard-deck-options-footer {
   justify-content: flex-end;
+  padding-top: var(--qard-space-4);
+  border-top: 1px solid var(--qard-border);
+}
+
+@container qard-deck-settings (max-width: 480px) {
+  .qard-deck-setting {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .qard-deck-options-footer > button {
+    flex: 1 1 auto;
+  }
+}
+
+.qard-doc-rows > .qard-doc-item > .qard-doc-row,
+.qard-app .qard-doc-rows > .qard-doc-row {
+  border-top: 0;
+}
+
+.qard-doc-rows > .qard-doc-item + .qard-doc-item,
+.qard-app .qard-doc-rows > .qard-doc-row + .qard-doc-row {
+  border-top: 1px solid var(--qard-border);
+}
+
+.qard-app .qard-learning-row {
+  flex-wrap: wrap;
+  gap: var(--qard-gap-actions);
+}
+
+.qard-app .qard-learning-row > .qard-objective-title {
+  display: grid;
+  flex: 1 1 240px;
+  min-width: 0;
+  white-space: normal;
+  overflow: visible;
+}
+
+.qard-app .qard-learning-row .qard-learning-row-course,
+.qard-app .qard-learning-row .qard-learning-row-meta {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.qard-today-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--qard-gap-actions) var(--qard-gap-fields);
+  color: var(--qard-muted);
+  font-size: var(--qard-font-meta);
+  font-weight: var(--qard-weight-normal);
+  line-height: 1.5;
+}
+
+.qard-app .qard-today-summary > p:not(.qard-time-line) {
+  flex: 1 1 calc(var(--qard-font-meta) * 10);
+  font: inherit;
+}
+
+.qard-today-summary > .qard-time-line {
+  flex: 0 1 auto;
+  margin: 0 0 0 auto;
+  font: inherit;
+  text-align: right;
+}
+
+.qard-today-summary .qard-time-line button.qard-text-button {
+  padding: 0;
+  min-height: 0;
+  font: inherit;
+  text-align: right;
+}
+
+.qard-exam-details-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--qard-gap-actions);
+}
+
+.qard-exam-info {
+  display: inline-flex;
+  color: var(--qard-muted);
+}
+
+@container qard-workspace (max-width: 640px) {
+  .qard-resume-label-full {
+    display: none;
+  }
+
+  .qard-resume-label-compact {
+    display: inline;
+  }
 }

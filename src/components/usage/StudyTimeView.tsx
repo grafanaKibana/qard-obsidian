@@ -187,30 +187,34 @@ export function StudyTimeView({ services }: { services: QardServices }) {
             )}
             <section>
               <div className="qard-label">By course</div>
-              <table className="qard-usage-table">
-                <thead>
-                  <tr>
-                    <th />
-                    <th>Total</th>
-                    {used.map((a) => (
-                      <th key={a.id}>{a.label}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {report.byCourse.map((r) => (
-                    <tr key={r.label}>
-                      <td>
-                        <strong>{r.label}</strong>
-                      </td>
-                      <td>{short(r.total)}</td>
+              <div className="qard-table-scroll">
+                <table className="qard-usage-table">
+                  <thead>
+                    <tr>
+                      <th />
+                      <th>Total</th>
                       {used.map((a) => (
-                        <td key={a.id}>{r.byActivity[a.id] ? short(r.byActivity[a.id]!) : '—'}</td>
+                        <th key={a.id}>{a.label}</th>
                       ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {report.byCourse.map((r) => (
+                      <tr key={r.label}>
+                        <td>
+                          <strong>{r.label}</strong>
+                        </td>
+                        <td>{short(r.total)}</td>
+                        {used.map((a) => (
+                          <td key={a.id}>
+                            {r.byActivity[a.id] ? short(r.byActivity[a.id]!) : '—'}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </section>
           </>
         )}

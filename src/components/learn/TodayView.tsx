@@ -6,7 +6,7 @@ import type { QardServices } from '../../views/services';
 import { InlineMarkdown } from '../Markdown';
 import type { Today, TodayItem } from '../../learn/learn-types';
 import { JobError, Waiting } from '../common/FeedbackStatus';
-import { StateChip } from './learning-status';
+import { STATE_LABEL, StateChip } from './learning-status';
 import { useLearn } from './useLearn';
 import { todayDueCards } from '../../review/today-cards';
 import { buildDecks } from '../../decks/deck-index';
@@ -112,49 +112,66 @@ export function TodayView({ services, nav }: { services: QardServices; nav: Lear
           : 'Your new-card allowance is complete for today.'
         : 'Choose a lesson to keep learning.';
   const open = (item: TodayItem) => (item.check ? nav.check(item.check) : undefined);
+  const presentStates = [...new Set([...today.checks, ...today.lessons].map((item) => item.state))];
+  const objectiveTitle = (item: TodayItem) => (
+    <span className="qard-objective-title">
+      <span className="qard-objective-status">
+        <span className="qard-objective-status-size" aria-hidden="true">
+          {presentStates.map((state) => (
+            <span key={state}>{STATE_LABEL[state]}</span>
+          ))}
+        </span>
+        <StateChip state={item.state} />
+      </span>
+      <span className="qard-objective-title-text">
+        <InlineMarkdown text={item.title} path={item.mastery} services={services} />
+      </span>
+    </span>
+  );
   return (
-    <div className="qard-doc">
+    <div className="qard-doc qard-today">
       <header>
         <h1>Today</h1>
-        <p className="qard-muted">
-          {nothing
-            ? ai
-              ? 'Nothing is due. Map a course or make a test to keep going.'
-              : 'Nothing is due.'
-            : `About ${minutes} ${minutes === 1 ? 'minute' : 'minutes'}. ${suggestion}`}
-        </p>
-        <StudyTimeLine services={services} days={1} open={nav.time} />
+        <div className="qard-today-summary">
+          <p className="qard-muted">
+            {nothing
+              ? ai
+                ? 'Nothing is due. Map a course or make a test to keep going.'
+                : 'Nothing is due.'
+              : `About ${minutes} ${minutes === 1 ? 'minute' : 'minutes'}. ${suggestion}`}
+          </p>
+          <StudyTimeLine services={services} days={1} open={nav.time} />
+        </div>
       </header>
       {today.checks.length > 0 && (
         <section>
           <h2>Checks</h2>
-          {today.checks.map((c) => {
-            const writing = job(`${c.mastery}#${c.objective}`, 'check-write');
-            return (
-              <div key={c.mastery + c.objective}>
-                <button
-                  className="qard-doc-row qard-row-button"
-                  disabled={!c.check}
-                  onClick={() => open(c)}
-                >
-                  <span>
-                    <InlineMarkdown text={c.title} path={c.mastery} services={services} />
-                  </span>
-                  <span className="qard-muted">{c.course}</span>
-                  <StateChip state={c.state} />
-                  {c.check ? (
-                    <ChevronRight size={15} />
-                  ) : (
-                    <span className="qard-muted">{writing?.error ? '' : 'Writing…'}</span>
-                  )}
-                </button>
-                <JobError
-                  job={writing}
-                  retry={() => void services.learn.ensureCheck(c.mastery, c.objective)}
-                />
-              </div>
-            );
-          })}
+          <div className="qard-doc-rows">
+            {today.checks.map((c) => {
+              const writing = job(`${c.mastery}#${c.objective}`, 'check-write');
+              return (
+                <div key={c.mastery + c.objective} className="qard-doc-item">
+                  <button
+                    className="qard-doc-row qard-row-button qard-learning-row"
+                    disabled={!c.check}
+                    onClick={() => open(c)}
+                  >
+                    {objectiveTitle(c)}
+                    <span className="qard-muted qard-learning-row-course">{c.course}</span>
+                    {c.check ? (
+                      <ChevronRight size={15} />
+                    ) : (
+                      <span className="qard-muted">{writing?.error ? '' : 'Writing…'}</span>
+                    )}
+                  </button>
+                  <JobError
+                    job={writing}
+                    retry={() => void services.learn.ensureCheck(c.mastery, c.objective)}
+                  />
+                </div>
+              );
+            })}
+          </div>
         </section>
       )}
       {due.length > 0 && (
@@ -233,33 +250,32 @@ export function TodayView({ services, nav }: { services: QardServices; nav: Lear
           <p className="qard-muted qard-small">
             Optional. These objectives need teaching before they can be checked.
           </p>
-          {today.lessons.map((l) => (
-            <button
-              key={l.mastery + l.objective}
-              className="qard-doc-row qard-row-button"
-              onClick={() =>
-                void teach(services, nav, l).catch((e) => setError((e as Error).message))
-              }
-            >
-              <span>
-                <InlineMarkdown text={l.title} path={l.mastery} services={services} />
-              </span>
-              <span className="qard-muted">{l.course}</span>
-              <StateChip state={l.state} />
-              <span className="qard-link">Teach</span>
-            </button>
-          ))}
-          {today.moreLessons > 0 && (
-            <button
-              className="qard-doc-row qard-row-button"
-              onClick={() => nav.course(today.lessons[0]!.mastery)}
-            >
-              <span className="qard-muted">
-                {plural(today.moreLessons, 'more objective')} to teach
-              </span>
-              <ChevronRight size={15} />
-            </button>
-          )}
+          <div className="qard-doc-rows">
+            {today.lessons.map((l) => (
+              <button
+                key={l.mastery + l.objective}
+                className="qard-doc-row qard-row-button qard-learning-row"
+                onClick={() =>
+                  void teach(services, nav, l).catch((e) => setError((e as Error).message))
+                }
+              >
+                {objectiveTitle(l)}
+                <span className="qard-muted qard-learning-row-course">{l.course}</span>
+                <span className="qard-link">Teach</span>
+              </button>
+            ))}
+            {today.moreLessons > 0 && (
+              <button
+                className="qard-doc-row qard-row-button"
+                onClick={() => nav.course(today.lessons[0]!.mastery)}
+              >
+                <span className="qard-muted">
+                  {plural(today.moreLessons, 'more objective')} to teach
+                </span>
+                <ChevronRight size={15} />
+              </button>
+            )}
+          </div>
         </section>
       )}
       {error && (

@@ -220,7 +220,10 @@ export function CourseView({
           <span>
             {plural(changed.length, 'note')} added or changed since {course.mapped!.slice(0, 10)}
           </span>
-          <span className="qard-muted">Update objectives</span>
+          <span className="qard-muted">
+            <span className="qard-resume-label-full">Update objectives</span>
+            <span className="qard-resume-label-compact">Update</span>
+          </span>
           <ChevronRight size={16} />
         </button>
       )}

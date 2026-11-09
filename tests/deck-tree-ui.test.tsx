@@ -117,6 +117,13 @@ it('edits a deck’s options, showing what it inherits and rejecting invalid val
   expect(host.textContent).toContain('Biology allows 10 as well.');
   expect(host.textContent).toContain('Your overall limit of 20 still applies.');
   const [target, limit] = Array.from(host.querySelectorAll<HTMLInputElement>('input'));
+  expect(host.querySelector('h2')?.textContent).toBe('Deck options');
+  expect(host.querySelector('.qard-deck-options-name')?.textContent).toBe('Biology::Cells');
+  expect(target!.labels?.[0]?.textContent).toBe('Target retention (%)');
+  expect(limit!.labels?.[0]?.textContent).toBe('New cards per day');
+  expect(document.getElementById(target!.getAttribute('aria-describedby')!)?.textContent).toContain(
+    'Empty uses 85% from Biology.',
+  );
   const type = (input: HTMLInputElement, value: string) =>
     act(() => {
       input.value = value;

@@ -428,7 +428,7 @@ it('the course map opens on topics, drills into one, and routes across topics', 
   expect(topic('Big data').textContent).toContain('Not covered yet');
   expect(host.querySelectorAll('.qard-map-edge')).toHaveLength(1);
   // Filtering by state dims topics with nothing in that state.
-  await click(buttons('1 mastered')[0]);
+  await click(buttons('1 Mastered')[0]);
   expect(topic('Topic models').classList.contains('is-dim')).toBe(true);
   await click(buttons('Show all')[0]);
 

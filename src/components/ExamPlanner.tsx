@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { CalendarDays, ChevronDown, Plus } from 'lucide-react';
+import { CalendarDays, ChevronDown, Info, Plus } from 'lucide-react';
 import { examProgress, localDay, type ExamPlan } from '../exams/exam-plan';
 import { dayDistance, examTone } from '../exams/exam-calendar';
 import { LibraryHeader } from './library/LibraryHeader';
@@ -244,16 +244,26 @@ export function ExamPlanner({
                         )
                       }
                     >
-                      Create practice test
+                      Create test
                     </button>
                   )}
                 </div>
                 <button
                   className="qard-exam-details-toggle"
+                  aria-label="Plan details"
                   aria-expanded={expanded === plan.id}
                   onClick={() => setExpanded(expanded === plan.id ? '' : plan.id)}
                 >
-                  Plan details
+                  <span className="qard-exam-details-label">
+                    <span
+                      className="qard-exam-info"
+                      title="Coverage counts cards reviewed since this plan began. It includes due reviews."
+                      aria-label="Coverage counts cards reviewed since this plan began. It includes due reviews."
+                    >
+                      <Info size={14} aria-hidden="true" />
+                    </span>
+                    Plan details
+                  </span>
                   <ChevronDown size={14} />
                 </button>
                 {expanded === plan.id && (
@@ -277,9 +287,6 @@ export function ExamPlanner({
                         <dd>{p.doneToday} reviews completed</dd>
                       </div>
                     </dl>
-                    <p className="qard-muted">
-                      Coverage counts cards reviewed since this plan began. It includes due reviews.
-                    </p>
                     <div className="qard-actions">
                       <button disabled={!!busy} onClick={() => setEditing(plan)}>
                         Edit plan

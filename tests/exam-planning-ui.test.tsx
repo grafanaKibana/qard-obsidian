@@ -66,8 +66,14 @@ it('creates, edits, studies and deletes a persistent plan, and sends its sources
   expect(plan.selection.decks).toEqual(['biology']);
   await click("Study today's cards");
   expect(start).toHaveBeenCalledWith(services.index.getSnapshot().cards, plan.id);
-  await click('Create practice test');
+  await click('Create test');
   expect(test).toHaveBeenCalledWith(expect.stringContaining('biology.md'));
+  const coverageInfo = host.querySelector('.qard-exam-info')!;
+  expect(coverageInfo.getAttribute('title')).toBe(
+    'Coverage counts cards reviewed since this plan began. It includes due reviews.',
+  );
+  expect(coverageInfo.nextSibling?.textContent).toBe('Plan details');
+  expect(host.textContent).not.toContain('Coverage counts cards reviewed');
   await click('Plan details');
   await click('Edit plan');
   await click('Continue');

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { X } from 'lucide-react';
 import { canonicalDeck, deckLineage } from '../decks/deck-index';
 import { deckLimits, deckRetention, withDeckOptions } from '../decks/deck-options';
@@ -16,6 +16,7 @@ export function DeckOptions({
   save: (deckOptions: Record<string, Options>) => Promise<void>;
   close: () => void;
 }) {
+  const id = useId();
   const name = canonicalDeck(deck),
     own = settings.deckOptions[name] ?? {};
   const [target, setTarget] = useState(
@@ -60,7 +61,10 @@ export function DeckOptions({
   return (
     <section className="qard-deck-options" aria-label={`Deck options for ${name}`}>
       <header>
-        <h2>Deck options · {name}</h2>
+        <div>
+          <h2>Deck options</h2>
+          <p className="qard-deck-options-name">{name}</p>
+        </div>
         <button className="qard-icon-button" aria-label="Close deck options" onClick={close}>
           <X size={16} />
         </button>
@@ -68,59 +72,70 @@ export function DeckOptions({
       <p className="qard-muted qard-small">
         These apply to this deck and the decks nested under it, unless a nested deck sets its own.
       </p>
-      <label>
-        <span>Target retention (%)</span>
-        <input
-          type="number"
-          min={70}
-          max={97}
-          step={1}
-          value={target}
-          disabled={busy}
-          placeholder={String(Math.round(inherited.value * 100))}
-          onChange={(e) => setTarget(e.target.value)}
-        />
-        <small className="qard-muted">
-          Empty uses {Math.round(inherited.value * 100)}% from{' '}
-          {inherited.from ?? 'your Qard settings'}.
-          {settings.scheduler === 'fsrs' ? '' : ' Only the FSRS scheduler uses this.'}
-        </small>
-      </label>
-      <label>
-        <span>New cards per day</span>
-        <input
-          type="number"
-          min={1}
-          max={10000}
-          step={1}
-          value={limit}
-          disabled={busy}
-          placeholder="No deck limit"
-          onChange={(e) => setLimit(e.target.value)}
-        />
-        <small className="qard-muted">
-          Shared by this deck and its subdecks.
-          {above.length
-            ? ` ${above.map((entry) => `${entry.deck} allows ${entry.limit}`).join('; ')} as well.`
-            : ''}
-          {settings.newCardsPerDay
-            ? ` Your overall limit of ${settings.newCardsPerDay} still applies.`
-            : ''}
-        </small>
-      </label>
+      <fieldset className="qard-deck-settings-section">
+        <legend>Scheduling</legend>
+        <div className="qard-deck-setting">
+          <div className="qard-deck-setting-copy">
+            <label htmlFor={`${id}-retention`}>Target retention (%)</label>
+            <p className="qard-muted" id={`${id}-retention-help`}>
+              Empty uses {Math.round(inherited.value * 100)}% from{' '}
+              {inherited.from ?? 'your Qard settings'}.
+              {settings.scheduler === 'fsrs' ? '' : ' Only the FSRS scheduler uses this.'}
+            </p>
+          </div>
+          <input
+            id={`${id}-retention`}
+            aria-describedby={`${id}-retention-help`}
+            type="number"
+            min={70}
+            max={97}
+            step={1}
+            value={target}
+            disabled={busy}
+            placeholder={String(Math.round(inherited.value * 100))}
+            onChange={(e) => setTarget(e.target.value)}
+          />
+        </div>
+        <div className="qard-deck-setting">
+          <div className="qard-deck-setting-copy">
+            <label htmlFor={`${id}-limit`}>New cards per day</label>
+            <p className="qard-muted" id={`${id}-limit-help`}>
+              Shared by this deck and its subdecks.
+              {above.length
+                ? ` ${above.map((entry) => `${entry.deck} allows ${entry.limit}`).join('; ')} as well.`
+                : ''}
+              {settings.newCardsPerDay
+                ? ` Your overall limit of ${settings.newCardsPerDay} still applies.`
+                : ''}
+            </p>
+          </div>
+          <input
+            id={`${id}-limit`}
+            aria-describedby={`${id}-limit-help`}
+            type="number"
+            min={1}
+            max={10000}
+            step={1}
+            value={limit}
+            disabled={busy}
+            placeholder="No deck limit"
+            onChange={(e) => setLimit(e.target.value)}
+          />
+        </div>
+      </fieldset>
       {error && (
         <p className="qard-error" role="alert">
           {error}
         </p>
       )}
-      <div className="qard-actions">
+      <footer className="qard-actions qard-deck-options-footer">
         <button disabled={busy} onClick={close}>
           Cancel
         </button>
         <button className="qard-primary" disabled={busy} onClick={() => void submit()}>
           Save options
         </button>
-      </div>
+      </footer>
     </section>
   );
 }

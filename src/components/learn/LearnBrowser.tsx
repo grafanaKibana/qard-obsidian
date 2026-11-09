@@ -189,18 +189,20 @@ export function LearnBrowser({
       {recent.length > 0 && (
         <section className="qard-learn-recent">
           <div className="qard-label">Recent lessons</div>
-          {recent.map((l) => (
-            <div key={l.path} className="qard-deletable-row">
-              <button className="qard-doc-row qard-row-button" onClick={() => nav.lesson(l.path)}>
-                <FileText size={14} />
-                <span>
-                  <InlineMarkdown text={l.title} path={l.path} services={services} />
-                </span>
-                <span className="qard-muted">{new Date(l.created).toLocaleDateString()}</span>
-              </button>
-              <DeleteLearnItem services={services} kind="lesson" path={l.path} />
-            </div>
-          ))}
+          <div className="qard-doc-rows">
+            {recent.map((l) => (
+              <div key={l.path} className="qard-deletable-row qard-doc-item">
+                <button className="qard-doc-row qard-row-button" onClick={() => nav.lesson(l.path)}>
+                  <FileText size={14} />
+                  <span>
+                    <InlineMarkdown text={l.title} path={l.path} services={services} />
+                  </span>
+                  <span className="qard-muted">{new Date(l.created).toLocaleDateString()}</span>
+                </button>
+                <DeleteLearnItem services={services} kind="lesson" path={l.path} />
+              </div>
+            ))}
+          </div>
         </section>
       )}
     </>

@@ -251,6 +251,59 @@ it('keeps due checks separate from deck review actions', async () => {
   expect(host.querySelectorAll('.qard-today-deck')).toHaveLength(2);
 });
 
+it('leads learning rows with their present states and groups the Today summary', async () => {
+  const item = {
+    mastery: 'Course.md',
+    course: 'Networks',
+    due: '2026-10-10',
+  };
+  vi.spyOn(services.learn, 'todayList').mockResolvedValue({
+    cards: 3,
+    moreLessons: 0,
+    checks: [
+      {
+        ...item,
+        objective: 'tcp',
+        title: 'Reliable delivery',
+        state: 'taught',
+        check: 'Check.json',
+      },
+      {
+        ...item,
+        objective: 'routing',
+        title: 'Routing tables',
+        state: 'gap',
+        check: 'Routing.json',
+      },
+    ],
+    lessons: [{ ...item, objective: 'dns', title: 'Name resolution', state: 'new' }],
+  });
+  await services.reviews.recordStudy({ '2026-10-10': { 'lessons|Networks': 2400 } }, '2026-10-10');
+  await mount();
+
+  const rows = [...host.querySelectorAll<HTMLButtonElement>('.qard-learning-row')];
+  expect(rows).toHaveLength(3);
+  expect(rows.map((row) => row.querySelector('.qard-state')?.textContent)).toEqual([
+    'Taught',
+    'Gap',
+    'New',
+  ]);
+  for (const row of rows) {
+    expect(row.firstElementChild?.classList.contains('qard-objective-title')).toBe(true);
+    expect(row.querySelector('.qard-objective-title')?.firstElementChild).toBe(
+      row.querySelector('.qard-objective-status'),
+    );
+    expect(row.querySelector('.qard-objective-status-size')?.textContent).toBe('TaughtGapNew');
+  }
+  expect(host.querySelectorAll('.qard-doc-rows > .qard-doc-item')).toHaveLength(2);
+  const summary = host.querySelector('.qard-today-summary')!;
+  expect(summary.children).toHaveLength(2);
+  expect(summary.firstElementChild?.textContent).toContain('About 5 minutes.');
+  expect(summary.lastElementChild?.textContent).toBe('40 min studied today');
+  await click(rows[0]!);
+  expect(nav.check).toHaveBeenCalledWith('Check.json');
+});
+
 it('shows the live due count and opens Today without starting a combined review', async () => {
   const start = vi.spyOn(services.reviews, 'startSession');
   await act(async () => {
