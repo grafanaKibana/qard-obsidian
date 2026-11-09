@@ -156,13 +156,11 @@ export function DeckBrowser({
       <div className="qard-study-desk">
         <section className="qard-desk-library" aria-label="Deck library">
           <div className="qard-heading qard-desk-heading">
-            <div>
-              <h1>Your decks</h1>
-              <p>
-                {decks.length} {decks.length === 1 ? 'deck' : 'decks'} ·{' '}
-                {decks.reduce((count, deck) => count + deck.cards.length, 0).toLocaleString()} cards
-              </p>
-            </div>
+            <h1>Your decks</h1>
+            <p>
+              {decks.length} {decks.length === 1 ? 'deck' : 'decks'} ·{' '}
+              {decks.reduce((count, deck) => count + deck.cards.length, 0).toLocaleString()} cards
+            </p>
           </div>
           {resume}
           <div className="qard-library-toolbar">

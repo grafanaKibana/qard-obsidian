@@ -1,8 +1,8 @@
 import { plural } from '../common/labels';
 import { UpdateCourse } from './UpdateCourse';
 import { teach } from './lesson-navigation';
-import { useEffect, useId, useState } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { useEffect, useId, useRef, useState } from 'react';
+import { ChevronRight, FileText, List, Network } from 'lucide-react';
 import type { QardServices } from '../../views/services';
 import type { Mastery, Objective } from '../../learn/mastery';
 import { CourseMap } from './CourseMap';
@@ -29,12 +29,19 @@ export function CourseView({
 }) {
   const { revision, job } = useLearn(services);
   const tabsId = useId();
+  const focusTab = useRef(false);
   const [course, setCourse] = useState<Mastery>(),
     [error, setError] = useState(''),
     [busy, setBusy] = useState<string>();
   const [view, setView] = useState<'map' | 'list'>('map'),
     [filter, setFilter] = useState<Set<string>>(new Set()),
     [updating, setUpdating] = useState(false);
+  useEffect(() => {
+    if (focusTab.current) {
+      document.getElementById(`${tabsId}-${view}`)?.focus();
+      focusTab.current = false;
+    }
+  }, [tabsId, view]);
   const [lessons, setLessons] = useState<LessonSummary[]>([]);
   useEffect(() => {
     let live = true;
@@ -135,6 +142,49 @@ export function CourseView({
       }
       return next;
     });
+  const footer = (
+    <footer className="qard-course-footer">
+      <div className="qard-segmented qard-course-view" role="tablist" aria-label="Course view">
+        {(['map', 'list'] as const).map((mode, index) => (
+          <button
+            key={mode}
+            role="tab"
+            aria-label={mode === 'map' ? 'Map' : 'List'}
+            id={`${tabsId}-${mode}`}
+            aria-controls={`${tabsId}-panel`}
+            aria-selected={view === mode}
+            tabIndex={view === mode ? 0 : -1}
+            onClick={() => setView(mode)}
+            onKeyDown={(event) => {
+              const next =
+                event.key === 'ArrowRight' || event.key === 'ArrowLeft'
+                  ? 1 - index
+                  : event.key === 'Home'
+                    ? 0
+                    : event.key === 'End'
+                      ? 1
+                      : undefined;
+              if (next === undefined) {
+                return;
+              }
+              event.preventDefault();
+              focusTab.current = (next === 0 ? 'map' : 'list') !== view;
+              setView(next === 0 ? 'map' : 'list');
+              const controls =
+                event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>(
+                  '[role="tab"]',
+                );
+              controls?.[next]?.focus();
+            }}
+          >
+            {mode === 'map' ? <Network size={16} /> : <List size={16} />}
+            <span className="qard-course-view-label">{mode === 'map' ? 'Map' : 'List'}</span>
+          </button>
+        ))}
+      </div>
+      <StudyTimeLine services={services} course={course.course} days={30} open={nav.time} />
+    </footer>
+  );
   const mapActions = {
     openLesson: (p: string) => nav.lesson(p),
     teach: (o: Objective) =>
@@ -153,50 +203,16 @@ export function CourseView({
         <div>
           <span className="qard-muted">Course</span>
           <h1>{course.course}</h1>
-          <StudyTimeLine services={services} course={course.course} days={30} open={nav.time} />
         </div>
         <div className="qard-actions">
-          <div className="qard-segmented" role="tablist" aria-label="Course view">
-            {(['map', 'list'] as const).map((mode, index) => (
-              <button
-                key={mode}
-                role="tab"
-                id={`${tabsId}-${mode}`}
-                aria-controls={`${tabsId}-panel`}
-                aria-selected={view === mode}
-                tabIndex={view === mode ? 0 : -1}
-                onClick={() => setView(mode)}
-                onKeyDown={(event) => {
-                  const next =
-                    event.key === 'ArrowRight' || event.key === 'ArrowLeft'
-                      ? 1 - index
-                      : event.key === 'Home'
-                        ? 0
-                        : event.key === 'End'
-                          ? 1
-                          : undefined;
-                  if (next === undefined) {
-                    return;
-                  }
-                  event.preventDefault();
-                  setView(next === 0 ? 'map' : 'list');
-                  const controls =
-                    event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>(
-                      '[role="tab"]',
-                    );
-                  controls?.[next]?.focus();
-                }}
-              >
-                {mode === 'map' ? 'Map' : 'List'}
-              </button>
-            ))}
-          </div>
-          <button onClick={() => setUpdating(true)}>Update objectives</button>
+          <button onClick={() => setUpdating(true)}>Update</button>
           <button
-            className="qard-text-button"
+            className="qard-icon-button"
+            aria-label="Open file"
+            title="Open file"
             onClick={() => void services.app.workspace.openLinkText(path, '', true)}
           >
-            Open file
+            <FileText size={16} />
           </button>
         </div>
       </header>
@@ -230,6 +246,7 @@ export function CourseView({
             today={day}
             lessons={lessons}
             initial={objective}
+            footer={footer}
           />
         ) : (
           <section>
@@ -238,17 +255,20 @@ export function CourseView({
               .map((o) => (
                 <div key={o.id} className="qard-objective">
                   <div className="qard-objective-main">
-                    <strong>
-                      <StateChip state={o.state} />{' '}
-                      <InlineMarkdown text={o.title} path={path} services={services} />
-                    </strong>
                     {o.due && !['new', 'planned'].includes(o.state) && (
-                      <div className="qard-objective-meta">
-                        <span className="qard-muted qard-objective-due">
-                          {relativeDay(o.due, day).replace(/^./, (first) => first.toUpperCase())}
-                        </span>
-                      </div>
+                      <span className="qard-muted qard-objective-due">
+                        {relativeDay(o.due, day).replace(/^./, (first) => first.toUpperCase())}
+                      </span>
                     )}
+                    <strong className="qard-objective-title">
+                      <StateChip state={o.state} />
+                      <span className="qard-objective-title-text">
+                        <InlineMarkdown text={o.title} path={path} services={services} />
+                      </span>
+                    </strong>
+                    <small className="qard-muted qard-objective-evidence">
+                      {o.evidence.at(-1) ?? 'No evidence yet'}
+                    </small>
                   </div>
                   {actions(o)}
                 </div>
@@ -256,6 +276,7 @@ export function CourseView({
           </section>
         )}
       </div>
+      {view === 'list' && footer}
       {!course.objectives.length && (
         <p className="qard-muted">
           This mastery file has no objectives table. Open it and add rows, or update the objectives.

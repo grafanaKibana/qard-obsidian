@@ -508,7 +508,7 @@ it('the course map opens on topics, drills into one, and routes across topics', 
   // A prerequisite in another topic opens that topic.
   await click(
     [...panel.querySelectorAll('.qard-map-link')].find((b) =>
-      b.textContent?.startsWith('Bag of words'),
+      b.querySelector(':scope > span')?.textContent?.startsWith('Bag of words'),
     ),
   );
   expect(host.querySelector('.qard-map-crumb')?.textContent).toBe('Text mining');
@@ -722,7 +722,7 @@ it('the header shows background jobs and jumps to them', async () => {
   await tick();
   expect(host.querySelector('.qard-jobs-button')?.textContent).toBe('1 running');
   await click(host.querySelector('.qard-jobs-button'));
-  expect(host.querySelector('.qard-jobs-item')?.textContent).toBe('Mapping course');
+  expect(host.querySelector('.qard-jobs-item strong')?.textContent).toBe('Mapping course');
   expect(host.querySelector('.qard-jobs-detail')?.textContent).toBe('DS346');
   await click(host.querySelector('.qard-jobs-item'));
   expect(nav.mapCourse).toHaveBeenCalledWith('Notes/DS346');

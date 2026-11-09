@@ -901,6 +901,7 @@
   --qard-inset-compact: var(--qard-space-4);
   --qard-workspace-gutter: 28px;
   --qard-objective-actions-width: calc(var(--qard-font-control) * 10 + var(--qard-space-8));
+  --qard-objective-status-width: calc(14ch + var(--qard-space-4));
   --qard-shadow-segment: 0 1px 3px color-mix(in srgb, var(--qard-text) 10%, transparent);
 
   /* UI roles follow Obsidian's type settings; reading and data keep their own scale. */
@@ -4067,10 +4068,27 @@ body.qard-focus-active .status-bar {
   overflow-wrap: anywhere;
 }
 
+.qard-objective-title {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--qard-gap-actions);
+}
+
+.qard-objective-title-text {
+  min-width: 0;
+}
+
 .qard-objective-main strong .qard-state {
   display: inline-flex;
-  vertical-align: 1px;
-  margin-right: var(--qard-gap-actions);
+  justify-content: center;
+  width: var(--qard-objective-status-width);
+}
+
+.qard-objective-evidence {
+  color: var(--qard-muted);
+  font-size: var(--qard-font-meta);
+  line-height: 1.5;
 }
 
 .qard-objective-meta {
@@ -4292,6 +4310,42 @@ body.qard-focus-active .status-bar {
   margin: 2px 0 0;
 }
 
+.qard-course-footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--qard-gap-fields);
+}
+
+.qard-course-view {
+  justify-self: start;
+}
+
+.qard-course-footer .qard-time-line {
+  grid-column: 2;
+  margin: 0;
+  text-align: center;
+}
+
+@container qard-workspace (max-width: 640px) {
+  .qard-course-footer {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+  }
+
+  .qard-course-view {
+    justify-self: center;
+  }
+
+  .qard-course-footer .qard-time-line {
+    grid-column: 1;
+  }
+
+  .qard-course-view-label {
+    display: none;
+  }
+}
+
 .qard-segmented,
 .qard-plans-view {
   display: inline-flex;
@@ -4348,6 +4402,8 @@ body.qard-focus-active .status-bar {
 .qard-progress-legend {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
   gap: 14px;
   font-size: var(--qard-font-meta);
   color: var(--qard-muted);
@@ -4780,6 +4836,35 @@ body.qard-focus-active .status-bar {
   border: 1.5px solid var(--qard-node);
 }
 
+.qard-app button.qard-map-dependency {
+  display: grid;
+  grid-template-columns: 9px minmax(0, 1fr);
+  gap: var(--qard-space-1) var(--qard-gap-actions);
+}
+
+.qard-map-dependency small {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: start;
+  white-space: normal;
+  font-size: var(--qard-font-meta);
+  overflow-wrap: anywhere;
+}
+
+.qard-map-dependency i {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: start;
+  margin-top: var(--qard-space-1);
+}
+
+.qard-map-dependency > span {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .qard-app button.qard-map-note {
   display: flex;
   justify-content: flex-start;
@@ -5003,12 +5088,6 @@ body.qard-focus-active .status-bar {
   margin: 0 2px;
 }
 
-.qard-map-link small {
-  margin-left: auto;
-  padding-left: 8px;
-  white-space: nowrap;
-}
-
 .qard-resume.is-static {
   display: flex;
   align-items: center;
@@ -5129,6 +5208,11 @@ body.qard-focus-active .status-bar {
   font-size: var(--qard-font-meta);
   font-variant-numeric: tabular-nums;
   line-height: 1.5;
+  width: 100%;
+  justify-content: space-between;
+  padding: var(--qard-space-1) var(--qard-gap-actions);
+  border-radius: var(--qard-control-radius);
+  background: var(--qard-soft);
 }
 
 .qard-jobs-note {
@@ -5757,7 +5841,7 @@ div.qard-ask-q {
 
 .qard-jobs-row-head {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) fit-content(48%) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--qard-gap-actions);
 }
@@ -5770,9 +5854,6 @@ div.qard-ask-q {
 
 .qard-jobs-role {
   flex-shrink: 0;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--qard-soft);
   font-size: var(--qard-font-meta);
   font-weight: var(--qard-weight-medium);
   color: var(--qard-muted);
@@ -5780,6 +5861,8 @@ div.qard-ask-q {
 
 .qard-jobs-time {
   min-width: 0;
+  margin-left: auto;
+  text-align: right;
   overflow-wrap: anywhere;
   font-size: var(--qard-font-meta);
   color: var(--qard-muted);
@@ -5790,7 +5873,7 @@ div.qard-ask-q {
   display: flex;
   flex-direction: column;
   gap: var(--qard-gap-actions);
-  padding: var(--qard-inset-compact);
+  padding: var(--qard-gap-actions) var(--qard-inset-compact) var(--qard-inset-compact);
 }
 
 .qard-jobs-row + .qard-jobs-row {
@@ -7573,6 +7656,15 @@ div.qard-ask-q {
   margin-top: 6px;
 }
 
+.qard-app .qard-desk-heading {
+  align-items: center;
+}
+
+.qard-app .qard-desk-heading p {
+  margin: 0 0 0 auto;
+  text-align: right;
+}
+
 .qard-library-toolbar {
   display: flex;
   justify-content: space-between;
@@ -7605,9 +7697,13 @@ div.qard-ask-q {
 
 .qard-study-desk .qard-deck-row {
   border: 0;
-  border-bottom: 1px solid var(--qard-border);
   border-radius: 0;
   padding-right: 0;
+}
+
+.qard-study-desk .qard-deck-node + .qard-deck-node > .qard-deck-row,
+.qard-study-desk .qard-deck-children > .qard-deck-node:first-child > .qard-deck-row {
+  border-top: 1px solid var(--qard-border);
 }
 
 .qard-app .qard-study-desk .qard-deck-row > button.qard-deck {

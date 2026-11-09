@@ -14,6 +14,7 @@ import {
   TOPIC,
 } from '../../learn/course-graph';
 import {
+  type ReactNode,
   useCallback,
   useEffect,
   useId,
@@ -62,6 +63,7 @@ export function CourseMap({
   today = isoDay(Date.now()),
   lessons = [],
   initial,
+  footer,
   services,
 }: {
   course: Mastery;
@@ -70,6 +72,7 @@ export function CourseMap({
   today?: string;
   lessons?: LessonSummary[];
   initial?: string;
+  footer?: ReactNode;
   services?: QardServices;
 }) {
   // Titles may hold maths; render them when the renderer is available.
@@ -556,12 +559,12 @@ export function CourseMap({
   const titleOf = (id: string) => byId.get(id)?.title ?? id;
   const links = (ids: string[]) =>
     ids.map((n) => (
-      <button key={n} className="qard-map-link" onClick={() => open(n, true)}>
-        <i className={cls(byId.get(n)?.state ?? 'new')} />
-        {md(titleOf(n))}
+      <button key={n} className="qard-map-link qard-map-dependency" onClick={() => open(n, true)}>
         {grouped && topicOf(n) !== topic ? (
           <small className="qard-muted">{byId.get(n)?.group}</small>
         ) : null}
+        <i className={cls(byId.get(n)?.state ?? 'new')} />
+        <span>{md(titleOf(n))}</span>
       </button>
     ));
   const topicName = (key: string) => topics.find((t) => t.key === key)?.name ?? key;
@@ -928,6 +931,7 @@ export function CourseMap({
               </svg>
             </div>
           </div>
+          {!expanded && footer}
         </div>
         {chosen && !atTopics && (
           <aside className="qard-map-panel" aria-label={chosen.title}>

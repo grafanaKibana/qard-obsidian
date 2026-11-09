@@ -229,16 +229,12 @@ export function RunningJobs({
                   role="listitem"
                   className={`qard-jobs-row${stuck ? ' is-stuck' : ''}`}
                 >
-                  <div className="qard-jobs-row-head">
-                    <button
-                      className="qard-jobs-item"
-                      onClick={() => {
-                        setOpen(false);
-                        j.open();
-                      }}
-                    >
-                      <strong>{j.label}</strong>
-                    </button>
+                  <div className="qard-jobs-meta">
+                    {showAgent && (
+                      <span className="qard-jobs-role">
+                        {role.charAt(0).toUpperCase() + role.slice(1)}
+                      </span>
+                    )}
                     <span
                       className={
                         stuck ? 'qard-jobs-time qard-jobs-stuck' : 'qard-jobs-time qard-muted'
@@ -253,6 +249,22 @@ export function RunningJobs({
                             .replace(/ sec/g, 's')}`
                         : ''}
                     </span>
+                  </div>
+                  <div className="qard-jobs-row-head">
+                    <button
+                      className="qard-jobs-item"
+                      onClick={() => {
+                        setOpen(false);
+                        j.open();
+                      }}
+                    >
+                      <strong>{j.label}</strong>
+                      {j.detail && (
+                        <span className="qard-jobs-detail">
+                          <InlineMarkdown text={j.detail} path={''} services={services} />
+                        </span>
+                      )}
+                    </button>
                     <button
                       className="qard-icon-button qard-jobs-cancel"
                       aria-label={`Cancel ${j.label.toLowerCase()}`}
@@ -260,18 +272,6 @@ export function RunningJobs({
                     >
                       <Square size={14} fill="currentColor" strokeWidth={0} aria-hidden="true" />
                     </button>
-                  </div>
-                  <div className="qard-jobs-meta">
-                    {showAgent && (
-                      <span className="qard-jobs-role">
-                        {role.charAt(0).toUpperCase() + role.slice(1)}
-                      </span>
-                    )}
-                    {j.detail && (
-                      <span className="qard-jobs-detail">
-                        <InlineMarkdown text={j.detail} path={''} services={services} />
-                      </span>
-                    )}
                   </div>
                 </div>
               );
