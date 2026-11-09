@@ -1,34 +1,29 @@
-# Combined visual fixes — final verification
+# Latest combined UI verification
 
-Source `1ef876275e96d658cc41b033430a8f0d553122f9`; baseline fork main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
+Final source: `fecd2962e7be1422f9dd8f6139765e44ea9919a9`. Baseline: fork main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
 
-## Five audit findings resolved
+## Latest requested refinements
 
-| Finding | Final behavior | Verification |
-| --- | --- | --- |
-| Active repair-filter color/contrast | Uses Qard action foreground/background tokens, matching primary actions. | Shared blue/white pair has 5.19:1 contrast; repair-filter comparison captured. |
-| Reading headings/code | Markdown headings scale relative to their reading container; code scales with the reading preference. UI headings retain their section roles. | At 32px body: H2 40px, H3 36px, fenced code 28px, checked in both themes and phone/desktop panes. |
-| Learn action overflow | One full-width row at normal mobile sizes; min-content flex bases allow wrapping when enlarged text cannot fit. | 320/390px normal and enlarged geometry assertions; native isolated app confirms no overflow. |
-| Changed-note banner overflow | Message shrinks/wraps naturally; compact action says Update. | Enlarged-text stress cases no longer overflow the course pane. |
-| Study-time table overflow | Existing table-scroll container contains minimum table width. | Enlarged 320px case no longer expands the page; matched comparison captured. |
+1. Lesson-plan fields, Revise and Start lesson share the control height. Start lesson keeps its label on one line. Whole controls may reflow when the form is narrow.
+2. The Ask composer is a panel-actions form with stretched, equal-height field/button controls. Lesson Next step is always aligned to the trailing edge.
+3. Lesson/test step selectors use an 8px gap, ChevronRight separators and the same control padding as the lesson trail. Separators stay grouped with the following trail item.
+4. Resume and Today summary rows share typography, surface/inset roles and an 8px bottom margin.
+5. Deck-options footer has no top divider or padding. Scope/inheritance help is an info tooltip at the leading edge of the action row.
+6. Deck titles have a smaller useful flex basis, avoiding premature action wrapping. Groups still wrap at genuinely constrained widths.
+7. Learn Usage and Study time are icon controls with explicit names/tooltips. Normal mobile actions fit on one full-width row.
+8. Compact Today Checks/Lessons put status/course above a one-line ellipsized title, with the trailing Chevron/Teach centered against the row. Desktop retains its inline arrangement. Start checks fills the compact row.
+9. Study time comparisons now use normal default typography at375px, replacing the exaggerated enlarged-text example. Enlarged-text table containment remains in the implementation.
 
-## Additional requested refinements
+Earlier requested token, map, mask, plan, typography and responsive fixes remain in this PR. No DESIGN.md was added.
 
-- Compact deck rows use tighter insets and gaps, shallow nested indentation, and no left guide border. Action groups wrap to full width when needed; Study all is last, with the same control style in full-label and compact play-only variants.
-- Wrapped course toolbars fill their available row. Legend labels use title case and zero row gap.
-- Stateful learning document rows begin with the pill beside the full title, sized against currently present statuses. Today, course proposals and update proposals share this treatment. The old generic row truncation rule excludes structured objective titles.
-- Today’s suggestion and study time use the same metadata typography at opposite ends of one row, with content-aware wrapping for enlarged text. Checks, Lessons and recent-lesson lists only draw separators between rows.
-- Plan actions say Create test. The coverage explanation is an info tooltip before Plan details.
-- Deck options separates title/deck identity, scheduling settings and footer actions. Each setting row groups its label/help beside the control on wide panes and stacks on compact panes. Validation and inheritance behavior are preserved; new settings can follow the same row/section structure.
+## Fresh checks
 
-## Evidence
+- `npm run check`: **766 tests / 95 suites**, formatter, TypeScript, ESLint, Stylelint, build and release checks passed.
+- After the final trail grouping, the 28 focused lesson/Ask/test UI tests, TypeScript, ESLint, CSS lint and build passed again. Final CSS formatter/lint/diff checks passed.
+- **216 integrated theme/pane scenarios**: no runtime errors, horizontal overflow or sampled out-of-bounds panels. Both themes; 320/375/430px touch panes, tablet768px, desktop1280px and a390px desktop split pane.
+- **102 final focused assertions**: plan/composer geometry, navigation alignment, step/trail gap/padding, Learn icons, compact Today metadata/title/action placement, full-width Start checks, footer help, resume consistency and deck wrapping. The deck sweep covers320,360,375,390,430,480,600,640,660,768,900 and1100px.
+- **Native isolated Obsidian:** plan field/Revise/Start lesson all34px; Ask field/button both34px; Next step trailing edges match; icon actions have labels and no redundant text. The two native synthetic lessons existed only in the test cache and were removed afterward. Pane-width overrides were removed, and the test app returned to Learn.
+- **32 matched main-to-final pairs /64 images**. Normal UI/reading settings are used in representative screenshots. Filled lesson controls are blurred identically on both sides to show their actual dimensions. Lesson-control examples scroll to the same footer on main/latest; the separate step-strip example shows selector spacing. All images are hashed in the capture manifest.
+- DevBook plugin files, global Obsidian vault configuration and installed app hashes remain unchanged. The separate test install matches the final build.
 
-- `npm run check`: **766 tests in 95 suites** passed, including formatting, TypeScript, ESLint, Stylelint, build and release validation. Final CSS formatting/Stylelint and build were checked after integration.
-- **216 normal-size theme/pane scenarios**: no runtime errors, horizontal page overflow or sampled out-of-bounds panels.
-- **72 normal/enlarged-text scenarios**: no runtime errors or page overflow. Breadcrumbs intentionally elide long labels inside their own bounds.
-- **88 final focused assertions**: toolbar width, legend row gap/case, compact Update copy, normal/enlarged Learn actions, reading hierarchy, setting rows, Today font/alignment/dividers/state order and title readability all passed.
-- **28 matched main-to-final screenshot pairs**, captured with identical per-pair conditions and no runtime errors. Two equal screenshot columns; at most three examples per group. Manifest records all 56 image hashes.
-- Native isolated Obsidian checks passed for setting-row stacking, nested border removal and normal/enlarged Learn controls. The isolated install hashes match the final build. Transient width overrides were removed.
-- DevBook plugin files, global Obsidian vault configuration and installed app hashes remain unchanged. The separate Qard test app remains open.
-
-Keyboard accessibility was outside this visual pass. Phone checks use touch emulation/narrow panes, not a physical iPhone/Safari run. No development server was launched for the file-based fixtures.
+Keyboard accessibility was outside this visual pass. Mobile coverage uses touch emulation and narrow panes, not physical iPhone/Safari testing. The separate test app remains open. No development server was launched for the file-based fixtures.

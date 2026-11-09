@@ -1,10 +1,10 @@
 {
   "before": "70056821914f0dae910b52a20f1fa3329b04d0ac",
-  "after": "1ef876275e96d658cc41b033430a8f0d553122f9",
-  "comparisons": 28,
+  "after": "fecd2962e7be1422f9dd8f6139765e44ea9919a9",
+  "comparisons": 32,
   "deviceScaleFactor": 2,
   "clock": "2026-11-09T12:00Z",
-  "capture": "Only fork main versus latest PR. Identical synthetic content, theme, pane width, input mode, typography and actions per pair. Rich-reading images use the default reading preference; enlarged Study time uses the same doubled font preferences on both sides. Redundant root-search, tall-map, breadcrumb and simple-study crops removed. Added Today, adaptive Deck options, reading hierarchy, repair-filter and Study-time examples.",
+  "capture": "Only fork main versus final PR source. Identical synthetic content, theme, input, pane, typography, clock and interaction per pair. Study time now uses default UI typography at375px. Lesson plan controls, lesson composer/navigation and step trail are included. Lesson-control pages scroll to the shared test footer on both revisions.",
   "maximumExamplesPerGroup": 3,
   "scenes": [
     {
@@ -103,6 +103,27 @@
       "crop": ".qard-jobs-list"
     },
     {
+      "name": "decks-phone",
+      "screen": "app",
+      "width": 390,
+      "touch": true,
+      "crop": ".qard-desk-library"
+    },
+    {
+      "name": "decks-desktop",
+      "screen": "app",
+      "width": 1000,
+      "crop": ".qard-desk-library"
+    },
+    {
+      "name": "nested-phone",
+      "screen": "app",
+      "width": 320,
+      "touch": true,
+      "nested": true,
+      "crop": ".qard-desk-library"
+    },
+    {
       "name": "builder-phone",
       "screen": "app",
       "request": "builder",
@@ -139,6 +160,13 @@
       "crop": ".qard-deck-options"
     },
     {
+      "name": "reading-phone",
+      "screen": "typography",
+      "width": 390,
+      "touch": true,
+      "crop": ".qard-study-card"
+    },
+    {
       "name": "repair-phone",
       "screen": "app",
       "width": 390,
@@ -150,9 +178,8 @@
       "name": "time-phone",
       "screen": "app",
       "request": "time",
-      "width": 320,
-      "touch": true,
-      "scale": true
+      "width": 375,
+      "touch": true
     },
     {
       "name": "mcq-dark",
@@ -163,39 +190,10 @@
       "selectAnswer": true
     },
     {
-      "name": "decks-desktop",
-      "screen": "app",
-      "width": 1000,
-      "crop": ".qard-desk-library"
-    },
-    {
-      "name": "nested-phone",
-      "screen": "app",
-      "width": 320,
-      "touch": true,
-      "nested": true,
-      "crop": ".qard-desk-library"
-    },
-    {
-      "name": "reading-phone",
-      "screen": "typography",
-      "width": 390,
-      "touch": true,
-      "crop": ".qard-study-card"
-    },
-    {
-      "name": "reading-desktop",
-      "screen": "typography",
+      "name": "lesson-steps",
+      "screen": "lesson",
       "width": 1100,
-      "theme": "dark",
-      "crop": ".qard-study-card"
-    },
-    {
-      "name": "decks-phone",
-      "screen": "app",
-      "width": 390,
-      "touch": true,
-      "crop": ".qard-desk-library"
+      "crop": ".qard-test-steps"
     },
     {
       "name": "today-phone",
@@ -209,44 +207,84 @@
       "screen": "app",
       "request": "today",
       "width": 1100
+    },
+    {
+      "name": "lesson-plan-phone",
+      "screen": "lesson",
+      "variant": "plan",
+      "width": 390,
+      "touch": true,
+      "plan": true
+    },
+    {
+      "name": "lesson-plan-desktop",
+      "screen": "lesson",
+      "variant": "plan",
+      "width": 1100,
+      "plan": true
+    },
+    {
+      "name": "lesson-step-phone",
+      "screen": "lesson",
+      "width": 390,
+      "touch": true,
+      "ask": true,
+      "bottom": true
+    },
+    {
+      "name": "lesson-step-desktop",
+      "screen": "lesson",
+      "width": 1100,
+      "theme": "dark",
+      "ask": true,
+      "bottom": true
     }
   ],
   "hashes": {
     "after-builder-phone.png": "2f206ab5b85ebe530a15284b5d90a7477c25cdd9ebfc66319761a91d212f70df",
     "after-decks-desktop.png": "7cac0129ffc88b52594dc8b5de2f985ed903740fd8202c7d5beda78a625c6f54",
-    "after-decks-phone.png": "0b4a427d2654bc5dd903a256d68d231aca21445973394ca6f82273c73888cf86",
+    "after-decks-phone.png": "99dfabf8d6fe4a2a4e750f7ba8c9957b4d267968855b02508d9deb966f3cfe2e",
     "after-exam-mobile.png": "8c85de352fcd8b631f839c4fcce1ad7e7a00d31d90db8bdc33ae7dd9ad151a12",
-    "after-learn-desktop.png": "dcb009b5533ad521e3c4b61a72cac4545d8b972e669904705d4bf259dd664fcb",
-    "after-learn-phone.png": "ce4242623ad458fe53cc40156c5be384723c7f42d8eea6fef851d9069c414e50",
-    "after-map-desktop.png": "4e98da2222516fd2e3e2b1ad0c0e142f66294f5f95acf1ee475f42178aea1a05",
-    "after-map-phone.png": "757d64016dcf3e50cb7204dcbd69eb391f164adbdfa1a2d87785cef933b32793",
+    "after-learn-desktop.png": "c908eb67a4ef4a9936d268c7d8b3f11fe4ed0bf015185c9e175ed98b078ada80",
+    "after-learn-phone.png": "7dd95fc1cdaf982b88d367ee605598df7ab6cdc8a8ba5895330cf76a4351b867",
+    "after-lesson-plan-desktop.png": "709733ac7ac983f5dbf2ded1dd194840ec0d4b21ee6c171e93a1284756ace289",
+    "after-lesson-plan-phone.png": "fe27f30ba21ea6a32718fb141c55f6c6ee011024a3aa98f3cb80680cada1ffaf",
+    "after-lesson-step-desktop.png": "c97e30d69ab30850c49de2fe75d21ec5c8007ed2f85c329ad6358e4a6f2d1b0f",
+    "after-lesson-step-phone.png": "c4e837a3a2e6b9435f6c5a654255e3a27009ffc550965e2c6f8d08e280ba5bdf",
+    "after-lesson-steps.png": "7212c7d38f389ad87c2943f98836d9c0f8c012fa556c93b0b96487d70e748dd6",
+    "after-map-desktop.png": "f5fa897089c1faf7e6c395ff95c34da67280ddbfb980d5fe76cfa7ea2551539d",
+    "after-map-phone.png": "81f42687d94c234932f472d1e14b31a6d109b17372324aec0c688fd87f41c9a3",
     "after-masks-desktop.png": "015672dde84295f4c833d5f645b575c67a35431d14057447dab0b7e374039e80",
     "after-masks-phone.png": "2ce267748f59cb8fffa36bc10c7899567caf3af551c2ce794fc9688fd833711e",
-    "after-mcq-dark.png": "e10f3f143c35d781012aa0c43aaaeeff1851f76772c9f1c0050d3d1fd2d1dfe0",
-    "after-nested-phone.png": "ea38f1e58ec9d983ddd0ab9d86431db04dbc444b0c610b989e2239e9e0ad27df",
-    "after-objectives-desktop.png": "859cbc04fdf17aac792168e949808d829f64ebeda5b36abbcb75d6baeadea482",
-    "after-objectives-phone.png": "604b00f3a5636ccabaa7d0bf0d0a64a77c62945ce8db4df0ba241b52e1c080d8",
-    "after-options-desktop.png": "bb5a1cbd105f2950fad1252351d77fe919d04064bc277b6b68d155dcbbf26a14",
-    "after-options-phone.png": "86db838ea822e9c0fbef11547c696145e362b68b64473467e8680a7d1932f097",
-    "after-plans-desktop.png": "09e5e4c592bc3772a62a5a7efb952cabdbecbeb3c006855eb5285410d2b46563",
+    "after-mcq-dark.png": "00c4c06d59793d7c71a01d0034fef78bec6c48eb7837c2bd0314be9672beceb8",
+    "after-nested-phone.png": "bee935f412581c5b8c88803132cf62a294c8e9b24d990af76b7bc5b78a9b457f",
+    "after-objectives-desktop.png": "8d05163e86f185d277472c16c0698359ba5e3255f1606d10aecc51d543d57498",
+    "after-objectives-phone.png": "80871a7a782a43cf63deb65957e6be71b2ce4590cf165f1a796b9fc3e895782a",
+    "after-options-desktop.png": "e8fe5f1125382494fb96544543cb1bc4f0380c312a79b4e28176e03e32d752c7",
+    "after-options-phone.png": "7b4d2eec1992ac2b05aa76d12c71ad888a30f8e341be9821c3dfaf43ab5c3c1f",
+    "after-plans-desktop.png": "5b95ac08e8a0ec7ce8f99715a7c690a887c6a8b3673f8dc700904a34262a1677",
     "after-plans-phone.png": "d5c70af05ef69cd1cb077dc39668a29e15b05c005825a003fadbbdc9893a5a9e",
-    "after-reading-desktop.png": "ad2a7f36d3255950e7613ba785ce144d2169ed39ac7d35a583d1c39e3b598f74",
     "after-reading-phone.png": "bbe484e130e2ad8edc13d9c9e9b434865128966aa41c3bd307e3d93f3e4b67b0",
-    "after-repair-phone.png": "9e69d56d8e0fa33ce2ec8312054c148f2ac1886ca387637861e330247b1d3a22",
+    "after-repair-phone.png": "ce06514210791bee51b0c576b392dac3cba703a43b05a5b13b15d4c8bbb35b12",
     "after-statistics-phone.png": "da7cb51b2500cfbed4836e78be3ec80c5714f3254a02e08b4bac24f51f1c40de",
     "after-tasks.png": "99917669b4f484cf2c5838e4d2dfc62bf0bcee15a01d07e8a21bebf854337e62",
-    "after-time-phone.png": "d6c331c504f93fcc28b436735f9295380cd3aa00caaa3c3692cbf457fcde9a4b",
-    "after-today-desktop.png": "4a57db0532c9eb7e6994db0ab1357a3b8916add26fbc393519c9d5cc466f0960",
-    "after-today-phone.png": "a151083026a3b2ad0c94f850092d62b6f4d785035b86b728bae5b86785ea3927",
-    "after-types-desktop.png": "d2da65ab0796bc48163b805720d760dd93c673e54d445e41f40b07be223ecff9",
-    "after-types-phone.png": "cb7835a4a2c2182fe7bf8207441d509733b16c28c4ccc78cafc464f03fb8d21f",
+    "after-time-phone.png": "b789f0bed29bb8b249f8c2cc1ee3203f529c1e7d48138880513e82313fba6d15",
+    "after-today-desktop.png": "4140f62ea648eaee446e90b6a3c42d57ab363650a423564d02a063ee78606323",
+    "after-today-phone.png": "07271ae79e2dc8b6d9ca6572375473ca14889b7fefd6d93647cb6c954619d2ea",
+    "after-types-desktop.png": "f76e1f8865c3b7f5be23d924f454855d26b573a280b1a955496de1409fa9b6cc",
+    "after-types-phone.png": "ba8d375cdb3684a05fa5168d0f215425a1774e0022bd8ffb3d56c46fb3aaed30",
     "before-builder-phone.png": "e63b753c0d62615f08a779ef4fa55e7efacbbf8ba2ec14bbeb9d0d33321a5297",
     "before-decks-desktop.png": "6e0f5cd8969c85b8eba5ab826b3ccbc5cd56d38b73454a87799a666926f86e3d",
     "before-decks-phone.png": "c533cb2a8050f2c356cd2379a66f36c37c9abb21b9220453927411b483bbd437",
     "before-exam-mobile.png": "10198204da5227ad42d27f8f7ccaf435c6220fa5519facc696a1e45da1321e77",
     "before-learn-desktop.png": "aa3b44125d9d44b9ca355a07e8365f8815181d5ebaacac351ae307f2ff1ea70e",
     "before-learn-phone.png": "8f40dca4fb494d34a4f99b81156c78b01f45492c25fec26cbc8ec6abd6255cd8",
-    "before-map-desktop.png": "247d3977cb2f276827d593d48fd9aba938f5865d02715d776f6f2b4c7bbbf699",
+    "before-lesson-plan-desktop.png": "d257f3143ce45d474af33de18132d3a2deead00c09d46365d675f8045b7a51ab",
+    "before-lesson-plan-phone.png": "4d6e6526f58aa5e1622d46e84a640c6b64937934e7306289221e38929a0312f9",
+    "before-lesson-step-desktop.png": "f0090762bc596fd37d5a3959f1e1bc1d1cffde45d8927b33f469f35f29bb7f93",
+    "before-lesson-step-phone.png": "38cd607e3348c608065840477628bedd702edcf49fa960b6d4f9921c5fe00f26",
+    "before-lesson-steps.png": "57a5f9f58c05173f5c4fd0b1416e018afb1d3acc9ac0a1f79db6b3a6f907932d",
+    "before-map-desktop.png": "27f24019ac7f89b023fb7143d9ee2b47b77b123e4fa8ff2776899fba9dbc56aa",
     "before-map-phone.png": "b6ddbd061a01f20709b95808eac298ecfdd7c0cd03aa86cb8e1d57aa0259015f",
     "before-masks-desktop.png": "dc15032780e8e9f4165a2f18033e92d20e7601eed71dc1db6a26a0c124437725",
     "before-masks-phone.png": "ad7b2cb6068db49297aad3b4e31560fcdf0c3ca36a7a13f637c57bd1d203ddfa",
@@ -258,15 +296,14 @@
     "before-options-phone.png": "1aec7a3a4f29ea3c61ba9c487432116f3df7fbbc3b875e1915066b0cdf01edfa",
     "before-plans-desktop.png": "a6441c1f23e611cef116df544650a9d7cb57616f1896d5246b4c46d9fffb97b9",
     "before-plans-phone.png": "57a10290a0c0768cd55c212259da29e355763af7ac5c8a23105086b176cc02f3",
-    "before-reading-desktop.png": "2e755459b5d9198e92350e439ce9670d2ff266d738f793ac0e78d89fa083b8cd",
     "before-reading-phone.png": "9297183458d2a9c4846d037ae9729be73a8187a7a33c3688123a22f4950781ea",
     "before-repair-phone.png": "4a1471f475d6b03207100c8820b34e74ccd68b5eca562cd9d62a0d43713062cf",
     "before-statistics-phone.png": "d79b7d05e8511e63f2c06b0cf03cc46fd966a9f6763ca9aa6fc51b1ee71bf14c",
     "before-tasks.png": "79c199f6cbaf0dde04628635078487558c486fdb661b7036d4777991822a4d78",
-    "before-time-phone.png": "f407f0d4443ff5dc8b9421b719bf16f9752c37cc941e8476b5890e61c2cf9270",
+    "before-time-phone.png": "d54ae7e2235f64a5b6f2aef473ff6c13dd3660a8305afdb48f7acfb23b478475",
     "before-today-desktop.png": "485db0788fa133ba86bf7eec7f7a6eb6f6f3c468cbcbb3952fcc1c0d0e32be85",
     "before-today-phone.png": "a4711c703c720b644b40846c0c14306221149cf2cb3e7811dbf789a2a6f07cd8",
-    "before-types-desktop.png": "91fbda2ced30ca3251b5782bd08731108963277728158da910d5d026b51fc4d1",
+    "before-types-desktop.png": "677d72b135e064f35c210b20bae1e4330dedfbae164bf2624f1cec10d940789f",
     "before-types-phone.png": "58a7b806b65396a8b553b13f8a06bf57e3317f2798d484140f46bc6f68f05462"
   }
 }
