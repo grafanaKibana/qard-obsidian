@@ -1,13 +1,13 @@
 # Latest combined UI verification
 
-Final source: `fecd2962e7be1422f9dd8f6139765e44ea9919a9`. Baseline: fork main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
+Final source: `5883b301c80eb21c54a08c5b7e0d11551a4fc9d5`. Baseline: fork main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
 
 ## Latest requested refinements
 
 1. Lesson-plan fields, Revise and Start lesson share the control height. Start lesson keeps its label on one line. Whole controls may reflow when the form is narrow.
 2. The Ask composer is a panel-actions form with stretched, equal-height field/button controls. Lesson Next step is always aligned to the trailing edge.
 3. Lesson/test step selectors use an 8px gap, ChevronRight separators and the same control padding as the lesson trail. Separators stay grouped with the following trail item.
-4. Resume and Today summary rows share typography, surface/inset roles and an 8px bottom margin.
+4. Resume and Today summary rows share typography, surface/inset roles and an 8px bottom margin. Pending/static resume rows use the same inset, margin and control font; native CSS confirmation passed.
 5. Deck-options footer has no top divider or padding. Scope/inheritance help is an info tooltip at the leading edge of the action row.
 6. Deck titles have a smaller useful flex basis, avoiding premature action wrapping. Groups still wrap at genuinely constrained widths.
 7. Learn Usage and Study time are icon controls with explicit names/tooltips. Normal mobile actions fit on one full-width row.
