@@ -891,6 +891,11 @@
   --qard-weight-normal: var(--font-normal, 400);
   --qard-weight-medium: var(--font-medium, 500);
   --qard-weight-strong: var(--font-semibold, 600);
+  --qard-control-radius: 7px;
+  --qard-control-radius-inner: 5px;
+  --qard-control-height: 34px;
+  --qard-control-height-compact: 30px;
+  --qard-control-padding: 6px 12px;
 
   height: 100%;
   min-height: 0;
@@ -939,11 +944,11 @@
   align-items: center;
   justify-content: center;
   gap: 7px;
-  min-height: 34px;
+  min-height: var(--qard-control-height);
   height: auto;
-  padding: 7px 12px;
+  padding: var(--qard-control-padding);
   border: 1px solid var(--qard-border);
-  border-radius: 7px;
+  border-radius: var(--qard-control-radius);
   background: transparent;
   color: var(--qard-text);
   box-shadow: none;
@@ -1020,10 +1025,11 @@
 .qard-app textarea,
 .qard-app select {
   width: 100%;
+  min-height: var(--qard-control-height);
   height: auto;
   border: 1px solid var(--qard-border);
-  border-radius: 7px;
-  padding: 9px 11px;
+  border-radius: var(--qard-control-radius);
+  padding: var(--qard-control-padding);
   font: var(--qard-weight-normal) var(--qard-font-control) / 1.4
     var(--font-interface, system-ui, sans-serif);
   background-color: var(--qard-bg);
@@ -1039,6 +1045,7 @@
 }
 
 .qard-app textarea {
+  padding: 9px 11px;
   font-size: var(--qard-font-reading);
   resize: vertical;
   min-height: 110px;
@@ -1151,13 +1158,14 @@
   gap: 10px;
   color: var(--qard-muted);
   border: 1px solid var(--qard-border);
-  border-radius: 9px;
+  border-radius: var(--qard-control-radius);
   background: var(--qard-soft);
   margin-bottom: 18px;
-  padding: 6px 12px;
+  padding: 0 12px;
 }
 
 .qard-app .qard-search input[type='search'] {
+  min-height: calc(var(--qard-control-height) - 2px);
   border: 0;
   background: transparent;
   padding: 6px 0;
@@ -1550,17 +1558,10 @@
 
 .qard-session-type {
   display: flex;
-  gap: 3px;
-  padding: 3px;
-  border-radius: 5px;
 }
 
 .qard-app .qard-session-type button {
   flex: 1;
-  padding: 6px 9px;
-  min-height: 30px;
-  border-radius: 3px;
-  font-size: var(--qard-font-control);
 }
 
 .qard-app .qard-session-type button[aria-pressed='true'] {
@@ -1573,12 +1574,6 @@
   margin: 9px 0 22px;
   min-height: 36px;
   font-size: var(--qard-font-meta);
-}
-
-.qard-app .qard-session-options select {
-  font-size: var(--qard-font-control);
-  padding: 9px 10px;
-  border-radius: 5px;
 }
 
 .qard-session-start {
@@ -1601,12 +1596,6 @@
   margin-top: 3px;
   font-size: var(--qard-font-meta);
   color: var(--qard-muted);
-}
-
-.qard-app .qard-session-start .qard-primary {
-  padding: 10px 14px;
-  border-radius: 5px;
-  font-size: var(--qard-font-control);
 }
 
 .qard-app .qard-selection-note {
@@ -3194,7 +3183,6 @@ body.qard-focus-active .status-bar {
 .qard-app textarea.qard-answer-input {
   border-color: transparent;
   background: var(--qard-soft);
-  border-radius: 10px;
   padding: 13px 15px;
   font-size: var(--qard-font-reading);
   min-height: 0;
@@ -4290,17 +4278,20 @@ body.qard-focus-active .status-bar {
   margin: 2px 0 0;
 }
 
-.qard-segmented {
+.qard-segmented,
+.qard-plans-view {
   display: inline-flex;
   padding: 2px;
-  border-radius: 8px;
+  border-radius: var(--qard-control-radius);
   background: var(--qard-soft);
 }
 
-.qard-app .qard-segmented button {
+.qard-app .qard-segmented button,
+.qard-app .qard-plans-view button {
   border: 0;
-  min-height: 30px;
+  min-height: var(--qard-control-height-compact);
   padding: 3px 12px;
+  border-radius: var(--qard-control-radius-inner);
   font-size: var(--qard-font-control);
   background: transparent;
   color: var(--qard-muted);
@@ -4786,6 +4777,11 @@ body.qard-focus-active .status-bar {
 }
 
 @media (pointer: coarse) {
+  .qard-app {
+    --qard-control-height: 44px;
+    --qard-control-height-compact: 40px;
+  }
+
   .qard-app .qard-map-tools button,
   .qard-app .qard-map-panel button,
   .qard-app .qard-objective-actions button {
@@ -5596,7 +5592,6 @@ div.qard-ask-q {
   field-sizing: content;
   resize: none;
   padding: 8px 12px;
-  border-radius: 10px;
   font-size: var(--qard-font-reading);
   line-height: 1.65;
 }
@@ -6050,18 +6045,7 @@ div.qard-ask-q {
 }
 
 .qard-plans-view {
-  display: inline-flex;
-  gap: 4px;
-  padding: 4px;
-  background: var(--qard-soft);
-  border-radius: 9px;
   margin-bottom: 24px;
-}
-
-.qard-app .qard-plans-view button {
-  border: 0;
-  color: var(--qard-muted);
-  padding: 6px 14px;
 }
 
 .qard-app .qard-plans-view button[aria-pressed='true'] {
@@ -7498,9 +7482,7 @@ div.qard-ask-q {
 .qard-app .qard-desk-review-main > .qard-primary {
   width: 100%;
   justify-content: space-between;
-  padding: 9px 12px;
-  font-size: var(--qard-font-control);
-  border-radius: 5px;
+  padding-inline: 12px;
 }
 
 .qard-desk-create {
@@ -7513,9 +7495,6 @@ div.qard-ask-q {
   width: 100%;
   justify-content: flex-start;
   border: 0;
-  border-radius: 4px;
-  padding: 8px 12px;
-  font-size: var(--qard-font-control);
 }
 
 .qard-desk-create h2 {
@@ -7540,11 +7519,6 @@ div.qard-ask-q {
 
 .qard-deck-identity > div {
   min-width: 0;
-}
-
-.qard-deck-detail .qard-actions button {
-  border-radius: 5px;
-  font-size: var(--qard-font-control);
 }
 
 .qard-deck-detail .qard-topics {
