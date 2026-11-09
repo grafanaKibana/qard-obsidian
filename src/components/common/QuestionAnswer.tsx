@@ -195,17 +195,7 @@ export function MarkedAnswer({
   );
 }
 
-/** Keep Obsidian's full Markdown render, placing controls only at the named gaps. */
-export function ClozePrompt({
-  services,
-  question: q,
-  answer,
-  path,
-  label,
-  locked,
-  onChange,
-  mark,
-}: {
+type ClozePromptProps = {
   services: QardServices;
   question: Question;
   answer?: AnswerState;
@@ -214,7 +204,34 @@ export function ClozePrompt({
   locked: boolean;
   onChange?: (patch: Partial<AnswerState>) => void;
   mark?: QuestionMark;
-}) {
+};
+
+/** Each question owns its Markdown DOM and portals, including during asynchronous renders. */
+export function ClozePrompt(props: ClozePromptProps) {
+  const { question: q, path } = props;
+  return <ClozePromptContent key={JSON.stringify([q.id, q.prompt, q.blanks, path])} {...props} />;
+}
+
+/** Keep Obsidian's full Markdown render, placing controls only at the named gaps. */
+function ClozePromptContent({
+  services,
+  question: q,
+  answer,
+  path,
+  label,
+  locked,
+  onChange,
+  mark,
+}: ClozePromptProps) {
+  let prefix = 'QARDCLOZESLOT';
+  while (q.prompt.includes(prefix)) {
+    prefix += 'X';
+  }
+  const tokenPattern = new RegExp(`${prefix}(\\d+)END`, 'g');
+  const text = q.prompt.replace(/\{\{([^{}]+)\}\}/g, (token, id: string) => {
+    const index = q.blanks?.findIndex((blank) => blank.id === id) ?? -1;
+    return index < 0 ? token : `${prefix}${index}END`;
+  });
   const ref = useRef<HTMLDivElement>(null);
   const [slots, setSlots] = useState<{ id: string; target: HTMLElement }[]>([]);
   useEffect(() => {
@@ -228,25 +245,22 @@ export function ClozePrompt({
       const nodes: Text[] = [];
       while (walker.nextNode()) {
         const node = walker.currentNode as Text;
-        if (
-          !node.parentElement?.closest('.qard-cloze-slot') &&
-          /\{\{([^{}]+)\}\}/.test(node.data)
-        ) {
+        if (!node.parentElement?.closest('.qard-cloze-slot') && node.data.includes(prefix)) {
           nodes.push(node);
         }
       }
       for (const node of nodes) {
         const fragment = createFragment();
         let end = 0;
-        for (const match of node.data.matchAll(/\{\{([^{}]+)\}\}/g)) {
-          const id = match[1]!;
-          if (!q.blanks?.some((blank) => blank.id === id)) {
+        for (const match of node.data.matchAll(tokenPattern)) {
+          const blank = q.blanks?.[Number(match[1])];
+          if (!blank) {
             continue;
           }
           fragment.append(node.data.slice(end, match.index));
           const target = host.createSpan({ cls: 'qard-cloze-slot' });
           fragment.append(target);
-          targets.push({ id, target });
+          targets.push({ id: blank.id, target });
           end = match.index + match[0].length;
         }
         if (end) {
@@ -266,13 +280,16 @@ export function ClozePrompt({
     observer.observe(host, { childList: true, subtree: true });
     place();
     return () => observer.disconnect();
-  }, [q.prompt, q.blanks]);
+  }, [text, prefix]);
   return (
     <div className="qard-q-prompt" ref={ref}>
-      <Markdown text={q.prompt} path={path} services={services} />
+      <Markdown text={text} path={path} services={services} />
       {slots.map(({ id, target }, i) => {
         const index = q.blanks!.findIndex((blank) => blank.id === id);
-        const blank = q.blanks![index]!;
+        const blank = q.blanks?.[index];
+        if (!blank || !ref.current?.contains(target)) {
+          return null;
+        }
         const correct = !!mark?.awarded[index];
         return createPortal(
           mark ? (
@@ -292,9 +309,11 @@ export function ClozePrompt({
               value={blankAnswer(answer, id)}
               disabled={locked}
               autoComplete="off"
-              onChange={(event) =>
-                onChange?.({ blanks: { ...answer?.blanks, [id]: event.target.value } })
-              }
+              onChange={(event) => {
+                if (!locked && ref.current?.contains(target)) {
+                  onChange?.({ blanks: { ...answer?.blanks, [id]: event.target.value } });
+                }
+              }}
             />
           ),
           target,

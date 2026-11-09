@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { act } from 'preact/test-utils';
+import { marked } from 'marked';
 import { createRoot, type Root } from 'react-dom/client';
 import { beforeEach, afterEach, expect, it, vi } from 'vitest';
 import { Component, MarkdownRenderer } from 'obsidian';
@@ -470,4 +471,176 @@ it('supports prototype-named blank IDs without inherited answers or completion c
   });
   expect(answered(question, answer)).toBe(true);
   expect(markCloze(question, answer)).toMatchObject({ score: 2, awarded: [true, true] });
+});
+
+it('keeps Markdown-sensitive blank IDs editable with the real Markdown parser', async () => {
+  const renderer = vi
+    .spyOn(MarkdownRenderer, 'render')
+    .mockImplementation(async (_app, text, el) => {
+      el.innerHTML = await marked.parse(text);
+    });
+  const question: Question = {
+    ...cloze,
+    prompt: '**Recall** {{_term_}}, {{__term__}}, and {{__proto__}}. QARDCLOZESLOT0END',
+    blanks: ['_term_', '__term__', '__proto__'].map((id) => ({ id, answers: ['oak', 'tree'] })),
+  };
+  let answer: AnswerState = {};
+  const render = () =>
+    root.render(
+      <AnswerInput
+        services={services}
+        question={{ ...question, blanks: question.blanks?.map((blank) => ({ ...blank })) }}
+        answer={answer}
+        locked={false}
+        path="Notes/HMM.md"
+        label="Question 1"
+        onChange={(patch) => {
+          answer = { ...answer, ...patch };
+          render();
+        }}
+      />,
+    );
+  try {
+    await act(async () => render());
+    await tick();
+    expect(host.querySelector('.qard-q-prompt strong')?.textContent).toBe('Recall');
+    const inputs = [...host.querySelectorAll<HTMLInputElement>('.qard-cloze-input')];
+    expect(inputs).toHaveLength(3);
+    expect(host.textContent).toContain('QARDCLOZESLOT0END');
+    for (const input of inputs) {
+      await act(async () => {
+        input.value = 'tree';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+    }
+    expect(host.querySelectorAll('.qard-cloze-input')).toHaveLength(3);
+    expect(Object.keys(answer.blanks!)).toEqual(['_term_', '__term__', '__proto__']);
+    expect(answered(question, answer)).toBe(true);
+    expect(markCloze(question, answer).awarded).toEqual([true, true, true]);
+  } finally {
+    renderer.mockRestore();
+  }
+});
+
+it('replaces marked cloze slots when navigating between questions with different blank IDs', async () => {
+  for (const id of ['first', 'second']) {
+    const question: Question = {
+      ...cloze,
+      id,
+      prompt: `The {{${id}}} is a tree.`,
+      blanks: [{ id, answers: ['oak'] }],
+    };
+    await act(async () =>
+      root.render(
+        <MarkedAnswer
+          services={services}
+          question={question}
+          answer={{ blanks: { [id]: id } }}
+          mark={{
+            score: 0,
+            awarded: [false],
+            annotations: [],
+            mistake: 'incomplete',
+            feedback: '',
+          }}
+          path="Notes/HMM.md"
+        />,
+      ),
+    );
+    await tick();
+    expect(host.querySelector('.qard-cloze-slot')?.textContent).toBe(
+      `${id} — Incorrect; expected: oak`,
+    );
+    expect(host.querySelectorAll('.qard-cloze-slot')).toHaveLength(1);
+  }
+});
+
+it('ignores detached cloze controls while the next question Markdown is rendering', async () => {
+  const onChange = vi.fn();
+  const render = (question: Question) =>
+    root.render(
+      <AnswerInput
+        services={services}
+        question={question}
+        locked={false}
+        path="Notes/HMM.md"
+        label="Question 1"
+        onChange={onChange}
+      />,
+    );
+  await act(async () => render(cloze));
+  await tick();
+  const previous = host.querySelector<HTMLInputElement>('.qard-cloze-input')!;
+  let finish!: () => void;
+  const renderer = vi.spyOn(MarkdownRenderer, 'render').mockImplementation(
+    (_app, text, el) =>
+      new Promise<void>((resolve) => {
+        finish = () => {
+          el.textContent = text;
+          resolve();
+        };
+      }),
+  );
+  try {
+    await act(async () =>
+      render({
+        ...cloze,
+        id: 'next',
+        prompt: 'The {{next}} is a tree.',
+        blanks: [{ id: 'next', answers: ['oak'] }],
+      }),
+    );
+    await act(async () => {
+      previous.value = 'stale';
+      previous.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    expect(onChange).not.toHaveBeenCalled();
+    await act(async () => finish());
+    await tick();
+    expect(host.querySelectorAll('.qard-cloze-input')).toHaveLength(1);
+    expect(host.querySelector<HTMLInputElement>('.qard-cloze-input')?.value).toBe('');
+  } finally {
+    renderer.mockRestore();
+  }
+});
+
+it('ignores a late Markdown render from a previous cloze question with the same blank IDs', async () => {
+  let finish!: () => void;
+  const renderer = vi.spyOn(MarkdownRenderer, 'render').mockImplementation((_app, text, el) => {
+    if (text.startsWith('Previous')) {
+      return new Promise<void>((resolve) => {
+        finish = () => {
+          el.textContent = text;
+          resolve();
+        };
+      });
+    }
+    el.textContent = text;
+    return Promise.resolve();
+  });
+  const render = (id: string) =>
+    root.render(
+      <AnswerInput
+        services={services}
+        question={{ ...cloze, id, prompt: `${id} {{method}}` }}
+        answer={{ blanks: { method: id } }}
+        locked={false}
+        path="Notes/HMM.md"
+        label={id}
+        onChange={() => {}}
+      />,
+    );
+  try {
+    await act(async () => render('Previous'));
+    await act(async () => render('Current'));
+    await tick();
+    await act(async () => finish());
+    await tick();
+    expect(host.textContent).toContain('Current');
+    expect(host.textContent).not.toContain('Previous');
+    expect(host.querySelectorAll('.qard-cloze-input')).toHaveLength(1);
+    expect(host.querySelector<HTMLInputElement>('.qard-cloze-input')?.value).toBe('Current');
+  } finally {
+    renderer.mockRestore();
+  }
 });
