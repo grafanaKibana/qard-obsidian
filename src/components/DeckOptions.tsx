@@ -40,6 +40,7 @@ export function DeckOptions({
     color = colorDraft ?? own.color ?? '';
   const iconsId = useId();
   const icons = useMemo(() => getIconIds().sort(), []);
+  const iconOptions = useMemo(() => icons.map((id) => <option key={id} value={id} />), [icons]);
   const unavailable = !!icon.trim() && !getIcon(icon.trim());
   // What applies when this deck sets nothing of its own.
   const parent = deckLineage(name)[1];
@@ -173,11 +174,7 @@ export function DeckOptions({
               : 'Choose a registered icon name, such as terminal or network.'}
           </small>
         </label>
-        <datalist id={iconsId}>
-          {icons.map((id) => (
-            <option key={id} value={id} />
-          ))}
-        </datalist>
+        <datalist id={iconsId}>{iconOptions}</datalist>
         <button disabled={busy || !icon} onClick={() => setIcon('')}>
           Automatic icon
         </button>
