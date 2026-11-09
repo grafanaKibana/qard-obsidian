@@ -5235,15 +5235,15 @@ body.qard-focus-active .status-bar {
 .qard-resume.is-static {
   display: flex;
   align-items: center;
-  margin-bottom: 0;
-  padding: 10px 16px;
-  border-radius: 10px;
+  margin-bottom: var(--qard-gap-actions);
+  padding: var(--qard-space-3) var(--qard-space-4);
+  border-radius: var(--qard-radius-floating);
   background: var(--qard-soft);
 }
 
 .qard-resume.is-static .qard-waiting {
   margin: 0;
-  font-size: var(--qard-font-meta);
+  font-size: var(--qard-font-control);
   line-height: 1.5;
 }
 
