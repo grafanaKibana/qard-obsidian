@@ -5,6 +5,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { DeckBrowser } from '../src/components/DeckBrowser';
 import { DeckOptions } from '../src/components/DeckOptions';
+import { TopicBrowser } from '../src/components/TopicBrowser';
 import { parseCards } from '../src/cards/parser';
 import { serializeCard } from '../src/cards/source-patch';
 import { buildDecks } from '../src/decks/deck-index';
@@ -504,3 +505,32 @@ it.each(['terminal', 'network', 'enter'])(
     expect(lookup).not.toHaveBeenCalled();
   },
 );
+
+it.each([
+  ['Biology::Cells', 'terminal', '#123456'],
+  ['History::Cells', 'network', '#654321'],
+])('looks up header appearance by full deck name %s', (name, icon, color) => {
+  const deck = buildDecks([card('a', name)])[0]!;
+  act(() =>
+    root.render(
+      <TopicBrowser
+        deck={deck}
+        deckOptions={{
+          'Biology::Cells': { icon: 'terminal', color: '#123456' },
+          'History::Cells': { icon: 'network', color: '#654321' },
+        }}
+        select={vi.fn()}
+        study={vi.fn()}
+        create={vi.fn()}
+      />,
+    ),
+  );
+  expect(host.querySelector('.qard-deck-identity [data-icon]')?.getAttribute('data-icon')).toBe(
+    icon,
+  );
+  expect(
+    host
+      .querySelector<HTMLElement>('.qard-deck-identity .qard-deck-badge')!
+      .style.getPropertyValue('--qard-course'),
+  ).toBe(color);
+});

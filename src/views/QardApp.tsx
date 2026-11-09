@@ -1,4 +1,3 @@
-import { deckAppearance } from '../decks/deck-options';
 import { failureDays, needsRepair } from '../review/card-repair';
 import { AI_SCREENS, type Screen } from './navigation';
 import { SavedSessions } from '../components/SavedSessions';
@@ -633,7 +632,7 @@ export function QardApp({ services, request }: { services: QardServices; request
             (deck ? (
               <>
                 <TopicBrowser
-                  appearance={deckAppearance(reviews.settings, deck.name)}
+                  deckOptions={reviews.settings.deckOptions}
                   back={library}
                   resume={<SavedSessions services={services} resume={resume} deck={deck.name} />}
                   states={reviews.states}
