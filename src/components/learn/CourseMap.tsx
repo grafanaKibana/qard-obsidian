@@ -16,6 +16,7 @@ import {
 import {
   useCallback,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -96,7 +97,11 @@ export function CourseMap({
     [expanded, setExpanded] = useState(false);
   const [view, setView] = useState({ x: 0, y: 0, k: 1 }),
     [animate, setAnimate] = useState(false);
+  const mapId = useId();
+  const nodeId = (id: string) => `${mapId}-node-${encodeURIComponent(id)}`;
   const box = useRef<HTMLDivElement>(null),
+    overlay = useRef<HTMLDivElement>(null),
+    keyboardFocus = useRef<string | undefined>(undefined),
     search = useRef<HTMLInputElement>(null),
     expandButton = useRef<HTMLButtonElement>(null),
     wasExpanded = useRef(expanded),
@@ -115,6 +120,10 @@ export function CourseMap({
         : layoutTopic(course, grouped ? topic : undefined),
     [atTopics, topics, course, grouped, topic],
   );
+  const firstNode = atTopics
+    ? topics[0]?.key
+    : [...layout.nodes.keys()].find((id) => !id.startsWith('@'));
+  const activeNode = cursor ?? (atTopics ? undefined : selected) ?? firstNode;
   const topicOf = useCallback((id: string) => topicKey(byId.get(id)?.group), [byId]);
   const dependents = useMemo(() => {
     const m = new Map<string, string[]>();
@@ -252,6 +261,43 @@ export function CourseMap({
     el.addEventListener('wheel', wheel, { passive: false });
     return () => el.removeEventListener('wheel', wheel);
   }, [zoomAt, expanded]);
+
+  useEffect(() => {
+    const id = keyboardFocus.current;
+    if (id) {
+      keyboardFocus.current = undefined;
+      box.current?.ownerDocument.getElementById(nodeId(id))?.focus();
+    }
+  }, [cursor, selected, topic, expanded]);
+  useEffect(() => {
+    const dialog = overlay.current;
+    if (!expanded || !dialog) {
+      return;
+    }
+    const background = [...dialog.ownerDocument.body.children]
+      .filter((child) => child !== dialog)
+      .map((child) => ({ child, inert: child.getAttribute('inert') }));
+    for (const { child } of background) {
+      child.setAttribute('inert', '');
+    }
+    const keepFocus = (event: FocusEvent) => {
+      if (!dialog.contains(event.target as Node)) {
+        expandButton.current?.focus();
+      }
+    };
+    dialog.ownerDocument.addEventListener('focusin', keepFocus);
+    return () => {
+      dialog.ownerDocument.removeEventListener('focusin', keepFocus);
+      for (const { child, inert } of background) {
+        if (inert === null) {
+          child.removeAttribute('inert');
+        } else {
+          child.setAttribute('inert', inert);
+        }
+      }
+    };
+  }, [expanded]);
+
   useEffect(() => {
     if (wasExpanded.current !== expanded) {
       wasExpanded.current = expanded;
@@ -259,7 +305,60 @@ export function CourseMap({
     }
   }, [expanded]);
 
-  const enter = (key: string | undefined) => {
+  function dialogKey(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      event.stopPropagation();
+      setExpanded(false);
+      return;
+    }
+    if (event.key !== 'Tab' || !overlay.current) {
+      return;
+    }
+    const dialog = overlay.current;
+    const controls = [
+      ...dialog.querySelectorAll<HTMLElement>(
+        'button, input, select, textarea, a[href], [tabindex]',
+      ),
+    ].filter((element) => {
+      if (
+        element.tabIndex < 0 ||
+        element.matches(':disabled') ||
+        element.closest('[hidden], [inert]')
+      ) {
+        return false;
+      }
+      for (
+        let parent: Element | null = element;
+        parent && parent !== dialog;
+        parent = parent.parentElement
+      ) {
+        const style = dialog.ownerDocument.defaultView?.getComputedStyle(parent);
+        if (style?.display === 'none' || style?.visibility === 'hidden') {
+          return false;
+        }
+      }
+      return true;
+    });
+    const first = controls[0],
+      last = controls.at(-1);
+    const active = dialog.ownerDocument.activeElement;
+    if (
+      (event.shiftKey && active === first) ||
+      (!event.shiftKey && active === last) ||
+      !dialog.contains(active)
+    ) {
+      event.preventDefault();
+      (event.shiftKey ? last : first)?.focus();
+    }
+  }
+
+  const enter = (key: string | undefined, keyboard = false) => {
+    if (keyboard) {
+      keyboardFocus.current = key
+        ? course.objectives.find((objective) => topicKey(objective.group) === key)?.id
+        : topics[0]?.key;
+    }
     setTopic(key);
     setHovered(undefined);
     setCursor(undefined);
@@ -349,6 +448,9 @@ export function CourseMap({
     !passes(byId.get(id)!);
 
   function onKey(e: KeyboardEvent) {
+    if (expanded && e.key === 'Escape') {
+      return;
+    }
     if ((e.target as HTMLElement).tagName === 'INPUT') {
       if (e.key === 'Escape') {
         setQuery('');
@@ -356,16 +458,19 @@ export function CourseMap({
       }
       return;
     }
-    const current = atTopics ? cursor : selected,
+    if (e.target !== box.current && !(e.target as Element).closest('.qard-map-node')) {
+      return;
+    }
+    const current = activeNode,
       p = current ? layout.nodes.get(current) : undefined;
     const move = (id?: string) => {
       if (!id) {
         return;
       }
       e.preventDefault();
-      if (atTopics) {
-        setCursor(id);
-      } else if (!id.startsWith('@')) {
+      keyboardFocus.current = id;
+      setCursor(id);
+      if (!atTopics && !id.startsWith('@')) {
         open(id, true);
       }
     };
@@ -376,12 +481,13 @@ export function CourseMap({
       if (selected) {
         open(undefined);
       } else if (grouped && !atTopics) {
-        enter(undefined);
+        enter(undefined, true);
       } else if (expanded) {
         setExpanded(false);
       }
-    } else if (e.key === 'Enter' && atTopics && cursor) {
-      enter(cursor);
+    } else if ((e.key === 'Enter' || e.key === ' ') && atTopics && activeNode) {
+      e.preventDefault();
+      enter(activeNode, true);
     } else if (e.key === '+' || e.key === '=') {
       zoomBy(1.25);
     } else if (e.key === '-') {
@@ -525,7 +631,8 @@ export function CourseMap({
         <div
           className="qard-map-frame"
           ref={box}
-          tabIndex={0}
+          tabIndex={-1}
+          role="group"
           onPointerDown={pointerDown}
           onPointerMove={pointerMove}
           onPointerUp={pointerUp}
@@ -614,10 +721,14 @@ export function CourseMap({
                     return (
                       <g
                         key={t.key}
+                        id={nodeId(t.key)}
                         className={names}
                         transform={`translate(${p.x},${p.y})`}
                         role="button"
-                        tabIndex={-1}
+                        ref={(node) => {
+                          node?.setAttribute('tabindex', activeNode === t.key ? '0' : '-1');
+                        }}
+                        onFocus={() => setCursor(t.key)}
                         aria-label={`${t.name}: ${t.learned} of ${total} learned, ${t.mastered} mastered${t.warnings ? `, ${t.warnings} to fix` : ''}${t.ready ? `, ${t.ready} ready to learn` : ''}`}
                         onPointerEnter={() => setHovered(t.key)}
                         onPointerLeave={() => setHovered((x) => (x === t.key ? undefined : x))}
@@ -729,10 +840,21 @@ export function CourseMap({
                     return (
                       <g
                         key={p.id}
+                        id={nodeId(p.id)}
                         className={names}
                         transform={`translate(${p.x},${p.y})`}
                         role="button"
-                        tabIndex={-1}
+                        ref={(node) => {
+                          node?.setAttribute('tabindex', activeNode === o.id ? '0' : '-1');
+                        }}
+                        onFocus={() => setCursor(o.id)}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            open(selected === o.id ? undefined : o.id);
+                          }
+                        }}
                         aria-pressed={selected === o.id}
                         aria-label={`${o.title}: ${STATE_LABEL[o.state]}${ready.has(o.id) ? ', ready to learn' : ''}${inProgress.has(o.id) ? ', lesson in progress' : ''}`}
                         onPointerEnter={() => setHovered(o.id)}
@@ -940,7 +1062,14 @@ export function CourseMap({
   );
   return expanded && box.current
     ? createPortal(
-        <div className="qard-root qard-map-overlay">
+        <div
+          ref={overlay}
+          className="qard-root qard-map-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${course.course} course map`}
+          onKeyDown={dialogKey}
+        >
           <div className="qard-app">{map}</div>
         </div>,
         box.current.ownerDocument.body,

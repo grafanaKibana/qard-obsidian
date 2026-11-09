@@ -1,5 +1,5 @@
-import { useRef, useState, type PointerEvent } from 'react';
-import { ImagePlus, Undo2, Trash2 } from 'lucide-react';
+import { useId, useRef, useState, type PointerEvent } from 'react';
+import { ImagePlus, Plus, Undo2, Trash2 } from 'lucide-react';
 import { IMAGE_EXTENSIONS, type ImageMask, type ImageOcclusion } from '../cards/card-format';
 import { attachImage, imageResource } from '../cards/image-attachment';
 import type { QardServices } from '../views/services';
@@ -30,7 +30,9 @@ export function OcclusionEditor({
 }) {
   const stage = useRef<HTMLDivElement>(null),
     picker = useRef<HTMLInputElement>(null),
+    focusMask = useRef<string | undefined>(undefined),
     gesture = useRef<Gesture | null>(null);
+  const instructions = useId();
   const [draft, setDraft] = useState<ImageMask | null>(null),
     [selected, setSelected] = useState<string>(),
     [filter, setFilter] = useState(''),
@@ -150,6 +152,15 @@ export function OcclusionEditor({
     change({ ...value, masks, target: value.target === id ? masks[0]?.id : value.target });
     setSelected(undefined);
   }
+  function addMask() {
+    if (!ready || uploading || value.masks.length >= 100) {
+      return;
+    }
+    const mask = { id: crypto.randomUUID(), x: 0.4, y: 0.4, width: 0.2, height: 0.2 };
+    focusMask.current = mask.id;
+    setSelected(mask.id);
+    change({ ...value, masks: [...value.masks, mask] });
+  }
   const masks = draft
     ? value.masks.some((mask) => mask.id === draft.id)
       ? value.masks.map((mask) => (mask.id === draft.id ? draft : mask))
@@ -242,8 +253,15 @@ export function OcclusionEditor({
               masks.map((mask, index) => (
                 <button
                   key={mask.id}
+                  ref={(element) => {
+                    if (element && focusMask.current === mask.id) {
+                      focusMask.current = undefined;
+                      element.focus();
+                    }
+                  }}
                   type="button"
                   aria-label={`Mask ${index + 1}`}
+                  aria-describedby={instructions}
                   aria-pressed={selected === mask.id}
                   className={
                     'qard-image-mask qard-edit-mask' +
@@ -335,11 +353,19 @@ export function OcclusionEditor({
         )}
       </div>
       <div className="qard-format-tools">
-        <span className="qard-muted">
-          {value.masks.length} {value.masks.length === 1 ? 'mask' : 'masks'} · Drag to draw, move,
-          or resize
+        <span id={instructions} className="qard-muted">
+          {value.masks.length} {value.masks.length === 1 ? 'mask' : 'masks'} · Add a mask or drag to
+          draw. Use arrow keys to move a selected mask and Width or Height to resize.
         </span>
         <div className="qard-actions">
+          <button
+            type="button"
+            disabled={!ready || uploading || value.masks.length >= 100}
+            onClick={addMask}
+          >
+            <Plus size={14} />
+            Add mask
+          </button>
           <button
             type="button"
             disabled={!value.masks.length}

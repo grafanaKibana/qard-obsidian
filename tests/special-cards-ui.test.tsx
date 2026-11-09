@@ -308,6 +308,89 @@ it('draws normalized masks, preserves them across resizing, and supports keyboar
   });
   expect(value.masks).toHaveLength(0);
 });
+it('adds and focuses a mask without dragging, supports keyboard placement, and respects image readiness and limits', async () => {
+  let value: ImageOcclusion = { image: '', masks: [] };
+  let uploading = false;
+  const render = () =>
+    root.render(
+      <OcclusionEditor
+        value={value}
+        change={(next) => {
+          value = next;
+          render();
+        }}
+        services={services}
+        path="Qard/Cards.md"
+        uploading={uploading}
+        setUploading={vi.fn()}
+        editing={true}
+      />,
+    );
+  await act(async () => render());
+  expect(button('Add mask').disabled).toBe(true);
+  await act(async () => {
+    value = { ...value, image: diagram.path };
+    render();
+  });
+  expect(button('Add mask').disabled).toBe(true);
+  await act(async () => {
+    host.querySelector('img')!.dispatchEvent(new Event('load'));
+  });
+  expect(button('Add mask').disabled).toBe(false);
+  await act(async () => {
+    uploading = true;
+    render();
+  });
+  expect(button('Add mask').disabled).toBe(true);
+  await act(async () => {
+    uploading = false;
+    render();
+  });
+  await click(button('Add mask'));
+  const mask = host.querySelector<HTMLButtonElement>('.qard-edit-mask')!;
+  expect(value.masks).toEqual([
+    { id: expect.any(String), x: 0.4, y: 0.4, width: 0.2, height: 0.2 },
+  ]);
+  expect(document.activeElement).toBe(mask);
+  expect(mask.getAttribute('aria-pressed')).toBe('true');
+  expect(document.getElementById(mask.getAttribute('aria-describedby')!)?.textContent).toContain(
+    'Use arrow keys',
+  );
+  await act(async () => {
+    mask.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    mask.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowUp', shiftKey: true, bubbles: true }),
+    );
+  });
+  expect(value.masks[0]?.x).toBeCloseTo(0.405);
+  expect(value.masks[0]?.y).toBeCloseTo(0.38);
+  await input(host.querySelector<HTMLInputElement>('input[type=number]')!, '30');
+  expect(value.masks[0]?.width).toBeCloseTo(0.3);
+  const target = value.masks[0]!.id;
+  await act(async () => {
+    value = { ...value, target };
+    render();
+  });
+  await click(button('Add mask'));
+  expect(value.masks).toHaveLength(2);
+  expect(value.target).toBe(target);
+  expect(document.activeElement?.getAttribute('aria-label')).toBe('Mask 2');
+  await act(async () => {
+    value = {
+      ...value,
+      masks: Array.from({ length: 100 }, (_, index) => ({
+        ...value.masks[0]!,
+        id: `mask-${index}`,
+      })),
+    };
+    render();
+  });
+  expect(button('Add mask').disabled).toBe(true);
+  await act(async () => {
+    host.querySelector('img')!.dispatchEvent(new Event('error'));
+  });
+  expect(button('Add mask').disabled).toBe(true);
+});
 it('creates one card per mask or a combined card without changing the rating model', async () => {
   // An initial format draft is also used by the selection/create workflow.
   await act(async () =>

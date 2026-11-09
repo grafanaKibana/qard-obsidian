@@ -261,9 +261,36 @@ function QuestionBlock({
               key={i}
               role="radio"
               aria-checked={answer?.choice === i}
+              tabIndex={!locked && !answer?.unknown && (answer?.choice ?? 0) === i ? 0 : -1}
               disabled={locked || !!answer?.unknown}
               className={'qard-option' + (answer?.choice === i ? ' is-on' : '')}
               onClick={() => set({ choice: i })}
+              onKeyDown={(event) => {
+                if (locked || answer?.unknown) {
+                  return;
+                }
+                const count = q.options!.length;
+                const next =
+                  event.key === 'ArrowRight' || event.key === 'ArrowDown'
+                    ? (i + 1) % count
+                    : event.key === 'ArrowLeft' || event.key === 'ArrowUp'
+                      ? (i - 1 + count) % count
+                      : event.key === 'Home'
+                        ? 0
+                        : event.key === 'End'
+                          ? count - 1
+                          : undefined;
+                if (next === undefined) {
+                  return;
+                }
+                event.preventDefault();
+                set({ choice: next });
+                const controls =
+                  event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>(
+                    '[role="radio"]',
+                  );
+                controls?.[next]?.focus();
+              }}
             >
               <span className="qard-radio" aria-hidden="true" />
               <Markdown text={o} path={path} services={services} />

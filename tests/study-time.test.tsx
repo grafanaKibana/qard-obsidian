@@ -136,6 +136,30 @@ it('shows study time by course and activity', async () => {
     '35 min on DS346 in the last 30 days',
     '35 min studied today',
   ]);
+  const tabs = [...host.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+  const panel = host.querySelector<HTMLElement>('[role="tabpanel"]')!;
+  const key = async (value: string) => {
+    await act(async () => {
+      const selected = tabs.find((tab) => tab.tabIndex === 0)!;
+      selected.focus();
+      selected.dispatchEvent(new KeyboardEvent('keydown', { key: value, bubbles: true }));
+    });
+    const selected = tabs.find((tab) => tab.getAttribute('aria-selected') === 'true')!;
+    expect(document.activeElement).toBe(selected);
+    expect(tabs.filter((tab) => tab.tabIndex === 0)).toEqual([selected]);
+    expect(selected.getAttribute('aria-controls')).toBe(panel.id);
+    expect(panel.getAttribute('aria-labelledby')).toBe(selected.id);
+  };
+  expect(tabs.map((tab) => tab.tabIndex)).toEqual([-1, 0, -1, -1]);
+  await key('Home');
+  expect(host.querySelector('.qard-usage-total')!.textContent).toBe('35 mintoday');
+  await key('ArrowLeft');
+  expect(tabs[3]!.getAttribute('aria-selected')).toBe('true');
+  expect(host.querySelector('.qard-usage-total')!.textContent).toBe('50 minin total');
+  await key('ArrowRight');
+  expect(tabs[0]!.getAttribute('aria-selected')).toBe('true');
+  await key('End');
+  expect(tabs[3]!.getAttribute('aria-selected')).toBe('true');
   await act(async () => root.unmount());
   host.remove();
 });

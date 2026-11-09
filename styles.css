@@ -887,6 +887,7 @@
   --qard-muted: var(--text-muted, #747985);
   --qard-border: var(--background-modifier-border, #e8eaef);
   --qard-blue: #4263dc;
+  --qard-on-blue: #fff;
   --qard-tint: color-mix(in srgb, var(--qard-blue) 6%, var(--qard-bg));
 
   height: 100%;
@@ -898,6 +899,7 @@
 
 .theme-dark .qard-app {
   --qard-blue: #9aafff;
+  --qard-on-blue: #182040;
 }
 
 .qard-app * {
@@ -4577,6 +4579,11 @@ body.qard-focus-active .status-bar {
   filter: drop-shadow(0 4px 10px rgb(0 0 0 / 14%));
 }
 
+.qard-map-node:focus-visible .qard-map-card {
+  stroke: var(--qard-blue);
+  stroke-width: 3;
+}
+
 .qard-map-node.is-dim {
   opacity: 0.22;
 }
@@ -4586,7 +4593,7 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-map-step text {
-  fill: #fff;
+  fill: var(--qard-on-blue);
   font-size: 11px;
   font-weight: 700;
   font-family: var(--font-interface);
@@ -5237,6 +5244,13 @@ body.qard-focus-active .status-bar {
 
 .qard-usage .qard-heading {
   align-items: flex-end;
+}
+
+.qard-usage-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  min-width: 0;
 }
 
 .qard-usage-summary {

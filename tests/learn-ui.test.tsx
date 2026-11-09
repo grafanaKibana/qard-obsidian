@@ -432,7 +432,11 @@ it('the course map opens on topics, drills into one, and routes across topics', 
   expect(topic('Topic models').classList.contains('is-dim')).toBe(true);
   await click(buttons('Show all')[0]);
 
+  await act(async () => {
+    (topic('Topic models') as HTMLElement).focus();
+  });
   await click(topic('Topic models'));
+  expect(host.querySelector('.qard-map-panel')).toBeNull();
   expect(host.querySelector('.qard-map-crumb')?.textContent).toBe('Topic models');
   expect(
     [...host.querySelectorAll('.qard-map-node:not(.qard-map-stub) .qard-map-title')].map(
@@ -442,6 +446,10 @@ it('the course map opens on topics, drills into one, and routes across topics', 
   expect(host.querySelector('.qard-map-stub')?.getAttribute('aria-label')).toBe(
     'Builds on Text mining',
   );
+  await act(async () => {
+    host.querySelector<HTMLElement>('.qard-map-node[aria-label^="List the LDA"]')!.focus();
+  });
+  expect(host.querySelector('.qard-map-panel')).toBeNull();
   await click(host.querySelector('.qard-map-node[aria-label^="List the LDA"]'));
   let panel = host.querySelector('.qard-map-panel')!;
   expect(panel.querySelector('h3')?.textContent).toBe('List the LDA generative process');
@@ -520,6 +528,124 @@ it('the course map opens on topics, drills into one, and routes across topics', 
   expect(document.activeElement).toBe(host.querySelector('[aria-label="Full screen"]'));
   await click(buttons('List')[0]);
   expect(host.querySelectorAll('.qard-objective')).toHaveLength(4);
+});
+
+it('keeps expanded-map focus inside its dialog and exposes keyboard node focus', async () => {
+  files.set(
+    MASTERY,
+    `---\nqard-mastery: DS346\n---\n\n| Objective | ID | Group | State | Needs |\n| --- | --- | --- | --- | --- |\n| Bag of words | bow | Text mining | mastered | |\n| Parameter counts | params | Topic models | taught | bow |\n`,
+  );
+  await act(async () => {
+    root.render(<CourseView services={services} nav={nav} path={MASTERY} />);
+  });
+  await tick();
+  await tick();
+  const key = async (element: Element, value: string, shiftKey = false) => {
+    await act(async () => {
+      element.dispatchEvent(
+        new KeyboardEvent('keydown', { key: value, shiftKey, bubbles: true, cancelable: true }),
+      );
+    });
+  };
+  let mapTab = host.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')!;
+  expect(mapTab.textContent).toBe('Map');
+  expect(mapTab.tabIndex).toBe(0);
+  expect(host.querySelector<HTMLElement>('[role="tab"][aria-selected="false"]')!.tabIndex).toBe(-1);
+  await key(mapTab, 'ArrowRight');
+  let selectedTab = host.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')!;
+  expect(selectedTab.textContent).toBe('List');
+  expect(document.activeElement).toBe(selectedTab);
+  expect(host.querySelectorAll('.qard-objective')).toHaveLength(2);
+  expect(host.querySelector('[role="tabpanel"]')?.getAttribute('aria-labelledby')).toBe(
+    selectedTab.id,
+  );
+  expect(selectedTab.getAttribute('aria-controls')).toBe(
+    host.querySelector('[role="tabpanel"]')?.id,
+  );
+  await key(selectedTab, 'Home');
+  mapTab = host.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')!;
+  expect(mapTab.textContent).toBe('Map');
+  await key(mapTab, 'End');
+  selectedTab = host.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')!;
+  expect(selectedTab.textContent).toBe('List');
+  await key(selectedTab, 'Home');
+
+  const topics = [...host.querySelectorAll<HTMLElement>('.qard-topic-node')];
+  expect(topics[0]!.tabIndex).toBe(0);
+  expect(topics[1]!.tabIndex).toBe(-1);
+  topics[0]!.focus();
+  await key(topics[0]!, 'ArrowDown');
+  expect(document.activeElement).toBe(topics[1]);
+  expect(topics[0]!.tabIndex).toBe(-1);
+  expect(topics[1]!.tabIndex).toBe(0);
+  expect(topics[1]!.id).not.toBe(topics[0]!.id);
+  await key(topics[1]!, 'Enter');
+  const objective = host.querySelector<HTMLElement>('.qard-map-node:not(.qard-map-stub)')!;
+  expect(document.activeElement).toBe(objective);
+  expect(objective.getAttribute('aria-label')).toContain('Parameter counts');
+  expect(host.querySelector('.qard-map-panel')).toBeNull();
+  await key(objective, 'Enter');
+  expect(host.querySelector('.qard-map-panel h3')?.textContent).toBe('Parameter counts');
+  const search = host.querySelector<HTMLInputElement>('[aria-label="Find an objective"]')!;
+  search.focus();
+  const selected = host.querySelector('.qard-map-node.is-selected');
+  await key(search, 'ArrowLeft');
+  expect(document.activeElement).toBe(search);
+  expect(host.querySelector('.qard-map-node.is-selected')).toBe(selected);
+  const zoom = host.querySelector<HTMLButtonElement>('[aria-label="Zoom in"]')!;
+  zoom.focus();
+  await key(zoom, 'ArrowLeft');
+  expect(document.activeElement).toBe(zoom);
+  expect(host.querySelector('.qard-map-node.is-selected')).toBe(selected);
+
+  const alreadyInert = document.createElement('div');
+  alreadyInert.setAttribute('inert', 'existing');
+  document.body.append(alreadyInert);
+  const outside = document.createElement('button');
+  document.body.append(outside);
+  try {
+    await click(host.querySelector('[aria-label="Full screen"]'));
+    const dialog = document.querySelector<HTMLElement>('.qard-map-overlay')!;
+    expect(dialog.getAttribute('role')).toBe('dialog');
+    expect(dialog.getAttribute('aria-modal')).toBe('true');
+    expect(dialog.getAttribute('aria-label')).toBe('DS346 course map');
+    expect(host.hasAttribute('inert')).toBe(true);
+    const controls = [
+      ...dialog.querySelectorAll<HTMLElement>('button, input, [tabindex="0"]'),
+    ].filter((element) => !element.matches(':disabled'));
+    const first = controls[0]!,
+      last = controls.at(-1)!;
+    const disabled = document.createElement('button');
+    disabled.disabled = true;
+    dialog.append(disabled);
+    const hidden = document.createElement('button');
+    hidden.hidden = true;
+    dialog.append(hidden);
+    last.focus();
+    await key(last, 'Tab');
+    expect(document.activeElement).toBe(first);
+    await key(first, 'Tab', true);
+    expect(document.activeElement).toBe(last);
+    outside.focus();
+    expect(document.activeElement).toBe(dialog.querySelector('[aria-label="Exit full screen"]'));
+    const expandedSearch = dialog.querySelector<HTMLInputElement>(
+      '[aria-label="Find an objective"]',
+    )!;
+    expandedSearch.focus();
+    await key(expandedSearch, 'Escape');
+    expect(document.querySelector('.qard-map-overlay')).toBeNull();
+    expect(host.hasAttribute('inert')).toBe(false);
+    expect(alreadyInert.getAttribute('inert')).toBe('existing');
+    expect(document.activeElement).toBe(host.querySelector('[aria-label="Full screen"]'));
+    await click(host.querySelector('[aria-label="Full screen"]'));
+    await act(async () => root.render(null));
+    expect(document.querySelector('.qard-map-overlay')).toBeNull();
+    expect(host.hasAttribute('inert')).toBe(false);
+    expect(alreadyInert.getAttribute('inert')).toBe('existing');
+  } finally {
+    alreadyInert.remove();
+    outside.remove();
+  }
 });
 
 it('a lesson links to its place on the map, and the map continues it rather than starting another', async () => {

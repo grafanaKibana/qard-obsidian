@@ -1,7 +1,7 @@
 import { plural } from '../common/labels';
 import { UpdateCourse } from './UpdateCourse';
 import { teach } from './lesson-navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import type { QardServices } from '../../views/services';
 import type { Mastery, Objective } from '../../learn/mastery';
@@ -28,6 +28,7 @@ export function CourseView({
   objective?: string;
 }) {
   const { revision, job } = useLearn(services);
+  const tabsId = useId();
   const [course, setCourse] = useState<Mastery>(),
     [error, setError] = useState(''),
     [busy, setBusy] = useState<string>();
@@ -155,13 +156,40 @@ export function CourseView({
           <StudyTimeLine services={services} course={course.course} days={30} open={nav.time} />
         </div>
         <div className="qard-actions">
-          <div className="qard-segmented" role="tablist">
-            <button role="tab" aria-selected={view === 'map'} onClick={() => setView('map')}>
-              Map
-            </button>
-            <button role="tab" aria-selected={view === 'list'} onClick={() => setView('list')}>
-              List
-            </button>
+          <div className="qard-segmented" role="tablist" aria-label="Course view">
+            {(['map', 'list'] as const).map((mode, index) => (
+              <button
+                key={mode}
+                role="tab"
+                id={`${tabsId}-${mode}`}
+                aria-controls={`${tabsId}-panel`}
+                aria-selected={view === mode}
+                tabIndex={view === mode ? 0 : -1}
+                onClick={() => setView(mode)}
+                onKeyDown={(event) => {
+                  const next =
+                    event.key === 'ArrowRight' || event.key === 'ArrowLeft'
+                      ? 1 - index
+                      : event.key === 'Home'
+                        ? 0
+                        : event.key === 'End'
+                          ? 1
+                          : undefined;
+                  if (next === undefined) {
+                    return;
+                  }
+                  event.preventDefault();
+                  setView(next === 0 ? 'map' : 'list');
+                  const controls =
+                    event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>(
+                      '[role="tab"]',
+                    );
+                  controls?.[next]?.focus();
+                }}
+              >
+                {mode === 'map' ? 'Map' : 'List'}
+              </button>
+            ))}
           </div>
           <button onClick={() => setUpdating(true)}>Update objectives</button>
           <button
@@ -187,37 +215,44 @@ export function CourseView({
           {error}
         </p>
       )}
-      {view === 'map' ? (
-        <CourseMap
-          services={services}
-          course={course}
-          actions={mapActions}
-          filter={filter}
-          today={day}
-          lessons={lessons}
-          initial={objective}
-        />
-      ) : (
-        <section>
-          {course.objectives
-            .filter((o) => !filter.size || filter.has(o.state))
-            .map((o) => (
-              <div key={o.id} className="qard-objective">
-                <div className="qard-objective-main">
-                  <strong>
-                    <InlineMarkdown text={o.title} path={path} services={services} />
-                  </strong>
-                  <small className="qard-muted">{o.evidence.at(-1) ?? 'No evidence yet'}</small>
+      <div
+        role="tabpanel"
+        id={`${tabsId}-panel`}
+        aria-labelledby={`${tabsId}-${view}`}
+        tabIndex={0}
+      >
+        {view === 'map' ? (
+          <CourseMap
+            services={services}
+            course={course}
+            actions={mapActions}
+            filter={filter}
+            today={day}
+            lessons={lessons}
+            initial={objective}
+          />
+        ) : (
+          <section>
+            {course.objectives
+              .filter((o) => !filter.size || filter.has(o.state))
+              .map((o) => (
+                <div key={o.id} className="qard-objective">
+                  <div className="qard-objective-main">
+                    <strong>
+                      <InlineMarkdown text={o.title} path={path} services={services} />
+                    </strong>
+                    <small className="qard-muted">{o.evidence.at(-1) ?? 'No evidence yet'}</small>
+                  </div>
+                  <StateChip state={o.state} />
+                  <span className="qard-muted qard-objective-due">
+                    {o.due && !['new', 'planned'].includes(o.state) ? relativeDay(o.due, day) : ''}
+                  </span>
+                  {actions(o)}
                 </div>
-                <StateChip state={o.state} />
-                <span className="qard-muted qard-objective-due">
-                  {o.due && !['new', 'planned'].includes(o.state) ? relativeDay(o.due, day) : ''}
-                </span>
-                {actions(o)}
-              </div>
-            ))}
-        </section>
-      )}
+              ))}
+          </section>
+        )}
+      </div>
       {!course.objectives.length && (
         <p className="qard-muted">
           This mastery file has no objectives table. Open it and add rows, or update the objectives.
