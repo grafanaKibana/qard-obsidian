@@ -8,7 +8,8 @@ export const TEACHING = `How to teach:
 - Teach the student to understand the mechanism, retrieve it later, and apply it to a new case.
 - Start from relevant knowledge supported by their answers. Treat a lesson title or taught status as evidence of exposure, not proof of understanding.
 - State the conditions under which a rule holds. Preserve boundaries needed for correctness.
-- Before explaining a mechanism, define the target, inputs, outputs, units and unfamiliar terms. For predictions, say which entity and time period are involved and what is known when. Use a compact worked example appropriate to the subject: code for programming, concrete quantities or a specific decision for other subjects. Ask before explaining only when the answer follows from knowledge the student has already demonstrated.
+- Always illustrate the idea with a compact example. Prefer a simple, generic situation that makes the mechanism clear. Define unfamiliar terms and supply every premise needed to follow the reasoning. Add numbers, names, units or timing only when they affect the explanation. Work through calculations or code when the idea requires them.
+- Give enough context to identify what the example describes and why its conclusion follows, without turning every example into a detailed case study. Ask before explaining only when the answer follows from knowledge the student has already demonstrated.
 - Prefer concrete inputs, state changes, decisions and outputs. Use terminology after establishing what it means.
 - Ground explanations in the student's notes and link the supporting passage: [[path#Heading|label]], or [[path#^block-id|label]] when that block ID already exists. Verify the path and anchor; link to the note itself if it has no suitable anchor. Never invent headings or block IDs. Keep answer-revealing citations out of questions shown before an attempt. Where no supporting note exists, use standard, correct knowledge without fabricating a citation.
 - Explain only what is needed, without vague philosophical prose or length quotas. Plain, direct language. Short paragraphs. Markdown, with LaTeX in $…$.`;
@@ -165,7 +166,7 @@ The lesson's steps, written at the same time by other writers (planned scope, no
 ${steps}
 
 Write step ${index + 1} of ${map.steps.length}: "${step.title}". Why it is needed now: ${step.why}
-- explain: establish the idea from what the student already accepts, recalling a known foundation in a sentence rather than re-teaching it. Use only the content needed to understand this idea, with a compact concrete example and verified source links; no minimum length.
+- explain: establish the idea from what the student already accepts, recalling a known foundation in a sentence rather than re-teaching it. Always include a compact example with the context needed to follow its reasoning and verified source links. Prefer a generic situation; work through calculations or code when needed, without inventing irrelevant detail. No minimum length.
 - connect: how it links to the previous step and the goal.
 - checkFirst: true only when the check follows from knowledge the student has already demonstrated, without facts introduced by this step's explanation. The check is then asked first, as a prediction. Otherwise false.
 - check: one question (id "k${index + 1}") that shows whether the step landed, worth 1–4 marks.${lesson.objective ? ` Set objective to "${lesson.objective}".` : ''}
