@@ -983,11 +983,11 @@ describe('learning service', () => {
       vault: undefined,
       effort: 'high',
     });
-    expect(
-      t.calls.find(
-        (c) => c.task.schema === stepReviewSchema && c.task.prompt.includes('Candidate'),
-      )!.task.prompt,
-    ).toContain('# Topic Models');
+    for (const call of t.calls.filter(
+      (c) => c.task.schema === stepReviewSchema && c.task.prompt.includes('Candidate'),
+    )) {
+      expect(call.task.prompt.split('# Topic Models')).toHaveLength(2);
+    }
 
     approve!({ issues: [] });
     await vi.waitFor(() => expect(t.learn.lessonAt(path)!.steps[0]?.title).toBe('Candidate 2'));
@@ -1516,12 +1516,14 @@ describe('learning service', () => {
     expect(
       t.calls
         .filter((call) => call.task.schema === questionsSchema)
-        .every((call) => call.task.prompt.includes('# Topic Models')),
+        .every((call) => call.task.prompt.split('# Topic Models').length === 2),
     ).toBe(true);
     expect(
       t.calls
         .filter((call) => call.task.schema === stepReviewSchema)
-        .every((call) => call.role === 'marker' && call.task.prompt.includes('# Topic Models')),
+        .every(
+          (call) => call.role === 'marker' && call.task.prompt.split('# Topic Models').length === 2,
+        ),
     ).toBe(true);
     approve({ issues: [] });
     const path = await first;
@@ -1865,6 +1867,13 @@ describe('learning service', () => {
         .filter((call) => call.task.schema === probeSchema)
         .every((call) => call.role === 'writer'),
     ).toBe(true);
+    const attempts = t.calls.filter(
+      (call) => call.task.schema === probeSchema || call.task.schema === stepReviewSchema,
+    );
+    expect(attempts).toHaveLength(4);
+    for (const call of attempts) {
+      expect(call.task.prompt.split('# Topic Models')).toHaveLength(2);
+    }
     t.replies.length = 0;
     t.reply(probeSchema, () => ({ questions: [mcq('bad')], note: 'Rejected.' }));
     t.reply(stepReviewSchema, () => ({ issues: ['Still reveals the answer.'] }));

@@ -1102,7 +1102,6 @@ export class LearnService {
             (sources ? `\n<source_text>\n${sources}\n</source_text>` : ''),
           schema: questionsSchema,
         },
-        sources,
       );
       const latestCourse = await this.course(mastery);
       if (signal.aborted || this.isRemoved(mastery) || (existing && this.isRemoved(existing))) {
@@ -1494,7 +1493,6 @@ export class LearnService {
           effort: 'low',
         },
         readProbe,
-        sources,
       );
       const questions = result.questions.slice(0, 4).map((q) => ({
         ...q,
