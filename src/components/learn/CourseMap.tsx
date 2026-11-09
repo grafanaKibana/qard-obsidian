@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { masteryNodeClass as cls } from './course-map-style';
 import { IN } from '../../learn/course-graph';
 import type { Topic, PlacedNode } from '../../learn/course-graph';
@@ -97,6 +98,8 @@ export function CourseMap({
     [animate, setAnimate] = useState(false);
   const box = useRef<HTMLDivElement>(null),
     search = useRef<HTMLInputElement>(null),
+    expandButton = useRef<HTMLButtonElement>(null),
+    wasExpanded = useRef(expanded),
     drag = useRef<{ x: number; y: number; vx: number; vy: number; moved: boolean } | undefined>(
       undefined,
     ),
@@ -137,9 +140,9 @@ export function CourseMap({
       window.setTimeout(() => setAnimate(false), 320);
     }
   }, []);
-  /** Frames the given nodes (all by default), leaving room for the toolbars and the side panel. */
+  /** Frames the given nodes (all by default) within the canvas. */
   const frame = useCallback(
-    (ids?: string[], smooth = true, panel = false) => {
+    (ids?: string[], smooth = true) => {
       const el = box.current;
       if (!el || !el.clientWidth) {
         return;
@@ -155,8 +158,8 @@ export function CourseMap({
         minY = Math.min(...points.map((p) => p.y)) - 16;
       const maxX = Math.max(...points.map((p) => p.x + w)) + 16,
         maxY = Math.max(...points.map((p) => p.y + h)) + 16;
-      const top = 60,
-        width = el.clientWidth - (panel ? 336 : 0) - 32,
+      const top = 20,
+        width = el.clientWidth - 32,
         height = el.clientHeight - top - 20;
       const fitted = Math.min(1, width / (maxX - minX), height / (maxY - minY)),
         k = Math.max(fitted, 0.6);
@@ -197,7 +200,7 @@ export function CourseMap({
       const k = Math.max(view.k, 0.9);
       moveTo({
         k,
-        x: (el.clientWidth - 320) / 2 - (p.x + layout.size.w / 2) * k,
+        x: el.clientWidth / 2 - (p.x + layout.size.w / 2) * k,
         y: el.clientHeight / 2 - (p.y + layout.size.h / 2) * k,
       });
     },
@@ -205,8 +208,8 @@ export function CourseMap({
   );
 
   // Each level opens framed; an objective chosen from another topic is focused once its topic is drawn.
-  const latest = useRef({ focus, frame });
-  latest.current = { focus, frame };
+  const latest = useRef({ focus, frame, selected });
+  latest.current = { focus, frame, selected };
   useEffect(() => {
     const id = pending.current;
     pending.current = undefined;
@@ -216,6 +219,22 @@ export function CourseMap({
       latest.current.frame(undefined, false);
     }
   }, [layout, expanded]);
+  useEffect(() => {
+    const el = box.current;
+    if (!el || typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    const observer = new ResizeObserver(() => {
+      const current = latest.current;
+      if (current.selected) {
+        current.focus(current.selected);
+      } else {
+        current.frame(undefined, false);
+      }
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [expanded]);
   useEffect(() => {
     const el = box.current;
     if (!el) {
@@ -232,7 +251,13 @@ export function CourseMap({
     };
     el.addEventListener('wheel', wheel, { passive: false });
     return () => el.removeEventListener('wheel', wheel);
-  }, [zoomAt]);
+  }, [zoomAt, expanded]);
+  useEffect(() => {
+    if (wasExpanded.current !== expanded) {
+      wasExpanded.current = expanded;
+      expandButton.current?.focus();
+    }
+  }, [expanded]);
 
   const enter = (key: string | undefined) => {
     setTopic(key);
@@ -436,458 +461,489 @@ export function CourseMap({
   const topicName = (key: string) => topics.find((t) => t.key === key)?.name ?? key;
   const routeCount = (t: Topic) => (route ? t.ids.filter((id) => route.includes(id)).length : 0);
 
-  return (
+  const map = (
     <div
       className={
-        'qard-map-frame' +
+        'qard-map-layout' +
         (expanded ? ' is-expanded' : '') +
         (chosen && !atTopics ? ' is-panel-open' : '')
       }
-      ref={box}
-      tabIndex={0}
       onKeyDown={onKey}
-      onPointerDown={pointerDown}
-      onPointerMove={pointerMove}
-      onPointerUp={pointerUp}
-      aria-label={`${course.course} course map. Arrow keys move, Enter opens a topic, / searches, Escape goes back.`}
     >
-      <svg
-        className="qard-map"
-        width="100%"
-        height="100%"
-        role="group"
-        aria-label={
-          atTopics ? `${course.course} topics` : `${current?.name ?? course.course} objectives`
-        }
-      >
-        <defs>
-          <marker
-            id="qard-arrow"
-            viewBox="0 0 10 10"
-            refX="9"
-            refY="5"
-            markerUnits="userSpaceOnUse"
-            markerWidth="10"
-            markerHeight="10"
-            orient="auto-start-reverse"
+      <div className="qard-map-toolbar">
+        <div className="qard-map-tools is-left">
+          {grouped && !atTopics && (
+            <>
+              <button className="qard-text-button qard-map-back" onClick={() => enter(undefined)}>
+                <ChevronLeft size={15} />
+                Topics
+              </button>
+              <span className="qard-map-crumb">{current?.name}</span>
+              <span className="qard-map-divider" />
+            </>
+          )}
+          <label className="qard-map-search">
+            <Search size={14} />
+            <input
+              ref={search}
+              type="search"
+              aria-label="Find an objective"
+              placeholder="Find…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && matches[0]) {
+                  open(matches[0], true);
+                }
+              }}
+            />
+          </label>
+          {q && <span className="qard-muted qard-small">{matches.length} found</span>}
+        </div>
+        <div className="qard-map-tools is-right">
+          <button className="qard-icon-button" aria-label="Zoom out" onClick={() => zoomBy(0.8)}>
+            <Minus size={15} />
+          </button>
+          <span className="qard-map-zoom">{Math.round(view.k * 100)}%</span>
+          <button className="qard-icon-button" aria-label="Zoom in" onClick={() => zoomBy(1.25)}>
+            <Plus size={15} />
+          </button>
+          <button className="qard-icon-button" aria-label="Fit" onClick={() => frame()}>
+            <Scan size={15} />
+          </button>
+          <button
+            ref={expandButton}
+            className="qard-icon-button"
+            aria-label={expanded ? 'Exit full screen' : 'Full screen'}
+            onClick={() => setExpanded(!expanded)}
           >
-            <path d="M0,1 L9,5 L0,9 z" className="qard-arrow-head" />
-          </marker>
-          <marker
-            id="qard-arrow-on"
-            viewBox="0 0 10 10"
-            refX="9"
-            refY="5"
-            markerUnits="userSpaceOnUse"
-            markerWidth="11"
-            markerHeight="11"
-            orient="auto-start-reverse"
-          >
-            <path d="M0,1 L9,5 L0,9 z" className="qard-arrow-head is-on" />
-          </marker>
-        </defs>
-        <g
-          className={animate ? 'is-animating' : ''}
-          style={{ transform: `translate(${view.x}px, ${view.y}px) scale(${view.k})` }}
+            {expanded ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
+          </button>
+        </div>
+      </div>
+      <div className="qard-map-body">
+        <div
+          className="qard-map-frame"
+          ref={box}
+          tabIndex={0}
+          onPointerDown={pointerDown}
+          onPointerMove={pointerMove}
+          onPointerUp={pointerUp}
+          aria-label={`${course.course} course map. Arrow keys move, Enter opens a topic, / searches, Escape goes back.`}
         >
-          {layout.edges.map((e) => {
-            const on =
-              !atTopics && route
-                ? route.includes(e.from) && route.includes(e.to)
-                : related
-                  ? related.has(e.from) && related.has(e.to)
-                  : false;
-            const weight = atTopics
-              ? (topics.find((t) => t.key === e.to)?.weight.get(e.from) ?? 1)
-              : 1;
-            const stub = e.from.startsWith('@') || e.to.startsWith('@');
-            return (
-              <path
-                key={e.from + '>' + e.to}
-                className={
-                  'qard-map-edge' +
-                  (on ? ' is-on' : related || (!atTopics && route) ? ' is-dim' : '') +
-                  (stub ? ' is-stub' : '')
-                }
-                d={e.d}
-                markerEnd={`url(#${on ? 'qard-arrow-on' : 'qard-arrow'})`}
-                style={atTopics ? { strokeWidth: 1.4 + Math.min(weight, 6) * 0.55 } : undefined}
-              />
-            );
-          })}
-          {atTopics
-            ? topics.map((t) => {
-                const p = layout.nodes.get(t.key)!,
-                  total = t.ids.length,
-                  barW = w - 32,
-                  steps = routeCount(t);
-                let at = 0;
-                const names = [
-                  'qard-map-node',
-                  'qard-topic-node',
-                  t.planned ? 'is-planned' : '',
-                  cursor === t.key ? 'is-selected' : '',
-                  dimTopic(t) ? 'is-dim' : '',
-                ]
-                  .filter(Boolean)
-                  .join(' ');
+          <svg
+            className="qard-map"
+            width="100%"
+            height="100%"
+            role="group"
+            aria-label={
+              atTopics ? `${course.course} topics` : `${current?.name ?? course.course} objectives`
+            }
+          >
+            <defs>
+              <marker
+                id="qard-arrow"
+                viewBox="0 0 10 10"
+                refX="9"
+                refY="5"
+                markerUnits="userSpaceOnUse"
+                markerWidth="10"
+                markerHeight="10"
+                orient="auto-start-reverse"
+              >
+                <path d="M0,1 L9,5 L0,9 z" className="qard-arrow-head" />
+              </marker>
+              <marker
+                id="qard-arrow-on"
+                viewBox="0 0 10 10"
+                refX="9"
+                refY="5"
+                markerUnits="userSpaceOnUse"
+                markerWidth="11"
+                markerHeight="11"
+                orient="auto-start-reverse"
+              >
+                <path d="M0,1 L9,5 L0,9 z" className="qard-arrow-head is-on" />
+              </marker>
+            </defs>
+            <g
+              className={animate ? 'is-animating' : ''}
+              style={{ transform: `translate(${view.x}px, ${view.y}px) scale(${view.k})` }}
+            >
+              {layout.edges.map((e) => {
+                const on =
+                  !atTopics && route
+                    ? route.includes(e.from) && route.includes(e.to)
+                    : related
+                      ? related.has(e.from) && related.has(e.to)
+                      : false;
+                const weight = atTopics
+                  ? (topics.find((t) => t.key === e.to)?.weight.get(e.from) ?? 1)
+                  : 1;
+                const stub = e.from.startsWith('@') || e.to.startsWith('@');
                 return (
-                  <g
-                    key={t.key}
-                    className={names}
-                    transform={`translate(${p.x},${p.y})`}
-                    role="button"
-                    tabIndex={-1}
-                    aria-label={`${t.name}: ${t.learned} of ${total} learned, ${t.mastered} mastered${t.warnings ? `, ${t.warnings} to fix` : ''}${t.ready ? `, ${t.ready} ready to learn` : ''}`}
-                    onPointerEnter={() => setHovered(t.key)}
-                    onPointerLeave={() => setHovered((x) => (x === t.key ? undefined : x))}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      enter(t.key);
-                    }}
-                  >
-                    <title>{`${t.name}\n${ORDER.filter((x) => t.counts[x])
-                      .map((x) => `${t.counts[x]} ${STATE_LABEL[x].toLowerCase()}`)
-                      .join(', ')}`}</title>
-                    <rect className="qard-map-card" width={w} height={h} rx={14} />
-                    <foreignObject x={16} y={12} width={w - 32 - (t.warnings ? 40 : 0)} height={24}>
-                      <div className="qard-map-text qard-topic-name">{t.name}</div>
-                    </foreignObject>
-                    {t.warnings > 0 && (
-                      <g className="qard-topic-warn" transform={`translate(${w - 16},20)`}>
-                        <text textAnchor="end">⚠ {t.warnings}</text>
-                      </g>
-                    )}
-                    <g transform={`translate(16,42)`}>
-                      <rect className="qard-topic-track" width={barW} height={8} rx={4} />
-                      {LEARNED.map((s) => {
-                        const n = t.counts[s] ?? 0;
-                        if (!n) {
-                          return null;
-                        }
-                        const seg = (
-                          <rect
-                            key={s}
-                            className={'qard-topic-seg ' + cls(s)}
-                            x={at}
-                            width={Math.max(2, (n / total) * barW - 1)}
-                            height={8}
-                            rx={2}
-                          />
-                        );
-                        at += (n / total) * barW;
-                        return seg;
-                      })}
-                    </g>
-                    <foreignObject x={16} y={58} width={w - 32} height={18}>
-                      <div className="qard-map-text qard-topic-meta">
-                        {t.planned ? 'Not covered yet' : `${t.learned} of ${total} learned`}
-                        {t.ids.some((id) => inProgress.has(id)) ? (
-                          <span className="qard-topic-ready"> · lesson in progress</span>
-                        ) : (
-                          !t.planned &&
-                          t.ready > 0 && (
-                            <span className="qard-topic-ready"> · {t.ready} ready</span>
-                          )
-                        )}
-                      </div>
-                    </foreignObject>
-                    {steps > 0 && (
-                      <g className="qard-map-step" transform={`translate(${w - 2},2)`}>
-                        <circle r={11} />
-                        <text textAnchor="middle" y={4}>
-                          {steps}
-                        </text>
-                      </g>
-                    )}
-                  </g>
-                );
-              })
-            : [...layout.nodes.values()].map((p) => {
-                if (p.id.startsWith('@')) {
-                  const key = p.id.slice(IN.length),
-                    incoming = p.id.startsWith(IN);
-                  return (
-                    <g
-                      key={p.id}
-                      className="qard-map-node qard-map-stub"
-                      transform={`translate(${p.x},${p.y + 8})`}
-                      role="button"
-                      tabIndex={-1}
-                      aria-label={`${incoming ? 'Builds on' : 'Unlocks'} ${topicName(key)}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        enter(key);
-                      }}
-                    >
-                      <rect width={w} height={h - 16} rx={(h - 16) / 2} />
-                      <foreignObject x={10} y={0} width={w - 20} height={h - 16}>
-                        <div className="qard-map-text qard-map-stub-label">
-                          {incoming ? '↑ ' : '↓ '}
-                          {topicName(key)}
-                        </div>
-                      </foreignObject>
-                    </g>
-                  );
-                }
-                const o = byId.get(p.id)!,
-                  step = route ? route.indexOf(o.id) : -1;
-                const names = [
-                  'qard-map-node',
-                  cls(o.state),
-                  ready.has(o.id) ? 'is-ready' : '',
-                  selected === o.id ? 'is-selected' : '',
-                  dimObjective(o.id) ? 'is-dim' : '',
-                ]
-                  .filter(Boolean)
-                  .join(' ');
-                return (
-                  <g
-                    key={p.id}
-                    className={names}
-                    transform={`translate(${p.x},${p.y})`}
-                    role="button"
-                    tabIndex={-1}
-                    aria-pressed={selected === o.id}
-                    aria-label={`${o.title}: ${STATE_LABEL[o.state]}${ready.has(o.id) ? ', ready to learn' : ''}${inProgress.has(o.id) ? ', lesson in progress' : ''}`}
-                    onPointerEnter={() => setHovered(o.id)}
-                    onPointerLeave={() => setHovered((x) => (x === o.id ? undefined : x))}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      open(selected === o.id ? undefined : o.id);
-                    }}
-                    onDoubleClick={(e: MouseEvent) => {
-                      e.stopPropagation();
-                      open(o.id, true);
-                    }}
-                  >
-                    <title>{o.title}</title>
-                    <rect className="qard-map-card" width={w} height={h} rx={10} />
-                    <rect className="qard-map-bar" x={9} y={10} width={4} height={h - 20} rx={2} />
-                    <foreignObject
-                      x={20}
-                      y={3}
-                      width={w - 28 - (step >= 0 ? 10 : 0)}
-                      height={h - 6}
-                    >
-                      <div className="qard-map-label">
-                        <span className="qard-map-title">{md(shortLabel(o))}</span>
-                      </div>
-                    </foreignObject>
-                    {step >= 0 ? (
-                      <g className="qard-map-step" transform={`translate(${w - 2},2)`}>
-                        <circle r={11} />
-                        <text textAnchor="middle" y={4}>
-                          {step + 1}
-                        </text>
-                      </g>
-                    ) : (
-                      inProgress.has(o.id) && (
-                        <g className="qard-map-lesson" transform={`translate(${w - 2},2)`}>
-                          <title>Lesson in progress</title>
-                          <circle r={9} />
-                          <path d="M-2.5,-4 L4,0 L-2.5,4 Z" />
-                        </g>
-                      )
-                    )}
-                  </g>
+                  <path
+                    key={e.from + '>' + e.to}
+                    className={
+                      'qard-map-edge' +
+                      (on ? ' is-on' : related || (!atTopics && route) ? ' is-dim' : '') +
+                      (stub ? ' is-stub' : '')
+                    }
+                    d={e.d}
+                    markerEnd={`url(#${on ? 'qard-arrow-on' : 'qard-arrow'})`}
+                    style={atTopics ? { strokeWidth: 1.4 + Math.min(weight, 6) * 0.55 } : undefined}
+                  />
                 );
               })}
-        </g>
-      </svg>
-      <div className="qard-map-tools is-left">
-        {grouped && !atTopics && (
-          <>
-            <button className="qard-text-button qard-map-back" onClick={() => enter(undefined)}>
-              <ChevronLeft size={15} />
-              Topics
-            </button>
-            <span className="qard-map-crumb">{current?.name}</span>
-            <span className="qard-map-divider" />
-          </>
-        )}
-        <label className="qard-map-search">
-          <Search size={14} />
-          <input
-            ref={search}
-            type="search"
-            aria-label="Find an objective"
-            placeholder="Find…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && matches[0]) {
-                open(matches[0], true);
-              }
-            }}
-          />
-        </label>
-        {q && <span className="qard-muted qard-small">{matches.length} found</span>}
-      </div>
-      <div className="qard-map-tools is-right">
-        <button className="qard-icon-button" aria-label="Zoom out" onClick={() => zoomBy(0.8)}>
-          <Minus size={15} />
-        </button>
-        <span className="qard-map-zoom">{Math.round(view.k * 100)}%</span>
-        <button className="qard-icon-button" aria-label="Zoom in" onClick={() => zoomBy(1.25)}>
-          <Plus size={15} />
-        </button>
-        <button className="qard-icon-button" aria-label="Fit" onClick={() => frame()}>
-          <Scan size={15} />
-        </button>
-        <button
-          className="qard-icon-button"
-          aria-label={expanded ? 'Exit full screen' : 'Full screen'}
-          onClick={() => setExpanded(!expanded)}
-        >
-          {expanded ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
-        </button>
-      </div>
-      {chosen && !atTopics && (
-        <aside className="qard-map-panel" aria-label={chosen.title}>
-          <div className="qard-map-panel-head">
-            <StateChip state={chosen.state} />
-            <button className="qard-icon-button" aria-label="Close" onClick={() => open(undefined)}>
-              <X size={15} />
-            </button>
-          </div>
-          <h3>{md(chosen.title)}</h3>
-          <p className="qard-muted qard-small">
-            {[chosen.group, status(chosen)].filter(Boolean).join(' · ')}
-          </p>
-          <div className="qard-map-panel-actions">
-            {inProgress.has(chosen.id) && actions.openLesson ? (
+              {atTopics
+                ? topics.map((t) => {
+                    const p = layout.nodes.get(t.key)!,
+                      total = t.ids.length,
+                      barW = w - 32,
+                      steps = routeCount(t);
+                    let at = 0;
+                    const names = [
+                      'qard-map-node',
+                      'qard-topic-node',
+                      t.planned ? 'is-planned' : '',
+                      cursor === t.key ? 'is-selected' : '',
+                      dimTopic(t) ? 'is-dim' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ');
+                    return (
+                      <g
+                        key={t.key}
+                        className={names}
+                        transform={`translate(${p.x},${p.y})`}
+                        role="button"
+                        tabIndex={-1}
+                        aria-label={`${t.name}: ${t.learned} of ${total} learned, ${t.mastered} mastered${t.warnings ? `, ${t.warnings} to fix` : ''}${t.ready ? `, ${t.ready} ready to learn` : ''}`}
+                        onPointerEnter={() => setHovered(t.key)}
+                        onPointerLeave={() => setHovered((x) => (x === t.key ? undefined : x))}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          enter(t.key);
+                        }}
+                      >
+                        <title>{`${t.name}\n${ORDER.filter((x) => t.counts[x])
+                          .map((x) => `${t.counts[x]} ${STATE_LABEL[x].toLowerCase()}`)
+                          .join(', ')}`}</title>
+                        <rect className="qard-map-card" width={w} height={h} rx={14} />
+                        <foreignObject
+                          x={16}
+                          y={12}
+                          width={w - 32 - (t.warnings ? 40 : 0)}
+                          height={24}
+                        >
+                          <div className="qard-map-text qard-topic-name">{t.name}</div>
+                        </foreignObject>
+                        {t.warnings > 0 && (
+                          <g className="qard-topic-warn" transform={`translate(${w - 16},20)`}>
+                            <text textAnchor="end">⚠ {t.warnings}</text>
+                          </g>
+                        )}
+                        <g transform={`translate(16,42)`}>
+                          <rect className="qard-topic-track" width={barW} height={8} rx={4} />
+                          {LEARNED.map((s) => {
+                            const n = t.counts[s] ?? 0;
+                            if (!n) {
+                              return null;
+                            }
+                            const seg = (
+                              <rect
+                                key={s}
+                                className={'qard-topic-seg ' + cls(s)}
+                                x={at}
+                                width={Math.max(2, (n / total) * barW - 1)}
+                                height={8}
+                                rx={2}
+                              />
+                            );
+                            at += (n / total) * barW;
+                            return seg;
+                          })}
+                        </g>
+                        <foreignObject x={16} y={58} width={w - 32} height={18}>
+                          <div className="qard-map-text qard-topic-meta">
+                            {t.planned ? 'Not covered yet' : `${t.learned} of ${total} learned`}
+                            {t.ids.some((id) => inProgress.has(id)) ? (
+                              <span className="qard-topic-ready"> · lesson in progress</span>
+                            ) : (
+                              !t.planned &&
+                              t.ready > 0 && (
+                                <span className="qard-topic-ready"> · {t.ready} ready</span>
+                              )
+                            )}
+                          </div>
+                        </foreignObject>
+                        {steps > 0 && (
+                          <g className="qard-map-step" transform={`translate(${w - 2},2)`}>
+                            <circle r={11} />
+                            <text textAnchor="middle" y={4}>
+                              {steps}
+                            </text>
+                          </g>
+                        )}
+                      </g>
+                    );
+                  })
+                : [...layout.nodes.values()].map((p) => {
+                    if (p.id.startsWith('@')) {
+                      const key = p.id.slice(IN.length),
+                        incoming = p.id.startsWith(IN);
+                      return (
+                        <g
+                          key={p.id}
+                          className="qard-map-node qard-map-stub"
+                          transform={`translate(${p.x},${p.y + 8})`}
+                          role="button"
+                          tabIndex={-1}
+                          aria-label={`${incoming ? 'Builds on' : 'Unlocks'} ${topicName(key)}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            enter(key);
+                          }}
+                        >
+                          <rect width={w} height={h - 16} rx={(h - 16) / 2} />
+                          <foreignObject x={10} y={0} width={w - 20} height={h - 16}>
+                            <div className="qard-map-text qard-map-stub-label">
+                              {incoming ? '↑ ' : '↓ '}
+                              {topicName(key)}
+                            </div>
+                          </foreignObject>
+                        </g>
+                      );
+                    }
+                    const o = byId.get(p.id)!,
+                      step = route ? route.indexOf(o.id) : -1;
+                    const names = [
+                      'qard-map-node',
+                      cls(o.state),
+                      ready.has(o.id) ? 'is-ready' : '',
+                      selected === o.id ? 'is-selected' : '',
+                      dimObjective(o.id) ? 'is-dim' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ');
+                    return (
+                      <g
+                        key={p.id}
+                        className={names}
+                        transform={`translate(${p.x},${p.y})`}
+                        role="button"
+                        tabIndex={-1}
+                        aria-pressed={selected === o.id}
+                        aria-label={`${o.title}: ${STATE_LABEL[o.state]}${ready.has(o.id) ? ', ready to learn' : ''}${inProgress.has(o.id) ? ', lesson in progress' : ''}`}
+                        onPointerEnter={() => setHovered(o.id)}
+                        onPointerLeave={() => setHovered((x) => (x === o.id ? undefined : x))}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          open(selected === o.id ? undefined : o.id);
+                        }}
+                        onDoubleClick={(e: MouseEvent) => {
+                          e.stopPropagation();
+                          open(o.id, true);
+                        }}
+                      >
+                        <title>{o.title}</title>
+                        <rect className="qard-map-card" width={w} height={h} rx={10} />
+                        <rect
+                          className="qard-map-bar"
+                          x={9}
+                          y={10}
+                          width={4}
+                          height={h - 20}
+                          rx={2}
+                        />
+                        <foreignObject
+                          x={20}
+                          y={3}
+                          width={w - 28 - (step >= 0 ? 10 : 0)}
+                          height={h - 6}
+                        >
+                          <div className="qard-map-label">
+                            <span className="qard-map-title">{md(shortLabel(o))}</span>
+                          </div>
+                        </foreignObject>
+                        {step >= 0 ? (
+                          <g className="qard-map-step" transform={`translate(${w - 2},2)`}>
+                            <circle r={11} />
+                            <text textAnchor="middle" y={4}>
+                              {step + 1}
+                            </text>
+                          </g>
+                        ) : (
+                          inProgress.has(o.id) && (
+                            <g className="qard-map-lesson" transform={`translate(${w - 2},2)`}>
+                              <title>Lesson in progress</title>
+                              <circle r={9} />
+                              <path d="M-2.5,-4 L4,0 L-2.5,4 Z" />
+                            </g>
+                          )
+                        )}
+                      </g>
+                    );
+                  })}
+            </g>
+          </svg>
+        </div>
+        {chosen && !atTopics && (
+          <aside className="qard-map-panel" aria-label={chosen.title}>
+            <div className="qard-map-panel-head">
+              <StateChip state={chosen.state} />
               <button
-                className="qard-primary"
-                onClick={() => actions.openLesson!(inProgress.get(chosen.id)!)}
+                className="qard-icon-button"
+                aria-label="Close"
+                onClick={() => open(undefined)}
               >
-                Continue lesson
+                <X size={15} />
               </button>
-            ) : (
-              <button
-                className={
-                  UNTAUGHT.includes(chosen.state) && chosen.state !== 'planned'
-                    ? 'qard-primary'
-                    : ''
-                }
-                onClick={() => actions.teach(chosen)}
-              >
-                Teach
-              </button>
-            )}
-            {actions.check && !UNTAUGHT.includes(chosen.state) && (
-              <button disabled={actions.busy?.(chosen.id)} onClick={() => actions.check!(chosen)}>
-                {actions.busy?.(chosen.id) ? 'Writing…' : 'Check'}
-              </button>
-            )}
-            {chosen.needs.length > 0 && (
-              <button
-                className={route ? 'is-on' : ''}
-                aria-pressed={!!route}
-                onClick={() => {
-                  if (route) {
-                    setRoute(undefined);
-                    return;
-                  }
-                  const next = routeTo(course, chosen.id);
-                  setRoute(next);
-                  frame(
-                    [...next, chosen.id].filter((id) => layout.nodes.has(id)),
-                    true,
-                    true,
-                  );
-                }}
-              >
-                <Route size={14} />
-                Route here
-              </button>
-            )}
-          </div>
-          {route && (
-            <section>
-              <div className="qard-label">
-                Route · {route.length ? `${route.length} to learn` : 'nothing left to learn'}
-              </div>
-              {route.length ? (
-                <div className="qard-map-route">
-                  {route.map((id, i) => (
-                    <button key={id} className="qard-map-link" onClick={() => open(id, true)}>
-                      <span className="qard-map-route-n">{i + 1}</span>
-                      <i className={cls(byId.get(id)?.state ?? 'new')} />
-                      {md(titleOf(id))}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <p className="qard-muted qard-small">Everything this builds on has been taught.</p>
-              )}
-              {route[0] && route[0] !== chosen.id && (
+            </div>
+            <h3>{md(chosen.title)}</h3>
+            <p className="qard-muted qard-small">
+              {[chosen.group, status(chosen)].filter(Boolean).join(' · ')}
+            </p>
+            <div className="qard-map-panel-actions">
+              {inProgress.has(chosen.id) && actions.openLesson ? (
                 <button
                   className="qard-primary"
-                  onClick={() => actions.teach(byId.get(route[0]!)!)}
+                  onClick={() => actions.openLesson!(inProgress.get(chosen.id)!)}
                 >
-                  Teach step 1
+                  Continue lesson
+                </button>
+              ) : (
+                <button
+                  className={
+                    UNTAUGHT.includes(chosen.state) && chosen.state !== 'planned'
+                      ? 'qard-primary'
+                      : ''
+                  }
+                  onClick={() => actions.teach(chosen)}
+                >
+                  Teach
                 </button>
               )}
-            </section>
-          )}
-          {chosen.needs.length > 0 && (
-            <section>
-              <div className="qard-label">Builds on</div>
-              {links(chosen.needs)}
-            </section>
-          )}
-          {(allDependents.get(chosen.id)?.length ?? 0) > 0 && (
-            <section>
-              <div className="qard-label">Unlocks</div>
-              {links(allDependents.get(chosen.id)!)}
-            </section>
-          )}
-          {actions.openLesson && lessons.some((l) => l.objective === chosen.id) && (
-            <section>
-              <div className="qard-label">Lessons</div>
-              {lessons
-                .filter((l) => l.objective === chosen.id)
-                .map((l) => (
+              {actions.check && !UNTAUGHT.includes(chosen.state) && (
+                <button disabled={actions.busy?.(chosen.id)} onClick={() => actions.check!(chosen)}>
+                  {actions.busy?.(chosen.id) ? 'Writing…' : 'Check'}
+                </button>
+              )}
+              {chosen.needs.length > 0 && (
+                <button
+                  className={route ? 'is-on' : ''}
+                  aria-pressed={!!route}
+                  onClick={() => {
+                    if (route) {
+                      setRoute(undefined);
+                      return;
+                    }
+                    const next = routeTo(course, chosen.id);
+                    setRoute(next);
+                    frame([...next, chosen.id].filter((id) => layout.nodes.has(id)));
+                  }}
+                >
+                  <Route size={14} />
+                  Route here
+                </button>
+              )}
+            </div>
+            {route && (
+              <section>
+                <div className="qard-label">
+                  Route · {route.length ? `${route.length} to learn` : 'nothing left to learn'}
+                </div>
+                {route.length ? (
+                  <div className="qard-map-route">
+                    {route.map((id, i) => (
+                      <button key={id} className="qard-map-link" onClick={() => open(id, true)}>
+                        <span className="qard-map-route-n">{i + 1}</span>
+                        <i className={cls(byId.get(id)?.state ?? 'new')} />
+                        {md(titleOf(id))}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="qard-muted qard-small">
+                    Everything this builds on has been taught.
+                  </p>
+                )}
+                {route[0] && route[0] !== chosen.id && (
                   <button
-                    key={l.path}
-                    className="qard-map-link"
-                    onClick={() => actions.openLesson!(l.path)}
+                    className="qard-primary"
+                    onClick={() => actions.teach(byId.get(route[0]!)!)}
                   >
-                    <span>{new Date(l.created).toLocaleDateString()}</span>
-                    <small className="qard-muted">{l.finished ? '✓ done' : 'in progress'}</small>
+                    Teach step 1
+                  </button>
+                )}
+              </section>
+            )}
+            {chosen.needs.length > 0 && (
+              <section>
+                <div className="qard-label">Builds on</div>
+                {links(chosen.needs)}
+              </section>
+            )}
+            {(allDependents.get(chosen.id)?.length ?? 0) > 0 && (
+              <section>
+                <div className="qard-label">Unlocks</div>
+                {links(allDependents.get(chosen.id)!)}
+              </section>
+            )}
+            {actions.openLesson && lessons.some((l) => l.objective === chosen.id) && (
+              <section>
+                <div className="qard-label">Lessons</div>
+                {lessons
+                  .filter((l) => l.objective === chosen.id)
+                  .map((l) => (
+                    <button
+                      key={l.path}
+                      className="qard-map-link"
+                      onClick={() => actions.openLesson!(l.path)}
+                    >
+                      <span>{new Date(l.created).toLocaleDateString()}</span>
+                      <small className="qard-muted">{l.finished ? '✓ done' : 'in progress'}</small>
+                    </button>
+                  ))}
+              </section>
+            )}
+            {chosen.notes.length > 0 && (
+              <section>
+                <div className="qard-label">Notes</div>
+                {chosen.notes.map((n) => (
+                  <button
+                    key={n}
+                    className="qard-link qard-map-note"
+                    onClick={() => actions.openNote(n)}
+                  >
+                    {n}
                   </button>
                 ))}
-            </section>
-          )}
-          {chosen.notes.length > 0 && (
-            <section>
-              <div className="qard-label">Notes</div>
-              {chosen.notes.map((n) => (
-                <button
-                  key={n}
-                  className="qard-link qard-map-note"
-                  onClick={() => actions.openNote(n)}
-                >
-                  {n}
-                </button>
-              ))}
-            </section>
-          )}
-          <section>
-            <div className="qard-label">Evidence</div>
-            {chosen.evidence.length ? (
-              [...chosen.evidence].reverse().map((e, i) => (
-                <p key={i} className="qard-small qard-map-evidence">
-                  {e}
-                </p>
-              ))
-            ) : (
-              <p className="qard-muted qard-small">None yet.</p>
+              </section>
             )}
-          </section>
-        </aside>
-      )}
+            <section>
+              <div className="qard-label">Evidence</div>
+              {chosen.evidence.length ? (
+                [...chosen.evidence].reverse().map((e, i) => (
+                  <p key={i} className="qard-small qard-map-evidence">
+                    {e}
+                  </p>
+                ))
+              ) : (
+                <p className="qard-muted qard-small">None yet.</p>
+              )}
+            </section>
+          </aside>
+        )}
+      </div>
     </div>
   );
+  return expanded && box.current
+    ? createPortal(
+        <div className="qard-root qard-map-overlay">
+          <div className="qard-app">{map}</div>
+        </div>,
+        box.current.ownerDocument.body,
+      )
+    : map;
 }

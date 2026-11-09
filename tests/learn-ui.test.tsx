@@ -443,10 +443,56 @@ it('the course map opens on topics, drills into one, and routes across topics', 
     'Builds on Text mining',
   );
   await click(host.querySelector('.qard-map-node[aria-label^="List the LDA"]'));
-  const panel = host.querySelector('.qard-map-panel')!;
+  let panel = host.querySelector('.qard-map-panel')!;
   expect(panel.querySelector('h3')?.textContent).toBe('List the LDA generative process');
   expect(panel.textContent).toContain('Builds on');
-  expect(host.querySelector('.qard-map-frame')?.classList.contains('is-panel-open')).toBe(true);
+  expect(host.querySelector('.qard-map-layout')?.classList.contains('is-panel-open')).toBe(true);
+  const canvas = host.querySelector<HTMLElement>('.qard-map-frame')!;
+  const graph = canvas.querySelector<SVGGElement>('.qard-map > g')!;
+  const transform = graph.style.transform;
+  const panelWheel = new WheelEvent('wheel', { deltaY: 50, bubbles: true, cancelable: true });
+  await act(async () => {
+    panel.dispatchEvent(panelWheel);
+  });
+  expect(panelWheel.defaultPrevented).toBe(false);
+  expect(graph.style.transform).toBe(transform);
+  const canvasWheel = new WheelEvent('wheel', { deltaY: 50, bubbles: true, cancelable: true });
+  await act(async () => {
+    canvas.dispatchEvent(canvasWheel);
+  });
+  expect(canvasWheel.defaultPrevented).toBe(true);
+  expect(graph.style.transform).not.toBe(transform);
+  await click(host.querySelector('[aria-label="Full screen"]'));
+  expect(host.querySelector('.qard-map-layout')).toBeNull();
+  const overlay = document.querySelector('.qard-map-overlay')!;
+  expect(overlay.querySelector('.qard-map-layout')?.classList.contains('is-expanded')).toBe(true);
+  expect(overlay.querySelector('.qard-map-panel h3')?.textContent).toBe(
+    'List the LDA generative process',
+  );
+  expect(document.activeElement).toBe(overlay.querySelector('[aria-label="Exit full screen"]'));
+  const expandedCanvas = overlay.querySelector('.qard-map-frame')!;
+  const expandedWheel = new WheelEvent('wheel', { deltaY: 50, bubbles: true, cancelable: true });
+  await act(async () => {
+    expandedCanvas.dispatchEvent(expandedWheel);
+  });
+  expect(expandedWheel.defaultPrevented).toBe(true);
+  const detachedWheel = new WheelEvent('wheel', { deltaY: 50, bubbles: true, cancelable: true });
+  canvas.dispatchEvent(detachedWheel);
+  expect(detachedWheel.defaultPrevented).toBe(false);
+  await click(overlay.querySelector('[aria-label="Exit full screen"]'));
+  expect(document.querySelector('.qard-map-overlay')).toBeNull();
+  expect(host.querySelector('.qard-map-layout')?.classList.contains('is-expanded')).toBe(false);
+  expect(document.activeElement).toBe(host.querySelector('[aria-label="Full screen"]'));
+  const restoredCanvas = host.querySelector('.qard-map-frame')!;
+  const restoredGraph = restoredCanvas.querySelector<SVGGElement>('.qard-map > g')!;
+  const restoredTransform = restoredGraph.style.transform;
+  const restoredWheel = new WheelEvent('wheel', { deltaY: 50, bubbles: true, cancelable: true });
+  await act(async () => {
+    restoredCanvas.dispatchEvent(restoredWheel);
+  });
+  expect(restoredWheel.defaultPrevented).toBe(true);
+  expect(restoredGraph.style.transform).not.toBe(restoredTransform);
+  panel = host.querySelector('.qard-map-panel')!;
   await click(buttons('Route here')[0]);
   expect([...host.querySelectorAll('.qard-map-route button')].map((b) => b.textContent)).toEqual([
     '1List the LDA generative process',
@@ -458,9 +504,20 @@ it('the course map opens on topics, drills into one, and routes across topics', 
     ),
   );
   expect(host.querySelector('.qard-map-crumb')?.textContent).toBe('Text mining');
+  await click(host.querySelector('.qard-map-panel [aria-label="Close"]'));
+  expect(host.querySelector('.qard-map-panel')).toBeNull();
+  expect(host.querySelector('.qard-map-layout')?.classList.contains('is-panel-open')).toBe(false);
   await click(buttons('Topics')[0]);
   expect(host.querySelectorAll('.qard-topic-node')).toHaveLength(3);
-  expect(host.querySelector('.qard-map-frame')?.classList.contains('is-panel-open')).toBe(false);
+  expect(host.querySelector('.qard-map-layout')?.classList.contains('is-panel-open')).toBe(false);
+  await click(host.querySelector('[aria-label="Full screen"]'));
+  await act(async () => {
+    document.activeElement!.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
+    );
+  });
+  expect(document.querySelector('.qard-map-overlay')).toBeNull();
+  expect(document.activeElement).toBe(host.querySelector('[aria-label="Full screen"]'));
   await click(buttons('List')[0]);
   expect(host.querySelectorAll('.qard-objective')).toHaveLength(4);
 });
