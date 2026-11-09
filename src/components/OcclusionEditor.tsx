@@ -388,35 +388,36 @@ export function OcclusionEditor({
         {chosen && (
           <div className="qard-mask-size" role="group" aria-label="Selected mask size">
             {(['width', 'height'] as const).map((dimension) => (
-              <label key={dimension}>
-                {dimension === 'width' ? 'Width (%)' : 'Height (%)'}
-                <input
-                  type="number"
-                  min={0}
-                  max={100}
-                  step="any"
-                  value={Math.round(chosen[dimension] * 1000) / 10}
-                  onChange={(e) => {
-                    const size = e.currentTarget.valueAsNumber / 100;
-                    if (Number.isFinite(size)) {
-                      change({
-                        ...value,
-                        masks: value.masks.map((mask) =>
-                          mask.id === chosen.id
-                            ? {
-                                ...mask,
-                                [dimension]: Math.max(
-                                  0.005,
-                                  Math.min(1 - mask[dimension === 'width' ? 'x' : 'y'], size),
-                                ),
-                              }
-                            : mask,
-                        ),
-                      });
-                    }
-                  }}
-                />
-              </label>
+              <input
+                key={dimension}
+                type="number"
+                placeholder={dimension === 'width' ? 'Width (%)' : 'Height (%)'}
+                aria-label={dimension === 'width' ? 'Width (%)' : 'Height (%)'}
+                title={dimension === 'width' ? 'Width (%)' : 'Height (%)'}
+                min={0}
+                max={100}
+                step="any"
+                value={Math.round(chosen[dimension] * 1000) / 10}
+                onChange={(e) => {
+                  const size = e.currentTarget.valueAsNumber / 100;
+                  if (Number.isFinite(size)) {
+                    change({
+                      ...value,
+                      masks: value.masks.map((mask) =>
+                        mask.id === chosen.id
+                          ? {
+                              ...mask,
+                              [dimension]: Math.max(
+                                0.005,
+                                Math.min(1 - mask[dimension === 'width' ? 'x' : 'y'], size),
+                              ),
+                            }
+                          : mask,
+                      ),
+                    });
+                  }
+                }}
+              />
             ))}
           </div>
         )}

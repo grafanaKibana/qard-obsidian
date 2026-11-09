@@ -576,69 +576,58 @@ export function CourseMap({
       }
       onKeyDown={onKey}
     >
+      <div className="qard-map-toolbar">
+        <div className={'qard-map-tools is-left' + (grouped && !atTopics ? ' has-topic' : '')}>
+          {grouped && !atTopics && (
+            <>
+              <button className="qard-text-button qard-map-back" onClick={() => enter(undefined)}>
+                <ChevronLeft size={15} />
+                Topics
+              </button>
+              <span className="qard-map-crumb">{current?.name}</span>
+              <span className="qard-map-divider" />
+            </>
+          )}
+          <label className="qard-map-search">
+            <Search size={14} />
+            <input
+              ref={search}
+              type="search"
+              aria-label="Find an objective"
+              placeholder="Find…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && matches[0]) {
+                  open(matches[0], true);
+                }
+              }}
+            />
+          </label>
+          {q && <span className="qard-muted qard-small">{matches.length} found</span>}
+        </div>
+      </div>
       <div className="qard-map-body">
         <div className="qard-map-canvas">
-          <div className="qard-map-toolbar">
-            <div className={'qard-map-tools is-left' + (grouped && !atTopics ? ' has-topic' : '')}>
-              {grouped && !atTopics && (
-                <>
-                  <button
-                    className="qard-text-button qard-map-back"
-                    onClick={() => enter(undefined)}
-                  >
-                    <ChevronLeft size={15} />
-                    Topics
-                  </button>
-                  <span className="qard-map-crumb">{current?.name}</span>
-                  <span className="qard-map-divider" />
-                </>
-              )}
-              <label className="qard-map-search">
-                <Search size={14} />
-                <input
-                  ref={search}
-                  type="search"
-                  aria-label="Find an objective"
-                  placeholder="Find…"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && matches[0]) {
-                      open(matches[0], true);
-                    }
-                  }}
-                />
-              </label>
-              {q && <span className="qard-muted qard-small">{matches.length} found</span>}
-            </div>
-            <div className="qard-map-tools is-right">
-              <button
-                className="qard-icon-button"
-                aria-label="Zoom out"
-                onClick={() => zoomBy(0.8)}
-              >
-                <Minus size={15} />
-              </button>
-              <span className="qard-map-zoom">{Math.round(view.k * 100)}%</span>
-              <button
-                className="qard-icon-button"
-                aria-label="Zoom in"
-                onClick={() => zoomBy(1.25)}
-              >
-                <Plus size={15} />
-              </button>
-              <button className="qard-icon-button" aria-label="Fit" onClick={() => frame()}>
-                <Scan size={15} />
-              </button>
-              <button
-                ref={expandButton}
-                className="qard-icon-button"
-                aria-label={expanded ? 'Exit full screen' : 'Full screen'}
-                onClick={() => setExpanded(!expanded)}
-              >
-                {expanded ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
-              </button>
-            </div>
+          <div className="qard-map-tools is-right">
+            <button className="qard-icon-button" aria-label="Zoom out" onClick={() => zoomBy(0.8)}>
+              <Minus size={15} />
+            </button>
+            <span className="qard-map-zoom">{Math.round(view.k * 100)}%</span>
+            <button className="qard-icon-button" aria-label="Zoom in" onClick={() => zoomBy(1.25)}>
+              <Plus size={15} />
+            </button>
+            <button className="qard-icon-button" aria-label="Fit" onClick={() => frame()}>
+              <Scan size={15} />
+            </button>
+            <button
+              ref={expandButton}
+              className="qard-icon-button"
+              aria-label={expanded ? 'Exit full screen' : 'Full screen'}
+              onClick={() => setExpanded(!expanded)}
+            >
+              {expanded ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
+            </button>
           </div>
           <div
             className="qard-map-frame"

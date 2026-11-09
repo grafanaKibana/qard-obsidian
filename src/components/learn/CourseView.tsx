@@ -239,19 +239,16 @@ export function CourseView({
                 <div key={o.id} className="qard-objective">
                   <div className="qard-objective-main">
                     <strong>
+                      <StateChip state={o.state} />{' '}
                       <InlineMarkdown text={o.title} path={path} services={services} />
                     </strong>
-                    <div className="qard-objective-meta">
-                      <StateChip state={o.state} />
-                      {o.due && !['new', 'planned'].includes(o.state) && (
+                    {o.due && !['new', 'planned'].includes(o.state) && (
+                      <div className="qard-objective-meta">
                         <span className="qard-muted qard-objective-due">
-                          {relativeDay(o.due, day)}
+                          {relativeDay(o.due, day).replace(/^./, (first) => first.toUpperCase())}
                         </span>
-                      )}
-                    </div>
-                    <small className="qard-muted qard-objective-evidence">
-                      {o.evidence.at(-1) ?? 'No evidence yet'}
-                    </small>
+                      </div>
+                    )}
                   </div>
                   {actions(o)}
                 </div>

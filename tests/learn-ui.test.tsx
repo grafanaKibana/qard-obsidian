@@ -722,7 +722,8 @@ it('the header shows background jobs and jumps to them', async () => {
   await tick();
   expect(host.querySelector('.qard-jobs-button')?.textContent).toBe('1 running');
   await click(host.querySelector('.qard-jobs-button'));
-  expect(host.querySelector('.qard-jobs-item')?.textContent).toContain('Mapping courseDS346');
+  expect(host.querySelector('.qard-jobs-item')?.textContent).toBe('Mapping course');
+  expect(host.querySelector('.qard-jobs-detail')?.textContent).toBe('DS346');
   await click(host.querySelector('.qard-jobs-item'));
   expect(nav.mapCourse).toHaveBeenCalledWith('Notes/DS346');
 });

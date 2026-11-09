@@ -4044,8 +4044,9 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-objective {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
   gap: var(--qard-gap-fields);
   padding: var(--qard-inset-compact) 0;
   border-top: 1px solid var(--qard-border);
@@ -4065,18 +4066,18 @@ body.qard-focus-active .status-bar {
   overflow-wrap: anywhere;
 }
 
+.qard-objective-main strong .qard-state {
+  display: inline-flex;
+  vertical-align: 1px;
+  margin-right: var(--qard-gap-actions);
+}
+
 .qard-objective-meta {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: var(--qard-gap-actions);
   min-width: 0;
-}
-
-.qard-objective-evidence {
-  min-width: 0;
-  font-size: var(--qard-font-meta);
-  overflow-wrap: anywhere;
 }
 
 .qard-objective-due {
@@ -4217,6 +4218,10 @@ body.qard-focus-active .status-bar {
 }
 
 @container qard-workspace (max-width: 640px) {
+  .qard-objective {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .qard-objective-actions > button {
     flex: 1 1 100px;
   }
@@ -4389,20 +4394,17 @@ body.qard-focus-active .status-bar {
   container-name: qard-map;
   min-width: 0;
   display: grid;
-  grid-template-rows: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
   gap: var(--qard-gap-fields);
 }
 
 .qard-map-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
-  justify-content: space-between;
-  gap: var(--qard-gap-actions);
   min-width: 0;
-  padding: var(--qard-space-3);
-  border-bottom: 1px solid var(--qard-border);
+  padding: 8px var(--qard-space-3);
+  border: 1px solid var(--qard-border);
+  border-radius: var(--qard-radius-floating);
   background: var(--qard-bg);
+  box-shadow: var(--shadow-s);
 }
 
 .qard-map-body {
@@ -4418,6 +4420,7 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-map-canvas {
+  position: relative;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -4637,8 +4640,22 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-map-tools.is-right {
-  flex: 0 1 auto;
+  position: absolute;
+  top: var(--qard-space-3);
+  left: var(--qard-space-3);
+  right: var(--qard-space-3);
+  z-index: 2;
   justify-content: space-between;
+  gap: var(--qard-space-1);
+  padding: var(--qard-space-1);
+  border: 1px solid var(--qard-border);
+  border-radius: var(--qard-radius-floating);
+  background: var(--qard-bg);
+  box-shadow: var(--shadow-s);
+}
+
+.qard-map-tools.is-right > * {
+  flex: 1;
 }
 
 .qard-map-zoom {
@@ -4786,35 +4803,17 @@ body.qard-focus-active .status-bar {
 }
 
 @container qard-map (max-width: 640px) {
-  .qard-map-tools.is-left {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) minmax(70px, 1fr);
-    flex-basis: 100%;
-  }
-
-  .qard-map-tools.is-left:not(.has-topic) {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
+  .qard-map-crumb,
   .qard-map-divider {
     display: none;
   }
 
-  .qard-map-crumb {
-    max-width: none;
-    min-width: 0;
+  .qard-map-tools.is-left {
+    flex-wrap: nowrap;
   }
 
-  .qard-map-tools.is-left > .qard-muted {
-    grid-column: 1 / -1;
-  }
-
-  .qard-map-tools.is-right {
-    flex-basis: 100%;
-  }
-
-  .qard-map-tools.is-right > * {
-    flex: 1;
+  .qard-map-search {
+    flex: 1 1 0;
   }
 }
 
@@ -5086,9 +5085,9 @@ body.qard-focus-active .status-bar {
 
 .qard-jobs-meta {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--qard-space-1);
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--qard-gap-actions);
   color: var(--qard-muted);
   font-size: var(--qard-font-meta);
   font-variant-numeric: tabular-nums;
@@ -5720,29 +5719,34 @@ div.qard-ask-q {
 }
 
 .qard-jobs-row-head {
-  display: flex;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) fit-content(48%) auto;
+  align-items: center;
   gap: var(--qard-gap-actions);
 }
 
 .qard-jobs-row-head .qard-jobs-item {
-  flex: 1;
+  flex: 1 1 auto;
+  width: auto;
   min-width: 0;
 }
 
-.qard-jobs-agent:empty {
-  display: none;
+.qard-jobs-role {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--qard-soft);
+  font-size: var(--qard-font-meta);
+  font-weight: var(--qard-weight-medium);
+  color: var(--qard-muted);
 }
 
-.qard-jobs-agent .qard-agent {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  font-size: inherit;
-  font-weight: var(--qard-weight-normal);
-  color: inherit;
+.qard-jobs-time {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: var(--qard-font-meta);
+  color: var(--qard-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .qard-jobs-row {
@@ -5761,10 +5765,11 @@ div.qard-ask-q {
 }
 
 .qard-app button.qard-jobs-cancel {
-  flex-shrink: 0;
-  padding: 4px 12px;
+  flex: 0 0 auto;
+  width: var(--qard-control-height);
   min-height: var(--qard-control-height);
-  font-size: var(--qard-font-control);
+  padding: 0;
+  color: var(--qard-muted);
 }
 
 .qard-app button.qard-jobs-cancel:hover {
@@ -6949,19 +6954,20 @@ div.qard-ask-q {
 
 /* Optional card formats use the existing editor and study surfaces. */
 .qard-card-type {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  padding: 4px;
-  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--qard-space-1);
+  padding: var(--qard-space-1);
+  margin-bottom: var(--qard-space-6);
   border: 1px solid var(--qard-border);
-  border-radius: 10px;
+  border-radius: var(--qard-radius-floating);
   background: var(--qard-soft);
-  width: fit-content;
+  width: 100%;
   max-width: 100%;
 }
 
 .qard-app .qard-card-type button {
+  min-width: 0;
   border-color: transparent;
   color: var(--qard-muted);
   padding: 8px 12px;
@@ -7165,17 +7171,9 @@ div.qard-ask-q {
   gap: var(--qard-gap-fields);
 }
 
-.qard-mask-size label {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  flex: 1;
-  gap: var(--qard-space-1);
-  min-width: 0;
-  color: var(--qard-muted);
-  font-size: var(--qard-font-meta);
-}
-
 .qard-mask-size input {
+  flex: 1;
+  width: 0;
   min-width: 0;
 }
 
@@ -7199,11 +7197,13 @@ div.qard-ask-q {
   color: var(--qard-blue);
 }
 
-@container (max-width: 420px) {
+@container qard-workspace (max-width: 640px) {
   .qard-card-type {
-    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
 
+@container (max-width: 420px) {
   .qard-app .qard-card-type button {
     flex: 1;
     font-size: var(--qard-font-control);

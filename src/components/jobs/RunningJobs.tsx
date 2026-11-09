@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Square } from 'lucide-react';
 import type { QardServices } from '../../views/services';
 import type { TestNav } from '../../views/navigation';
 import type { LearnNav } from '../../views/navigation';
 import { overdue, roleOf, timeLeft } from '../../jobs/job-clock';
-import { AgentLabel } from './AgentLabel';
 import { LoadingIndicator } from '../common/LoadingIndicator';
 import { InlineMarkdown } from '../Markdown';
 import type { GenerationSnapshot } from '../../cards/generation-service';
@@ -169,6 +168,10 @@ export function RunningJobs({
   const container = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const now = useTick(open && jobs.length > 0);
+  const showAgent = useSyncExternalStore(
+    services.reviews.subscribe ?? noSubscribe,
+    () => services.reviews.getSnapshot().settings.showAgent,
+  );
   useEffect(() => {
     if (!open) {
       return;
@@ -218,7 +221,8 @@ export function RunningJobs({
             {jobs.map((j) => {
               const estimate = services.jobs?.estimate(j.kind),
                 left = timeLeft(estimate, j.startedAt, now),
-                stuck = overdue(estimate, j.startedAt, now);
+                stuck = overdue(estimate, j.startedAt, now),
+                role = roleOf(j.kind);
               return (
                 <div
                   key={j.key}
@@ -234,32 +238,40 @@ export function RunningJobs({
                       }}
                     >
                       <strong>{j.label}</strong>
-                      {j.detail && (
-                        <span className="qard-jobs-detail">
-                          <InlineMarkdown text={j.detail} path={''} services={services} />
-                        </span>
-                      )}
                     </button>
-                    <button
-                      className="qard-text-button qard-jobs-cancel"
-                      aria-label={`Cancel ${j.label.toLowerCase()}`}
-                      onClick={j.cancel}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                  <div className="qard-jobs-meta">
-                    <span className="qard-jobs-agent">
-                      <AgentLabel services={services} role={roleOf(j.kind)} />
-                    </span>
                     <span
                       className={
                         stuck ? 'qard-jobs-time qard-jobs-stuck' : 'qard-jobs-time qard-muted'
                       }
+                      title={`${j.startedAt ? `${clock(now - j.startedAt)} elapsed` : 'Running'}${left ? ` · ${left}` : ''}`}
                     >
-                      {j.startedAt ? `${clock(now - j.startedAt)} elapsed` : 'Running'}
-                      {left ? ` · ${left}` : ''}
+                      {j.startedAt ? clock(now - j.startedAt) : 'Running'}
+                      {left
+                        ? ` · ${left
+                            .replace(/^about /, '~')
+                            .replace(/ min/g, 'm')
+                            .replace(/ sec/g, 's')}`
+                        : ''}
                     </span>
+                    <button
+                      className="qard-icon-button qard-jobs-cancel"
+                      aria-label={`Cancel ${j.label.toLowerCase()}`}
+                      onClick={j.cancel}
+                    >
+                      <Square size={14} fill="currentColor" strokeWidth={0} aria-hidden="true" />
+                    </button>
+                  </div>
+                  <div className="qard-jobs-meta">
+                    {showAgent && (
+                      <span className="qard-jobs-role">
+                        {role.charAt(0).toUpperCase() + role.slice(1)}
+                      </span>
+                    )}
+                    {j.detail && (
+                      <span className="qard-jobs-detail">
+                        <InlineMarkdown text={j.detail} path={''} services={services} />
+                      </span>
+                    )}
                   </div>
                 </div>
               );
