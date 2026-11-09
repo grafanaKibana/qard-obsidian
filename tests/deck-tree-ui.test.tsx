@@ -354,3 +354,74 @@ it('suggests, previews and saves registered icon-pack IDs', async () => {
     A: { icon: 'ri_terminal' },
   });
 });
+
+it.each([
+  {
+    field: 'Target retention (%)',
+    value: '86',
+    remote: { icon: 'network', color: '#aabbcc' },
+    expected: { desiredRetention: 0.86, icon: 'network', color: '#aabbcc' },
+  },
+  {
+    field: 'Icon',
+    value: 'network',
+    remote: { icon: 'atom', color: '#aabbcc' },
+    expected: { desiredRetention: 0.85, icon: 'network', color: '#aabbcc' },
+  },
+  {
+    field: 'Color',
+    value: '#abcdef',
+    remote: { icon: 'network', color: '#aabbcc' },
+    expected: { desiredRetention: 0.85, icon: 'network', color: '#abcdef' },
+  },
+  {
+    field: 'Icon',
+    value: '',
+    remote: { icon: 'network', color: '#aabbcc' },
+    expected: { desiredRetention: 0.85, color: '#aabbcc' },
+  },
+  {
+    field: 'Color',
+    value: '',
+    remote: { icon: 'network', color: '#aabbcc' },
+    expected: { desiredRetention: 0.85, icon: 'network' },
+  },
+  { field: 'Target retention (%)', value: '86', remote: {}, expected: { desiredRetention: 0.86 } },
+  {
+    field: 'Color',
+    value: '#abcdef',
+    remote: { icon: 'other-device-icon', color: '#aabbcc' },
+    expected: { desiredRetention: 0.85, icon: 'other-device-icon', color: '#abcdef' },
+  },
+])(
+  'preserves unedited synced appearance while editing $field to "$value"',
+  async ({ field, value, remote, expected }) => {
+    const save = vi.fn(async () => {});
+    const render = (appearance: { icon?: string; color?: string }) =>
+      act(() =>
+        root.render(
+          <DeckOptions
+            deck="A"
+            settings={readSettings({
+              deckOptions: {
+                A: { desiredRetention: 0.85, newCardsPerDay: 3, ...appearance },
+                B: { icon: 'atom' },
+              },
+            })}
+            save={save}
+            close={vi.fn()}
+          />,
+        ),
+      );
+    render({ icon: 'terminal', color: '#123456' });
+    await typeAppearance(field, value);
+    render(remote);
+    if (field !== 'Icon') expect(appearanceField('Icon').value).toBe(remote.icon ?? '');
+    if (field !== 'Color') expect(appearanceField('Color').value).toBe(remote.color ?? '');
+    await action('Save options');
+    expect(save).toHaveBeenCalledWith({
+      A: { newCardsPerDay: 3, ...expected },
+      B: { icon: 'atom' },
+    });
+  },
+);

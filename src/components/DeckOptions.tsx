@@ -32,10 +32,12 @@ export function DeckOptions({
     ),
     [targetEdited, setTargetEdited] = useState(false),
     [limit, setLimit] = useState(own.newCardsPerDay ? String(own.newCardsPerDay) : ''),
-    [icon, setIcon] = useState(own.icon ?? ''),
-    [color, setColor] = useState(own.color ?? ''),
+    [iconDraft, setIcon] = useState<string>(),
+    [colorDraft, setColor] = useState<string>(),
     [error, setError] = useState(''),
     [busy, setBusy] = useState(false);
+  const icon = iconDraft ?? own.icon ?? '',
+    color = colorDraft ?? own.color ?? '';
   const iconsId = useId();
   const icons = useMemo(() => getIconIds().sort(), []);
   const unavailable = !!icon.trim() && !getIcon(icon.trim());
