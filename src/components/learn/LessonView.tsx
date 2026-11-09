@@ -340,7 +340,8 @@ function LessonMapView({
       )}
       <p className="qard-muted">
         This lesson teaches the objective. Predictions before explanations and checks after them
-        guide feedback. Finishing marks it as taught; later retention checks establish mastery.
+        guide feedback. Finishing records teaching evidence; delayed retention checks assess
+        mastery.
       </p>
       <section>
         <h2>Plan</h2>
@@ -535,8 +536,8 @@ function LessonSteps({
             <>
               <p className="qard-muted">
                 {step.checkFirst
-                  ? 'Prediction before the explanation: work it out from what you know. Your answer guides feedback, then reveals the explanation. Finishing the lesson marks it as taught; delayed checks establish mastery.'
-                  : 'Check after the explanation: recall what you just learned. Your answer guides feedback. Finishing the lesson marks it as taught; a later retention check tests what stays with you.'}
+                  ? 'Prediction before the explanation: work it out from what you know. Your answer guides feedback, then reveals the explanation. Finishing records teaching evidence; delayed retention checks assess mastery.'
+                  : 'Check after the explanation: recall what you just learned. Your answer guides feedback. Finishing records teaching evidence; a later retention check tests what stays with you.'}
               </p>
               <AnswerInput
                 services={services}
@@ -816,15 +817,14 @@ function LessonClose({
           />
         </h1>
         <p className="qard-muted">
-          Lesson finished: taught, with retention still to check. Later checks establish mastery and
-          schedule what comes next.
+          Lesson finished. Delayed retention checks assess mastery and schedule what comes next.
         </p>
         {objective && (
           <p className="qard-check-outcome">
             <StateChip state={objective.state} />
             <span className="qard-muted">
               {objective.due
-                ? `First retention check ${relativeDay(objective.due, isoDay(Date.now()))}.`
+                ? `Retention check ${relativeDay(objective.due, isoDay(Date.now()))}.`
                 : ''}
             </span>
           </p>

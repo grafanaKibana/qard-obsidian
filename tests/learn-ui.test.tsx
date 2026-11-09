@@ -260,6 +260,8 @@ it('a lesson plan is shown for approval before teaching starts', async () => {
     'What your answers showStart from pLSA. You know the $\\theta_i \\sim \\mathrm{Dir}(\\alpha)$ step.',
   );
   expect(host.textContent).toContain('Dirichlet draws');
+  expect(host.textContent).toContain('Finishing records teaching evidence');
+  expect(host.textContent).not.toContain('Finishing marks it as taught');
   await click(buttons('Start lesson')[0]);
   await tick();
   expect(host.textContent).toContain('Writing this step…');
@@ -313,6 +315,38 @@ async function openRecap(
   await tick();
   return { path, create };
 }
+
+it.each(['taught', 'right once', 'mastered'] as const)(
+  'lesson completion describes the saved %s progress without assuming a first retention check',
+  async (state) => {
+    files.set(
+      MASTERY,
+      newMasteryNote('DS346', [
+        {
+          id: 'params',
+          title: 'Parameter counts',
+          state,
+          due: '2000-01-01',
+          notes: [],
+          needs: [],
+          evidence: ['Earlier retention evidence'],
+          cells: {},
+        },
+      ]),
+    );
+    const savedMastery = files.get(MASTERY);
+    await openRecap({ mastery: MASTERY, objective: 'params' });
+    const outcome = host.querySelector('.qard-check-outcome')!;
+    expect(outcome.textContent).toContain(
+      state === 'right once' ? 'Right once' : state === 'mastered' ? 'Mastered' : 'Taught',
+    );
+    expect(host.textContent).not.toContain('Lesson finished: taught');
+    expect(host.textContent).not.toContain('First retention check');
+    expect(outcome.textContent).toContain('Retention check');
+    expect(host.textContent).not.toContain('retention still to check');
+    expect(files.get(MASTERY)).toBe(savedMastery);
+  },
+);
 
 it('recap cards use the selected source note fixed topic without changing the shared destination', async () => {
   const selected = 'Notes/Generics.md',
@@ -662,6 +696,8 @@ it.each([true, false])(
       checkFirst ? 'Prediction before the explanation' : 'Check after the explanation',
     );
     expect(host.textContent).toContain('guides feedback');
+    expect(host.textContent).toContain('Finishing records teaching evidence');
+    expect(host.textContent).not.toContain('Finishing the lesson marks it as taught');
     expect(host.textContent?.includes('The explanation is here.')).toBe(!checkFirst);
     expect(host.textContent).not.toContain('2 marks');
     expect(host.querySelector('.qard-rubric-row')).toBeNull();
