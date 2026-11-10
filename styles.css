@@ -1234,9 +1234,9 @@
 .qard-deck-actions {
   display: flex;
   align-items: center;
-  flex: 1 1 auto;
-  flex-wrap: wrap;
-  gap: var(--qard-gap-actions);
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  gap: var(--qard-inset-compact);
   margin-left: auto;
   justify-content: flex-end;
 }
@@ -1279,11 +1279,25 @@
 }
 
 .qard-deck-row {
+  position: relative;
+  gap: var(--qard-inset-compact);
   border: 1px solid var(--qard-border);
   border-radius: 12px;
   padding: var(--qard-inset-compact);
   flex-wrap: wrap;
   transition: background 0.12s;
+}
+
+.qard-deck-row > .qard-deck-actions,
+.qard-deck-row > .qard-deck-toggle {
+  position: relative;
+  z-index: 1;
+}
+
+.qard-deck-row > .qard-deck::after {
+  content: '';
+  position: absolute;
+  inset: 0;
 }
 
 .qard-deck-row:hover {
@@ -5677,17 +5691,25 @@ body.qard-focus-active .status-bar {
 
 .qard-usage-legend {
   display: flex;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: var(--qard-space-1) var(--qard-space-4);
   font-size: var(--qard-font-meta);
   color: var(--qard-muted);
   margin-top: -12px;
 }
 
+.qard-usage-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--qard-space-1);
+  white-space: nowrap;
+}
+
 .qard-usage-legend i {
+  flex: 0 0 auto;
   width: 9px;
   height: 9px;
   border-radius: 2px;
-  margin-right: 6px;
   display: inline-block;
 }
 
@@ -5924,9 +5946,19 @@ div.qard-ask-q {
   max-height: 180px;
   field-sizing: content;
   resize: none;
-  padding: var(--qard-control-padding);
+  padding-inline: var(--qard-space-3);
+  padding-block: max(0px, calc((var(--qard-control-height) - 1lh - 2px) / 2));
   font-size: var(--qard-font-control);
   line-height: 1.4;
+}
+
+.qard-ask-input textarea:placeholder-shown {
+  white-space: nowrap;
+}
+
+.qard-ask-input textarea::placeholder {
+  line-height: inherit;
+  white-space: nowrap;
 }
 
 .qard-panel-ask {
@@ -6067,7 +6099,7 @@ div.qard-ask-q {
   gap: 12px;
 }
 
-/* Delete actions remain separate from row navigation and visible on touch screens. */
+/* Delete actions remain separate from row navigation. */
 .qard-deletable-row {
   display: flex;
   align-items: center;
@@ -7885,6 +7917,7 @@ div.qard-ask-q {
 }
 
 .qard-study-desk .qard-deck-row {
+  gap: var(--qard-inset-compact);
   border: 0;
   border-radius: 0;
   padding: var(--qard-inset-compact);
@@ -7897,7 +7930,7 @@ div.qard-ask-q {
 
 .qard-app .qard-study-desk .qard-deck-row > button.qard-deck {
   padding: 0;
-  gap: 14px;
+  gap: var(--qard-inset-compact);
   border-radius: 0;
 }
 
@@ -8366,16 +8399,14 @@ div.qard-ask-q {
   }
 
   .qard-deck-actions {
-    justify-content: space-between;
+    flex: 0 0 auto;
+    gap: var(--qard-space-3);
   }
 
-  .qard-app .qard-deck-actions > button,
-  .qard-app .qard-deck-actions > .qard-delete-item {
-    flex: 1 1 0;
-  }
-
-  .qard-app .qard-deck-actions > .qard-delete-item > button {
-    width: 100%;
+  .qard-app .qard-deck-row > .qard-deck-toggle,
+  .qard-deck-actions > :not(.qard-deck-study),
+  .qard-deck-actions:not(.has-study) {
+    display: none;
   }
 
   .qard-deck-study-label {
@@ -8383,21 +8414,19 @@ div.qard-ask-q {
   }
 
   .qard-study-desk .qard-deck-row {
+    flex-wrap: nowrap;
     padding: var(--qard-space-3);
-    gap: var(--qard-gap-actions);
+    gap: var(--qard-space-3);
   }
 
   .qard-app .qard-study-desk .qard-deck-row > button.qard-deck {
-    flex-basis: calc(var(--qard-font-body) * 7 + var(--qard-space-2));
-    gap: var(--qard-gap-actions);
+    flex: 1 1 0;
+    min-width: 0;
+    gap: var(--qard-space-3);
   }
 
   .qard-deck-children {
     margin-left: var(--qard-gap-actions);
-  }
-
-  .qard-deck-actions {
-    gap: var(--qard-space-1);
   }
 
   .qard-exam-steps {
@@ -8662,7 +8691,7 @@ div.qard-ask-q {
 
 .qard-app button.qard-today-learning-row {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) minmax(0, auto) auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: var(--qard-gap-actions);
   align-items: center;
   padding-inline: 0;
@@ -8736,39 +8765,6 @@ div.qard-ask-q {
 }
 
 @container qard-workspace (max-width: 640px) {
-  .qard-app button.qard-today-learning-row {
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    grid-template-areas:
-      'state course course'
-      'title title action';
-    gap: var(--qard-space-1) var(--qard-gap-actions);
-  }
-
-  .qard-today-learning-row > .qard-objective-status {
-    grid-area: state;
-  }
-
-  .qard-app .qard-today-learning-row .qard-objective-title-text {
-    grid-area: title;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .qard-app .qard-today-learning-row .qard-learning-row-course {
-    grid-area: course;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: right;
-  }
-
-  .qard-learning-row-action {
-    grid-area: action;
-    place-self: center end;
-  }
-
   .qard-today .qard-doc-footer > button,
   .qard-lesson .qard-lesson-navigation > button:last-child {
     width: 100%;
@@ -8804,4 +8800,68 @@ div.qard-ask-q {
   grid-column: 1 / -1;
   grid-row: 2;
   min-width: 0;
+}
+
+/* Quiet course separators replace repeated row metadata. */
+.qard-learning-group + .qard-learning-group {
+  margin-top: var(--qard-space-4);
+}
+
+.qard-app .qard-learning-group-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--qard-gap-actions);
+  margin: 0 0 var(--qard-space-1);
+  color: var(--qard-muted);
+  font-size: var(--qard-font-meta);
+  font-weight: var(--qard-weight-medium);
+}
+
+.qard-learning-group-heading::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid var(--qard-border);
+}
+
+.qard-app .qard-today-learning-row .qard-objective-title-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.qard-figure-meta {
+  flex-basis: 100%;
+}
+
+.qard-figure.is-drawing > .qard-waiting {
+  flex: 1 0 100%;
+  flex-wrap: nowrap;
+  margin: 0;
+}
+
+.qard-figure.is-drawing > .qard-job-controls {
+  flex-basis: 100%;
+  justify-content: flex-end;
+}
+
+.qard-figure-redraw-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--qard-gap-actions);
+}
+
+@container qard-workspace (max-width: 640px) {
+  .qard-figure-redraw {
+    flex-wrap: wrap;
+  }
+
+  .qard-figure-redraw input {
+    flex-basis: 100%;
+  }
+
+  .qard-figure-redraw-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }

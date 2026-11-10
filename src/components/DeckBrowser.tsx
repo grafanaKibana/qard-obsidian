@@ -1,16 +1,7 @@
 import { DeleteItem } from './DeleteItem';
 import { RenameItem } from './RenameItem';
 import { useState, type ReactNode } from 'react';
-import {
-  ArrowRight,
-  ChevronDown,
-  ChevronRight,
-  ClipboardCheck,
-  Plus,
-  Search,
-  Play,
-  Settings2,
-} from 'lucide-react';
+import { ArrowRight, Minus, ClipboardCheck, Plus, Search, Play, Settings2 } from 'lucide-react';
 import type { Deck } from '../cards/card-types';
 import { buildDeckTree, type DeckNode } from '../decks/deck-index';
 import { DeckBadge } from './DeckBadge';
@@ -81,7 +72,7 @@ export function DeckBrowser({
               aria-label={`${open ? 'Collapse' : 'Expand'} ${node.name}`}
               onClick={() => toggle(node.name)}
             >
-              {open ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+              {open ? <Minus size={16} /> : <Plus size={16} />}
             </button>
           )}
           <button
@@ -100,16 +91,7 @@ export function DeckBrowser({
               </small>
             </span>
           </button>
-          <div className="qard-deck-actions">
-            {deck && (
-              <button
-                className="qard-icon-button"
-                aria-label={`Open deck ${deck.name}`}
-                onClick={() => openDeck(deck.name)}
-              >
-                <ChevronRight size={16} />
-              </button>
-            )}
+          <div className={`qard-deck-actions${parent && studyDecks ? ' has-study' : ''}`}>
             {parent && options && (
               <button
                 className="qard-icon-button"

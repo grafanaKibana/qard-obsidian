@@ -92,6 +92,21 @@ it('nests decks under their parents, opens real decks and studies a whole subtre
   expect(button('Expand Biology').getAttribute('aria-expanded')).toBe('false');
 });
 
+it('opens a deck through its row button without a redundant chevron action', async () => {
+  const open = vi.fn(),
+    studyDecks = vi.fn();
+  library(true, { open, studyDecks });
+  const row = host.querySelector('.qard-deck-row')!;
+  expect(row.querySelector('[aria-label^="Open deck"]')).toBeNull();
+  expect(row.querySelector('svg.lucide-chevron-right')).toBeNull();
+  await click(row.querySelector('button.qard-deck')!);
+  expect(open).toHaveBeenCalledWith('Biology');
+  open.mockClear();
+  await click(button('Study Biology and its subdecks'));
+  expect(studyDecks).toHaveBeenCalledOnce();
+  expect(open).not.toHaveBeenCalled();
+});
+
 it('keeps the flat list with full names while searching or filtering', () => {
   library(false);
   expect(names()).toEqual(['Biology', 'Biology::Cells', 'Biology::Genetics::DNA', 'Chemistry']);
