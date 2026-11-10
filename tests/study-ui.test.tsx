@@ -356,9 +356,7 @@ it('skip reports no review, leaves the schedule unchanged and offers skipped car
   expect(host.querySelector('.qard-difficulty')).toBeNull();
   expect(services.reviews.getSnapshot()).toBe(before);
   await act(async () =>
-    [...host.querySelectorAll('button')]
-      .find((b) => b.textContent === 'Review skipped cards')!
-      .click(),
+    [...host.querySelectorAll('button')].find((b) => b.textContent === 'Review skipped')!.click(),
   );
   expect(repeat).toHaveBeenCalledWith(cards);
 });
@@ -381,7 +379,7 @@ it('pause advances a saved session without rating, and does not offer paused car
     await services.reviews.flush().catch(() => {});
   });
   expect(host.textContent).toContain('Session complete');
-  expect(host.textContent).not.toContain('Review skipped cards');
+  expect(host.textContent).not.toContain('Review skipped');
   expect(services.reviews.getSnapshot().states.first).toMatchObject({
     paused: true,
     reviewCount: 0,

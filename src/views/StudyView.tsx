@@ -658,21 +658,25 @@ export function StudyView({
   if (!card) {
     return (
       <div className="qard-summary">
-        <CheckCircle2 size={32} />
-        <h1>{cram ? 'Cram session complete' : 'Session complete'}</h1>
-        <div className="qard-summary-stats">
-          <div>
-            <strong>
-              {cram ? position - skipped.length : new Set(results.map((r) => r.cardId)).size} /{' '}
-              {cards.length}
-            </strong>
-            <span>{cram ? 'cards viewed' : 'cards reviewed'}</span>
+        <header className="qard-summary-header">
+          <div className="qard-summary-title">
+            <CheckCircle2 size={24} aria-hidden="true" />
+            <h1>{cram ? 'Cram session complete' : 'Session complete'}</h1>
           </div>
-          <div>
-            <strong>{Math.max(1, Math.round((Date.now() - start.current) / 60000))} min</strong>
-            <span>this visit</span>
+          <div className="qard-summary-stats">
+            <div>
+              <strong>
+                {cram ? position - skipped.length : new Set(results.map((r) => r.cardId)).size} /{' '}
+                {cards.length}
+              </strong>
+              <span>{cram ? 'cards viewed' : 'cards reviewed'}</span>
+            </div>
+            <div>
+              <strong>{Math.max(1, Math.round((Date.now() - start.current) / 60000))} min</strong>
+              <span>this visit</span>
+            </div>
           </div>
-        </div>
+        </header>
         {!cram && <SessionDifficultyChart results={results} />}
         {!!repairCount && (
           <p className="qard-muted">
@@ -731,7 +735,7 @@ export function StudyView({
               onClick={() => void repeatSaved(activeCards.filter((c) => skipped.includes(c.id)))}
             >
               <RotateCcw size={16} />
-              Review skipped cards
+              Review skipped
             </button>
           )}
           {cram && (
@@ -753,7 +757,7 @@ export function StudyView({
               }
             >
               <RotateCcw size={16} />
-              Review difficult cards
+              Review difficult
             </button>
           )}
           <button className="qard-primary" disabled={busy} onClick={exit}>

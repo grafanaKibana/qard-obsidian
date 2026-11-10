@@ -41,7 +41,9 @@ it('plots actual rating frequencies and percentages with an accessible median', 
 
 it('places an even median between the two middle ratings, including a split distribution', async () => {
   await render([1, 1, 4, 4]);
-  expect(host.querySelector('.qard-difficulty-median')?.textContent).toBe('Median Again / Easy');
+  expect(host.querySelector('.qard-difficulty-marker title')?.textContent).toBe(
+    'Median: Again / Easy',
+  );
   expect(host.querySelector('.qard-difficulty-marker')?.getAttribute('d')).toBe('M 240 28 V 148');
   expect(
     [...host.querySelectorAll('.qard-difficulty-point')].map((p) => Number(p.getAttribute('cy'))),

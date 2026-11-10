@@ -40,28 +40,31 @@ export function JobStatus({
       : `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')} elapsed`;
   return (
     <div className="qard-wait-status qard-job-status">
-      {heading ?? (
-        <>
-          {job && (
-            <div className="qard-jobs-meta qard-wait-meta">
-              <AgentLabel services={services} role={roleOf(job.kind)} compact />
-              <span className="qard-jobs-time qard-wait-estimate">
-                {elapsed}
-                {left ? ` · ${left}` : ''}
-              </span>
-            </div>
-          )}
-          <div className="qard-wait-head">
-            <div className="qard-wait-heading">
-              <Waiting text={title} />
-            </div>
-          </div>
-        </>
+      {!heading && job && (
+        <div className="qard-jobs-meta qard-wait-meta">
+          <AgentLabel services={services} role={roleOf(job.kind)} compact />
+          <span className="qard-jobs-time qard-wait-estimate">
+            {elapsed}
+            {left ? ` · ${left}` : ''}
+          </span>
+        </div>
       )}
-      {children}
-      {!ready && (
-        <JobControls services={services} job={job} cancel={cancel} start={start} hint={hint} />
-      )}
+      <div className="qard-wait-head">
+        <div className="qard-wait-heading">
+          {heading ?? <Waiting text={title} />}
+          {children}
+        </div>
+        {!ready && (
+          <JobControls
+            services={services}
+            job={job}
+            cancel={cancel}
+            start={start}
+            hint={hint}
+            compact
+          />
+        )}
+      </div>
     </div>
   );
 }

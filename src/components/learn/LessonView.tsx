@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useId, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { ArrowRight, ChevronRight, Info, FileText } from 'lucide-react';
 import type { QardServices } from '../../views/services';
 import type { Lesson } from '../../learn/learn-types';
@@ -208,8 +208,6 @@ function LessonProbe({
   lesson: Lesson;
 }) {
   const { job } = useLearn(services);
-  const [showHelp, setShowHelp] = useState(false);
-  const helpId = useId();
   const probing = job(path, 'probe'),
     mapping = job(path, 'map'),
     probe = lesson.probe;
@@ -265,20 +263,15 @@ function LessonProbe({
     <div className="qard-test">
       <div className="qard-test-heading">
         <div>
-          <span className="qard-muted qard-diagnostic-label">
-            <button
-              type="button"
-              className="qard-icon-button qard-section-info"
-              title={DIAGNOSTIC_HELP}
-              aria-label="About diagnostic questions"
-              aria-expanded={showHelp}
-              aria-controls={helpId}
-              onClick={() => setShowHelp(!showHelp)}
-            >
-              <Info size={14} aria-hidden="true" />
-            </button>
-            Diagnostic · {lesson.course ?? 'Before we start'}
-          </span>
+          <details>
+            <summary className="qard-muted qard-diagnostic-label" title={DIAGNOSTIC_HELP}>
+              <span className="qard-section-info">
+                <Info size={14} aria-hidden="true" />
+              </span>
+              Diagnostic · {lesson.course ?? 'Before we start'}
+            </summary>
+            <p className="qard-muted qard-small qard-diagnostic-help">{DIAGNOSTIC_HELP}</p>
+          </details>
           <h1>
             <InlineMarkdown
               text={lesson.topic}
@@ -288,9 +281,6 @@ function LessonProbe({
           </h1>
         </div>
       </div>
-      <p id={helpId} className="qard-muted qard-small" hidden={!showHelp}>
-        {DIAGNOSTIC_HELP}
-      </p>
       {probe.questions.map((q, i) => (
         <AnswerInput
           key={q.id}

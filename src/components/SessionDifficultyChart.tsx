@@ -1,4 +1,5 @@
 import { useId } from 'react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import type { SessionResult } from '../review/session';
 
 const labels = ['Again', 'Hard', 'Good', 'Easy'] as const;
@@ -38,17 +39,15 @@ export function SessionDifficultyChart({ results }: { results: SessionResult[] }
   return (
     <figure className="qard-difficulty" aria-labelledby={`${id}-title`}>
       <figcaption className="qard-difficulty-heading">
-        <div>
-          <h2 id={`${id}-title`}>Recall difficulty</h2>
-          <p>Your ratings this session</p>
-        </div>
-        <span className="qard-difficulty-median">
-          Median <strong>{median}</strong>
-        </span>
+        <h2 id={`${id}-title`}>Recall difficulty</h2>
+        <p>Your ratings this session</p>
       </figcaption>
+      <span className="qard-difficulty-scale">
+        {peak} {peak === 1 ? 'card' : 'cards'}
+      </span>
       <svg
         className="qard-difficulty-plot"
-        viewBox="0 0 480 176"
+        viewBox="0 22 480 132"
         role="img"
         aria-label={description}
       >
@@ -58,13 +57,12 @@ export function SessionDifficultyChart({ results }: { results: SessionResult[] }
             <stop offset="100%" stopColor="currentColor" stopOpacity="0.02" />
           </linearGradient>
         </defs>
-        <path className="qard-difficulty-grid" d={`M 24 ${top} H 456`} />
-        <text className="qard-difficulty-scale" x="24" y="18">
-          {peak} {peak === 1 ? 'card' : 'cards'}
-        </text>
+        <path className="qard-difficulty-grid" d={`M 0 ${top} H 480`} />
         <path d={`${line} L 420 ${baseline} L 60 ${baseline} Z`} fill={`url(#${id}-fill)`} />
-        <path className="qard-difficulty-axis" d={`M 24 ${baseline} H 456`} />
-        <path className="qard-difficulty-marker" d={`M ${medianX} ${top} V ${baseline}`} />
+        <path className="qard-difficulty-axis" d={`M 0 ${baseline} H 480`} />
+        <path className="qard-difficulty-marker" d={`M ${medianX} ${top} V ${baseline}`}>
+          <title>Median: {median}</title>
+        </path>
         <path className="qard-difficulty-line" d={line} />
         {points.map((point, index) => (
           <circle
@@ -88,8 +86,14 @@ export function SessionDifficultyChart({ results }: { results: SessionResult[] }
         ))}
       </div>
       <div className="qard-difficulty-direction" aria-hidden="true">
-        <span>More difficult</span>
-        <span>Easier</span>
+        <span>
+          <ArrowLeft size={14} />
+          More difficult
+        </span>
+        <span>
+          Easier
+          <ArrowRight size={14} />
+        </span>
       </div>
     </figure>
   );

@@ -1122,7 +1122,7 @@ it('opens the completed lesson note with a named icon button', async () => {
   expect(host.textContent).not.toContain('Delayed retention checks');
 });
 
-it('opens and closes diagnostic guidance from its info button without submitting answers', async () => {
+it('opens and closes diagnostic guidance from its info disclosure without submitting answers', async () => {
   const submit = vi.spyOn(services.learn, 'submitProbe');
   await openRecap({
     close: undefined,
@@ -1130,21 +1130,16 @@ it('opens and closes diagnostic guidance from its info button without submitting
     probe: { questions: [], answers: {} },
     map: undefined,
   });
-  const info = host.querySelector<HTMLButtonElement>(
-    'button[aria-label="About diagnostic questions"]',
-  )!;
-  const help = document.getElementById(info.getAttribute('aria-controls')!)!;
-  expect(info.type).toBe('button');
-  expect(info.getAttribute('aria-expanded')).toBe('false');
-  expect(help.hidden).toBe(true);
-  expect(info.title).toBe(help.textContent);
-  expect(info.parentElement?.textContent).toContain('Diagnostic · Programming');
+  const info = host.querySelector<HTMLElement>('summary.qard-diagnostic-label')!;
+  const disclosure = info.closest('details')!;
+  const help = disclosure.querySelector('.qard-diagnostic-help');
+  expect(disclosure.open).toBe(false);
+  expect(info.title).toBe(help?.textContent);
+  expect(info.textContent).toContain('Diagnostic · Programming');
   await click(info);
-  expect(info.getAttribute('aria-expanded')).toBe('true');
-  expect(help.hidden).toBe(false);
-  expect(help.textContent).toContain('They do not establish mastery');
+  expect(disclosure.open).toBe(true);
+  expect(help?.textContent).toContain('They do not establish mastery');
   await click(info);
-  expect(info.getAttribute('aria-expanded')).toBe('false');
-  expect(help.hidden).toBe(true);
+  expect(disclosure.open).toBe(false);
   expect(submit).not.toHaveBeenCalled();
 });
