@@ -904,6 +904,12 @@
   --qard-workspace-gutter: 28px;
   --qard-page-max-width: 1440px;
   --qard-reading-measure: 72ch;
+  --qard-study-card-width: 860px;
+  --qard-row-accent: var(--qard-blue);
+  --qard-row-padding: var(--qard-space-3) var(--qard-space-4);
+  --qard-row-gap: var(--qard-gap-actions);
+  --qard-row-radius: var(--qard-radius-floating);
+  --qard-row-height: 72px;
   --qard-row-action-size: 34px;
   --qard-control-hover: color-mix(in srgb, var(--qard-text) 12%, var(--qard-bg));
   --qard-objective-actions-width: calc(var(--qard-font-control) * 10 + var(--qard-space-8));
@@ -2092,6 +2098,9 @@
 
 .qard-study-card {
   display: grid;
+  width: 100%;
+  max-width: var(--qard-study-card-width);
+  margin-inline: auto;
 }
 
 .qard-study-face {
@@ -3998,23 +4007,86 @@ body.qard-focus-active .status-bar {
   }
 }
 
+.qard-row-lesson {
+  --qard-row-accent: var(--qard-miss);
+}
+
+.qard-row-study {
+  --qard-row-accent: var(--qard-ok);
+}
+
+.qard-row-update {
+  --qard-row-accent: var(--qard-vague);
+}
+
+.qard-app :is(button.qard-resume, .qard-summary-row, .qard-saved-session) {
+  border: 1px solid color-mix(in srgb, var(--qard-row-accent) 25%, var(--qard-border));
+  border-radius: var(--qard-row-radius);
+  background: color-mix(in srgb, var(--qard-row-accent) 6%, var(--qard-bg));
+  color: var(--qard-text);
+}
+
+.qard-app :is(button.qard-resume, .qard-summary-row) {
+  min-height: var(--qard-row-height);
+  padding: var(--qard-row-padding);
+  gap: var(--qard-row-gap);
+  margin-bottom: var(--qard-gap-actions);
+}
+
+.qard-app :is(button.qard-resume, .qard-summary-row):hover {
+  background: color-mix(in srgb, var(--qard-row-accent) 10%, var(--qard-bg));
+}
+
 .qard-app button.qard-resume {
   display: flex;
   width: 100%;
   justify-content: flex-start;
   flex-wrap: nowrap;
-  gap: var(--qard-gap-actions);
-  margin-bottom: var(--qard-gap-actions);
-  padding: var(--qard-space-3) var(--qard-space-4);
-  border-radius: var(--qard-radius-floating);
-  font-size: var(--qard-font-control);
+  font-size: var(--qard-font-body);
   line-height: 1.5;
-  border-color: color-mix(in srgb, var(--qard-blue) 25%, var(--qard-border));
-  background: var(--qard-tint);
   text-align: left;
 }
 
+.qard-app .qard-summary-row > button:is(.qard-resume, .qard-test-row) {
+  align-self: stretch;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.qard-deck-list > .qard-summary-row {
+  margin-bottom: 0;
+}
+
+.qard-app .qard-summary-row > .qard-delete-item > button {
+  width: var(--qard-row-action-size);
+  min-width: var(--qard-row-action-size);
+  height: var(--qard-row-action-size);
+  padding: 0;
+}
+
+.qard-app .qard-summary-row > .qard-delete-item > button:hover {
+  background: color-mix(in srgb, var(--qard-row-accent) 16%, var(--qard-bg));
+}
+
+.qard-summary-row .qard-test-row > svg:last-child,
+.qard-summary-row.qard-test-row > svg:last-child {
+  width: var(--qard-row-action-size);
+  height: var(--qard-row-action-size);
+  padding: calc((var(--qard-row-action-size) - 16px) / 2);
+}
+
+.qard-app :is(.qard-resume, .qard-summary-row, .qard-saved-session) .qard-muted,
+.qard-summary-row small,
+.qard-saved-session-progress {
+  color: color-mix(in srgb, var(--qard-row-accent) 28%, var(--qard-text));
+}
+
 .qard-resume strong {
+  font-size: var(--qard-font-body);
   font-weight: var(--qard-weight-medium);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -7280,28 +7352,29 @@ div.qard-ask-q {
 
 .qard-saved-session {
   min-width: 0;
-  border: 1px solid color-mix(in srgb, var(--qard-blue) 25%, var(--qard-border));
-  border-radius: 10px;
-  background: var(--qard-tint);
 }
 
 .qard-saved-session-row {
+  min-height: var(--qard-row-height);
   display: flex;
   align-items: center;
   gap: var(--qard-gap-actions);
-  padding: var(--qard-space-3) var(--qard-space-4);
+  padding: var(--qard-row-padding);
 }
 
 .qard-saved-session-copy {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--qard-space-1);
   min-width: 0;
   flex: 1;
 }
 
 .qard-saved-session-title {
   display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   min-width: 0;
   font-size: var(--qard-font-body);
   font-weight: var(--qard-weight-medium);
@@ -7312,7 +7385,7 @@ div.qard-ask-q {
 .qard-saved-session-progress {
   display: block;
   font-size: var(--qard-font-meta);
-  color: var(--qard-muted);
+  color: color-mix(in srgb, var(--qard-row-accent) 28%, var(--qard-text));
   line-height: 1.5;
 }
 
@@ -7353,19 +7426,21 @@ div.qard-ask-q {
   line-height: 1.6;
 }
 
-@container (width < 420px) {
-  .qard-saved-session-row {
-    flex-wrap: wrap;
-    gap: var(--qard-space-3);
-  }
-
-  .qard-saved-session-copy {
-    flex-basis: 100%;
-  }
-
-  .qard-saved-session-actions {
-    width: 100%;
+@container qard-workspace (max-width: 640px) {
+  .qard-tabs {
     justify-content: space-between;
+    gap: var(--qard-gap-actions);
+  }
+
+  .qard-saved-session-resume-label {
+    display: none;
+  }
+
+  .qard-app .qard-saved-session-actions > .qard-primary {
+    width: var(--qard-row-action-size);
+    min-width: var(--qard-row-action-size);
+    height: var(--qard-row-action-size);
+    padding: 0;
   }
 }
 
@@ -8780,7 +8855,13 @@ div.qard-ask-q {
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: var(--qard-gap-actions);
   align-items: center;
-  padding-inline: 0;
+  padding: var(--qard-row-padding);
+  border-radius: var(--qard-radius-badge);
+  background: color-mix(in srgb, var(--qard-row-accent) 4%, var(--qard-bg));
+}
+
+.qard-app button.qard-today-learning-row:enabled:hover {
+  background: color-mix(in srgb, var(--qard-row-accent) 10%, var(--qard-bg));
 }
 
 .qard-today-learning-row > .qard-objective-status {
@@ -8885,8 +8966,18 @@ div.qard-ask-q {
 
 .qard-resume-title {
   grid-column: 1 / -1;
-  grid-row: 2;
+  grid-row: 1;
   min-width: 0;
+}
+
+.qard-resume-copy > .qard-resume-label {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.qard-resume-copy > .qard-resume-context {
+  grid-column: 2;
+  grid-row: 2;
 }
 
 /* Quiet course separators replace repeated row metadata. */

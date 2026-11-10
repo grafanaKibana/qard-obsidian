@@ -167,7 +167,7 @@ export function TodayView({ services, nav }: { services: QardServices; nav: Lear
                   return (
                     <div key={c.mastery + c.objective} className="qard-doc-item">
                       <button
-                        className="qard-doc-row qard-row-button qard-learning-row qard-today-learning-row"
+                        className="qard-doc-row qard-row-button qard-learning-row qard-today-learning-row qard-row-check"
                         disabled={!c.check}
                         onClick={() => open(c)}
                       >
@@ -281,7 +281,7 @@ export function TodayView({ services, nav }: { services: QardServices; nav: Lear
                 {group.items.map((l) => (
                   <button
                     key={l.mastery + l.objective}
-                    className="qard-doc-row qard-row-button qard-learning-row qard-today-learning-row"
+                    className="qard-doc-row qard-row-button qard-learning-row qard-today-learning-row qard-row-lesson"
                     onClick={() =>
                       void teach(services, nav, l).catch((e) => setError((e as Error).message))
                     }

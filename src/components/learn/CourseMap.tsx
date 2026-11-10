@@ -78,6 +78,7 @@ export function CourseMap({
   // Titles may hold maths; render them when the renderer is available.
   const md = (text: string) =>
     services ? <InlineMarkdown text={text} path={course.path} services={services} /> : text;
+  const hasObjectives = course.objectives.length > 0;
   const grouped = hasTopics(course);
   const ready = useMemo(() => readyToLearn(course), [course]);
   const topics = useMemo(() => topicsOf(course, ready), [course, ready]);
@@ -289,6 +290,10 @@ export function CourseMap({
     }
   }, [cursor, selected, topic, expanded]);
   useEffect(() => {
+    if (!hasObjectives) {
+      setExpanded(false);
+      return;
+    }
     const dialog = overlay.current;
     if (!expanded || !dialog) {
       return;
@@ -315,7 +320,7 @@ export function CourseMap({
         }
       }
     };
-  }, [expanded]);
+  }, [expanded, hasObjectives]);
 
   useEffect(() => {
     if (wasExpanded.current !== expanded) {
@@ -402,6 +407,7 @@ export function CourseMap({
     if (!id) {
       return;
     }
+    setCursor(id);
     if (grouped && topicOf(id) !== topic) {
       pending.current = id;
       enter(topicOf(id));
@@ -566,7 +572,7 @@ export function CourseMap({
     }
   };
 
-  if (!course.objectives.length) {
+  if (!hasObjectives) {
     return null;
   }
   const { w, h } = layout.size,

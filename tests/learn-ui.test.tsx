@@ -5,12 +5,13 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { Component } from 'obsidian';
 import { LearnService } from '../src/learn/learn-service';
 import { type LearnStorage } from '../src/learn/learn-contracts';
-import { newMasteryNote } from '../src/learn/mastery';
+import { newMasteryNote, parseMastery } from '../src/learn/mastery';
 import { readSettings } from '../src/settings/settings';
 import { marksSchema } from '../src/tests/test-schema';
 import { CheckView } from '../src/components/learn/CheckView';
 import { LessonView } from '../src/components/learn/LessonView';
 import { CourseView } from '../src/components/learn/CourseView';
+import { CourseMap } from '../src/components/learn/CourseMap';
 import { TodayRow } from '../src/components/learn/TodayView';
 import { LearnBrowser } from '../src/components/learn/LearnBrowser';
 import type { LearnNav } from '../src/views/navigation';
@@ -544,6 +545,71 @@ it('keeps an active objective after following a cross-topic stub with an old sel
   const active = host.querySelectorAll('.qard-map-node:not(.qard-map-stub)[tabindex="0"]');
   expect(active).toHaveLength(1);
   expect(active[0]!.getAttribute('aria-label')).toContain('Bag of words');
+});
+
+it('releases fullscreen inertness when a mounted map becomes empty and stays collapsed on refill', async () => {
+  const course = parseMastery(MASTERY, files.get(MASTERY)!);
+  const actions = { teach: vi.fn(), openNote: vi.fn() };
+  const alreadyInert = document.createElement('div');
+  alreadyInert.setAttribute('inert', 'existing');
+  const outside = document.createElement('button');
+  document.body.append(alreadyInert, outside);
+  try {
+    await act(async () => root.render(<CourseMap course={course} actions={actions} />));
+    await click(host.querySelector('[aria-label="Full screen"]'));
+    expect(host.hasAttribute('inert')).toBe(true);
+    expect(document.querySelector('.qard-map-overlay')).not.toBeNull();
+    await act(async () =>
+      root.render(<CourseMap course={{ ...course, objectives: [] }} actions={actions} />),
+    );
+    expect(document.querySelector('.qard-map-overlay')).toBeNull();
+    expect(host.hasAttribute('inert')).toBe(false);
+    expect(alreadyInert.getAttribute('inert')).toBe('existing');
+    outside.focus();
+    expect(document.activeElement).toBe(outside);
+    await act(async () => root.render(<CourseMap course={course} actions={actions} />));
+    expect(document.querySelector('.qard-map-overlay')).toBeNull();
+    expect(host.querySelector('[aria-label="Full screen"]')).not.toBeNull();
+    await click(host.querySelector('[aria-label="Full screen"]'));
+    expect(document.querySelector('.qard-map-overlay')).not.toBeNull();
+    await click(document.querySelector('[aria-label="Exit full screen"]'));
+    expect(host.hasAttribute('inert')).toBe(false);
+  } finally {
+    alreadyInert.remove();
+    outside.remove();
+  }
+});
+
+it('continues node navigation from a search result instead of the previously focused objective', async () => {
+  const course = parseMastery(
+    MASTERY,
+    `---\nqard-mastery: DS346\n---\n\n| Objective | ID | State | Needs |\n| --- | --- | --- | --- |\n| Alpha | a | mastered | |\n| Beta | b | taught | a |\n| Gamma | c | taught | b |\n`,
+  );
+  await act(async () =>
+    root.render(<CourseMap course={course} actions={{ teach: vi.fn(), openNote: vi.fn() }} />),
+  );
+  const key = async (element: Element, value: string) => {
+    await act(async () => {
+      element.dispatchEvent(
+        new KeyboardEvent('keydown', { key: value, bubbles: true, cancelable: true }),
+      );
+    });
+  };
+  const alpha = host.querySelector<HTMLElement>('.qard-map-node[aria-label^="Alpha"]')!;
+  await act(async () => alpha.focus());
+  const search = host.querySelector<HTMLInputElement>('[aria-label="Find an objective"]')!;
+  await act(async () => {
+    search.focus();
+    search.value = 'Beta';
+    search.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  await key(search, 'Enter');
+  expect(host.querySelector('.qard-map-panel h3')?.textContent).toBe('Beta');
+  await key(search, 'Escape');
+  expect(document.activeElement).toBe(host.querySelector('.qard-map-frame'));
+  await key(document.activeElement!, 'ArrowDown');
+  expect(host.querySelector('.qard-map-panel h3')?.textContent).toBe('Gamma');
+  expect(document.activeElement?.getAttribute('aria-label')).toContain('Gamma');
 });
 
 it('removes the expanded map before opening an objective note', async () => {

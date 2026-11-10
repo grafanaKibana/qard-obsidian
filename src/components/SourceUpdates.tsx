@@ -17,14 +17,16 @@ export function SourceUpdatesRow({
     return null;
   }
   return (
-    <button className="qard-resume" onClick={open}>
-      <span className="qard-muted">Source updates</span>
-      <strong>
-        {state.error
-          ? 'Check source tracking'
-          : `${state.changes.length} ${state.changes.length === 1 ? 'card may' : 'cards may'} need updating`}
-      </strong>
-      <span className="qard-muted">Review changes</span>
+    <button className="qard-resume qard-row-update" onClick={open}>
+      <span className="qard-resume-copy">
+        <span className="qard-muted qard-resume-label">Source updates</span>
+        <strong className="qard-resume-title">
+          {state.error
+            ? 'Check source tracking'
+            : `${state.changes.length} ${state.changes.length === 1 ? 'card may' : 'cards may'} need updating`}
+        </strong>
+        <span className="qard-muted qard-resume-context">Review changes</span>
+      </span>
       <ChevronRight size={16} />
     </button>
   );

@@ -216,7 +216,7 @@ export function CourseView({
       </header>
       <CourseProgress course={course} filter={filter} toggle={toggle} />
       {changed.length > 0 && (
-        <button className="qard-resume" onClick={() => setUpdating(true)}>
+        <button className="qard-resume qard-row-update" onClick={() => setUpdating(true)}>
           <span>
             {plural(changed.length, 'note')} added or changed since {course.mapped!.slice(0, 10)}
           </span>
