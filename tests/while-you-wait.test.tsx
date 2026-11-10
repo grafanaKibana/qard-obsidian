@@ -137,6 +137,40 @@ it('offers cards while waiting, keeps you there once you start, and shows a read
   expect(onContinue).toHaveBeenCalledOnce();
 });
 
+it('separates warm-up context from progress and preserves skip, show, rating and note actions', async () => {
+  const onEngage = vi.fn();
+  await act(async () => {
+    root.render(
+      <WhileYouWait
+        services={services}
+        title="Preparing your lesson…"
+        context={{ kind: 'lesson', prefer: { files: ['Notes/Cloud.md'] } }}
+        onEngage={onEngage}
+      />,
+    );
+  });
+  await tick();
+  const header = () => host.querySelector('.qard-wait-card-meta')!;
+  expect(header().firstElementChild?.textContent).toBe('Warm-up on what this builds on');
+  expect(header().lastElementChild?.textContent).toBe('1 of 2');
+  expect(header().textContent).not.toContain('·');
+  expect(buttons('Warm-up · 2')[0]?.getAttribute('aria-pressed')).toBe('true');
+  await click(buttons('Skip')[0]);
+  expect(header().lastElementChild?.textContent).toBe('2 of 2');
+  expect(host.textContent).toContain('Front fresh');
+  expect(review).not.toHaveBeenCalled();
+  await click(buttons('Show answer')[0]);
+  expect(host.textContent).toContain('Back fresh');
+  expect(onEngage).toHaveBeenCalledOnce();
+  await click(buttons('Good')[0]);
+  expect(review).toHaveBeenCalledWith('fresh', 3, expect.any(Number), undefined, [], 'DS346');
+  await click(buttons('Read the notes')[0]);
+  expect(buttons('Read the notes')[0]?.getAttribute('aria-pressed')).toBe('true');
+  await click(buttons('Cloud')[0]);
+  expect(services.app.workspace.openLinkText).toHaveBeenCalledWith('Notes/Cloud.md', '', 'split');
+  expect(onEngage).toHaveBeenCalledOnce();
+});
+
 it('prefers a due check when there is time, and lets you switch activity', async () => {
   (services.learn as unknown as { todayList: () => Promise<unknown> }).todayList = async () => ({
     checks: [

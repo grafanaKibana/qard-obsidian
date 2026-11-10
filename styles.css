@@ -3224,7 +3224,11 @@ body.qard-focus-active .status-bar {
   display: flex;
   align-items: center;
   gap: 0;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
   margin-bottom: 18px;
 }
 
@@ -3234,6 +3238,8 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-app .qard-test-steps button {
+  flex: 0 0 auto;
+  white-space: nowrap;
   min-width: 0;
   border: 0;
   padding: var(--qard-control-padding);
@@ -5264,7 +5270,11 @@ body.qard-focus-active .status-bar {
 .qard-lesson-trail {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
   gap: 0;
   max-width: 720px;
   margin: 0 auto 14px;
@@ -5272,9 +5282,15 @@ body.qard-focus-active .status-bar {
   color: var(--qard-muted);
 }
 
+.qard-lesson-trail > button,
+.qard-lesson-trail > .qard-state {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
 .qard-app .qard-lesson-trail .qard-link {
   min-width: 0;
-  white-space: normal;
+  white-space: nowrap;
   min-height: var(--qard-control-height);
   padding: var(--qard-control-padding);
   font-size: var(--qard-font-control);
@@ -5511,7 +5527,30 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-wait-tabs .qard-label {
-  margin: 0 6px 0 0;
+  margin: 0;
+}
+
+.qard-wait-activities {
+  display: flex;
+  flex: 1 1 220px;
+  gap: var(--qard-gap-actions);
+  min-width: 0;
+}
+
+.qard-wait-activities > button {
+  flex: 1 1 0;
+}
+
+.qard-wait-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--qard-gap-actions);
+}
+
+.qard-wait-card-progress {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .qard-wait-card {
@@ -5536,9 +5575,12 @@ body.qard-focus-active .status-bar {
 
 .qard-wait-ratings {
   display: flex;
-  justify-content: flex-end;
-  gap: 8px;
+  gap: var(--qard-gap-actions);
   flex-wrap: wrap;
+}
+
+.qard-wait-ratings > button {
+  flex: 1 1 0;
 }
 
 .qard-wait-done {
@@ -5692,7 +5734,9 @@ body.qard-focus-active .status-bar {
 .qard-usage-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--qard-space-1) var(--qard-space-4);
+  align-items: center;
+  justify-content: space-between;
+  gap: 0 var(--qard-gap-actions);
   font-size: var(--qard-font-meta);
   color: var(--qard-muted);
   margin-top: -12px;
@@ -5701,6 +5745,8 @@ body.qard-focus-active .status-bar {
 .qard-usage-legend > span {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  padding: var(--qard-space-1) var(--qard-gap-actions);
   gap: var(--qard-space-1);
   white-space: nowrap;
 }
@@ -8160,7 +8206,7 @@ div.qard-ask-q {
 
   .qard-app .qard-library-search input[type='search'] {
     width: 140px;
-    font-size: 16px;
+    font-size: var(--qard-font-control);
   }
 
   .qard-deck-detail .qard-topic-heading > button:first-of-type {
@@ -8862,6 +8908,47 @@ div.qard-ask-q {
 
   .qard-figure-redraw-actions {
     width: 100%;
-    justify-content: flex-end;
+  }
+
+  .qard-figure-redraw-actions > button {
+    flex: 1 1 0;
+  }
+
+  .qard-wait-ratings {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .qard-time,
+  .qard-time .qard-usage-panel {
+    gap: var(--qard-space-4);
+  }
+
+  .qard-time .qard-heading > div:first-child > p {
+    font-size: var(--qard-font-control);
+  }
+
+  .qard-time .qard-usage-summary {
+    display: grid;
+    gap: var(--qard-space-4);
+  }
+
+  .qard-time .qard-usage-total strong {
+    font-size: var(--qard-font-page);
+    line-height: 1.2;
+  }
+
+  .qard-time .qard-usage-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--qard-gap-fields) var(--qard-space-4);
+  }
+
+  .qard-time .qard-usage-stats dd {
+    font-size: var(--qard-font-body);
+  }
+
+  .qard-time .qard-usage-table {
+    font-size: var(--qard-font-meta);
   }
 }

@@ -261,17 +261,20 @@ export function WhileYouWait({
           <section className="qard-wait-body">
             <div className="qard-wait-tabs">
               <span className="qard-label">While you wait</span>
-              {available.length > 1 &&
-                available.map((a) => (
-                  <button
-                    key={a.id}
-                    className={'qard-chip' + (current === a.id ? ' is-on' : '')}
-                    aria-pressed={current === a.id}
-                    onClick={() => setActivity(a.id)}
-                  >
-                    {a.label}
-                  </button>
-                ))}
+              {available.length > 1 && (
+                <div className="qard-wait-activities">
+                  {available.map((a) => (
+                    <button
+                      key={a.id}
+                      className={'qard-chip' + (current === a.id ? ' is-on' : '')}
+                      aria-pressed={current === a.id}
+                      onClick={() => setActivity(a.id)}
+                    >
+                      {a.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             {current === 'cards' && (
               <MiniReview
@@ -375,8 +378,11 @@ function MiniReview({
   }
   return (
     <div className="qard-wait-card">
-      <div className="qard-muted qard-small">
-        {warmup ? 'Warm-up on what this builds on' : card.deck} · {index + 1} of {cards.length}
+      <div className="qard-muted qard-small qard-wait-card-meta">
+        <span>{warmup ? 'Warm-up on what this builds on' : card.deck}</span>
+        <span className="qard-wait-card-progress">
+          {index + 1} of {cards.length}
+        </span>
       </div>
       <div className="qard-wait-front">
         <Markdown text={card.frontMarkdown} path={card.sourceFile} services={services} />
@@ -450,10 +456,13 @@ function RetryPoint({
   const path = q.source?.path || folder;
   return (
     <div className="qard-wait-card">
-      <div className="qard-muted qard-small">
-        <InlineMarkdown text={test.title} path={folder} services={services} />
-        {' · you scored '}
-        {mark?.score ?? 0}/{q.marks}
+      <div className="qard-muted qard-small qard-wait-card-meta">
+        <span>
+          <InlineMarkdown text={test.title} path={folder} services={services} />
+        </span>
+        <span className="qard-wait-card-progress">
+          you scored {mark?.score ?? 0}/{q.marks}
+        </span>
       </div>
       <div className="qard-wait-front">
         <Markdown text={q.prompt} path={path} services={services} />

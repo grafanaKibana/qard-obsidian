@@ -524,9 +524,6 @@ function LessonSteps({
           )}
           {!st?.mark ? (
             <>
-              {step.checkFirst && (
-                <p className="qard-label">Try this first. Work it out from what you know.</p>
-              )}
               <AnswerInput
                 services={services}
                 question={step.check}
