@@ -1,10 +1,10 @@
 {
   "before": "70056821914f0dae910b52a20f1fa3329b04d0ac",
-  "after": "9aec6249abba6e17e39c31b53ab19223af614aa2",
+  "after": "80815a885ff0cc6a1965a3aa288396f3a31272e6",
   "comparisons": 36,
   "deviceScaleFactor": 2,
   "clock": "2026-11-09T12:00Z",
-  "capture": "Only fork main versus final PR. Identical synthetic content, theme, pane, input, typography, clock and interaction per pair. Today contains two course groups; Study time contains all six activities; figures exercise redraw and running states. No intermediate revisions.",
+  "capture": "Only fork main versus final PR. Identical synthetic content, theme, pane, input, typography, clock and interaction per pair. Two-course Today queues; all six study activities; revealed mobile waiting card and unrevealed desktop card. Redundant step strip replaced by check-first helper/trails example. No intermediate revisions.",
   "maximumExamplesPerGroup": 3,
   "scenes": [
     {
@@ -241,16 +241,18 @@
       "bottom": true
     },
     {
-      "name": "lesson-steps",
+      "name": "lesson-check-first-phone",
       "screen": "lesson",
-      "width": 1100,
-      "crop": ".qard-test-steps"
+      "variant": "check-first",
+      "width": 390,
+      "touch": true
     },
     {
       "name": "waiting-phone",
       "screen": "wait",
       "width": 390,
-      "touch": true
+      "touch": true,
+      "revealWait": true
     },
     {
       "name": "waiting-desktop",
@@ -270,23 +272,23 @@
   "hashes": {
     "after-builder-phone.png": "2f206ab5b85ebe530a15284b5d90a7477c25cdd9ebfc66319761a91d212f70df",
     "after-decks-desktop.png": "c80c95be79e8b6588e88a6e4ab890ad92288650d733563418f9ea6068f79cb94",
-    "after-decks-phone.png": "3a26eb3d0c2538ac451213cdc3811c5405054995e6e1687ea26d124de477e234",
+    "after-decks-phone.png": "c604290d4b8d810d0e236fee7419a6a9f03a849165ca2040eb93f89d2eff5275",
     "after-exam-mobile.png": "8c85de352fcd8b631f839c4fcce1ad7e7a00d31d90db8bdc33ae7dd9ad151a12",
     "after-figure-redraw-desktop.png": "8ac720d551a5481db70b87d2c1a92945f9ea6f57f93b07cf5bb5a19521dd698c",
-    "after-figure-redraw-phone.png": "73f7a4f92e92ee7959d1cfd2917c52fcd4901e17747d5337f976a59e987ed8f9",
+    "after-figure-redraw-phone.png": "31516ae44d7a01a356e216aa4dc81121bc9b81b835361bb69bed30632dbc5829",
     "after-figure-wait-phone.png": "19b691bd68106421cb48ac166eb934238acfa32f6ef91252af7a61ee45f98a97",
     "after-learn-desktop.png": "30212d9f807447c1a726731f94b01a72457e367b322e80cbb37dab6c5716af9b",
     "after-learn-phone.png": "3424148d1e0335e44099f1353973bc437a501a915e60476c8cb4918033e4af55",
-    "after-lesson-plan-phone.png": "0793c6d87ec0175fcbcd412c15dc5b86bf49a29503ad94dbcf2fd6ec7e2607c2",
-    "after-lesson-step-desktop.png": "cfe34bf1bfbd22a501c85da43029f715dec91ae92d1db44188662dbb7b3a77c8",
-    "after-lesson-step-phone.png": "121895dfc27cf89305bbd7a71878080dd1f64b5efcf5f8b9b7e678d47d81b7a8",
-    "after-lesson-steps.png": "f00b7ee32e7ef212f9706e1f23218b73fc715c613092b66fd5435d1237a303e7",
+    "after-lesson-check-first-phone.png": "4b8e7c639013a517e9e31be956f8491e494114d2d5e84caa298eaf7093427ab9",
+    "after-lesson-plan-phone.png": "740e0d5e6c3f185421ce19ec5c1fb273c20396f4ae58e774bb5cb7d31971d355",
+    "after-lesson-step-desktop.png": "11fffdddb30ec35b3b5eb26f8d4ff06375a0834e3d7c92d6a9b6e19e18272c6c",
+    "after-lesson-step-phone.png": "3286a0b6b7cf027283efec29559bc98d6fb524673f1ac574ea8368c0be86d29a",
     "after-map-desktop.png": "0bfe720c940063c84024402ae51fae35537d72539d34ee79befcbe4770322ac9",
     "after-map-phone.png": "b1bd766b3ded4bdb103ff4c3fdb73719cbd7ebe3120fe655bbfb4b9ea0229edd",
     "after-masks-desktop.png": "015672dde84295f4c833d5f645b575c67a35431d14057447dab0b7e374039e80",
     "after-masks-phone.png": "2ce267748f59cb8fffa36bc10c7899567caf3af551c2ce794fc9688fd833711e",
     "after-mcq-dark.png": "00c4c06d59793d7c71a01d0034fef78bec6c48eb7837c2bd0314be9672beceb8",
-    "after-nested-phone.png": "f43b294010802a679f0ae3148a789b060efed5419db4c4439228bfce24bede89",
+    "after-nested-phone.png": "464e1b1ab0ce5a21be53a56d9c0c783a3e5b7f4b4e9bbd62817a4a8ca4a2096b",
     "after-objectives-desktop.png": "9803891e6286486c5d3c33a162e814a30115ddea37feeb5195bb315f87daf5ed",
     "after-objectives-phone.png": "4fc34e0cd559965f0c8db0d05dfb5bc8c87f0d7b8ca6f08fc24a3cc5d6704c11",
     "after-options-desktop.png": "e8fe5f1125382494fb96544543cb1bc4f0380c312a79b4e28176e03e32d752c7",
@@ -294,16 +296,16 @@
     "after-plans-desktop.png": "5b95ac08e8a0ec7ce8f99715a7c690a887c6a8b3673f8dc700904a34262a1677",
     "after-plans-phone.png": "d5c70af05ef69cd1cb077dc39668a29e15b05c005825a003fadbbdc9893a5a9e",
     "after-reading-phone.png": "bbe484e130e2ad8edc13d9c9e9b434865128966aa41c3bd307e3d93f3e4b67b0",
-    "after-repair-phone.png": "dafd8dbad00746fbb5fa5151e8a45ab18bfd927b7f2f2482b4dc0255bf371bfb",
+    "after-repair-phone.png": "aa84627afd40b317d796f4eda3bde13c17e153acc2959aebb39c16613371736a",
     "after-statistics-phone.png": "da7cb51b2500cfbed4836e78be3ec80c5714f3254a02e08b4bac24f51f1c40de",
     "after-tasks.png": "99917669b4f484cf2c5838e4d2dfc62bf0bcee15a01d07e8a21bebf854337e62",
-    "after-time-phone.png": "0c9734bc0d2d86e36d72d3c2d6b5536c23c6968fa08055085cf2e33f169e5566",
+    "after-time-phone.png": "cbcaa50e980cff154b78ddadc31cb7b6186f91c45f1f5ead0a6216d2606a66b1",
     "after-today-desktop.png": "919b063fadd09acd5e9edff742bc5f062263584e8780dbd7b8d13b0ca24103b2",
     "after-today-phone.png": "7935d84543c616af5f2b6465d3f36b3e0584c909f193a91f55fd6a33dc2dd7e1",
-    "after-types-desktop.png": "f76e1f8865c3b7f5be23d924f454855d26b573a280b1a955496de1409fa9b6cc",
+    "after-types-desktop.png": "d2da65ab0796bc48163b805720d760dd93c673e54d445e41f40b07be223ecff9",
     "after-types-phone.png": "cb7835a4a2c2182fe7bf8207441d509733b16c28c4ccc78cafc464f03fb8d21f",
-    "after-waiting-desktop.png": "fadfdf56b769505f7372cc988ae4d40f002d47aab4921703a8fe16f7b85eb7e8",
-    "after-waiting-phone.png": "0b0d793137fdc7bf49a2a77c7764d4dfdd998cc590b7472bd1eee0f563e00c84",
+    "after-waiting-desktop.png": "34a1c09dd0596f698b7880aba1320664a30363a3a6126c6b7e93157fe4524cee",
+    "after-waiting-phone.png": "b5783d7298ed8e2443ef082df80aaaed5947941310782a68b748705fe1eb7408",
     "before-builder-phone.png": "e63b753c0d62615f08a779ef4fa55e7efacbbf8ba2ec14bbeb9d0d33321a5297",
     "before-decks-desktop.png": "6e0f5cd8969c85b8eba5ab826b3ccbc5cd56d38b73454a87799a666926f86e3d",
     "before-decks-phone.png": "623878cc2f0d1915877c7064c3d7ecad011e965c9f1675d7766c199a64b285e4",
@@ -313,10 +315,10 @@
     "before-figure-wait-phone.png": "a5206511dbecf8ec33c88eb094b009d46e643571f8f5943986d5c07a0942f36c",
     "before-learn-desktop.png": "28186752bda94981f85bc14eb48994da178184e9c9a02af84bd53eb64e17dbdd",
     "before-learn-phone.png": "6b8493aca1387184f4c1745cd885b6d5540db63c7a1b663746dbddfc4109c736",
+    "before-lesson-check-first-phone.png": "0244034eff1f0b987db3a768758715683e11ff41654832a48cde441456bb2b10",
     "before-lesson-plan-phone.png": "4d6e6526f58aa5e1622d46e84a640c6b64937934e7306289221e38929a0312f9",
     "before-lesson-step-desktop.png": "f0090762bc596fd37d5a3959f1e1bc1d1cffde45d8927b33f469f35f29bb7f93",
     "before-lesson-step-phone.png": "38cd607e3348c608065840477628bedd702edcf49fa960b6d4f9921c5fe00f26",
-    "before-lesson-steps.png": "57a5f9f58c05173f5c4fd0b1416e018afb1d3acc9ac0a1f79db6b3a6f907932d",
     "before-map-desktop.png": "3e0c45d0aa4f178802ab2401c862ed12e947de73632d843e2e95c5f18419be9a",
     "before-map-phone.png": "ed7ec631b5a39577231de2fa8b391b12e7320100159f2dec4f069fac58ee5a17",
     "before-masks-desktop.png": "dc15032780e8e9f4165a2f18033e92d20e7601eed71dc1db6a26a0c124437725",
@@ -339,6 +341,6 @@
     "before-types-desktop.png": "677d72b135e064f35c210b20bae1e4330dedfbae164bf2624f1cec10d940789f",
     "before-types-phone.png": "58a7b806b65396a8b553b13f8a06bf57e3317f2798d484140f46bc6f68f05462",
     "before-waiting-desktop.png": "203754d4220d8254d4034732c51d61769026857da3ef4600bc722e4f3de1f608",
-    "before-waiting-phone.png": "d857f15854d79d26296b98ca8a2f29a261afb712e063b45a4c3d29b201a76529"
+    "before-waiting-phone.png": "9424786a678c40c2ddc724ec4ee3ff278129cc0b2aa20e9a3cf4a695acd91012"
   }
 }
