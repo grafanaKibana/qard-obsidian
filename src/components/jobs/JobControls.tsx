@@ -1,6 +1,8 @@
+import type { ReactNode } from 'react';
 import type { QardServices } from '../../views/services';
-import { overdue } from '../../jobs/job-clock';
+import { overdue, roleOf } from '../../jobs/job-clock';
 import { useTick } from './RunningJobs';
+import { TutorHint } from '../learn/learning-status';
 
 /**
  * Under a waiting screen: Cancel while the job runs, a warning once it's well past its usual time, and a way to
@@ -11,16 +13,21 @@ export function JobControls({
   job,
   cancel,
   start,
+  hint,
 }: {
   services: QardServices;
   job?: { kind: string; startedAt?: number; error?: string };
   cancel?: () => void;
   start?: () => void;
+  hint?: ReactNode;
 }) {
   const now = useTick(!!job && !job.error);
+  const help =
+    hint ?? (job && roleOf(job.kind) === 'tutor' ? <TutorHint services={services} /> : undefined);
   if (!job) {
     return start ? (
       <div className="qard-job-controls is-stuck" role="status">
+        {help}
         <span>Nothing is working on this right now.</span>
         <button className="qard-primary" onClick={start}>
           Start again
@@ -38,6 +45,7 @@ export function JobControls({
       className={`qard-job-controls${stuck ? ' is-stuck' : ''}`}
       role={stuck ? 'status' : undefined}
     >
+      {help}
       {stuck && (
         <span>
           This has taken {minutes} min, much longer than usual, so it may be stuck. Cancel it and

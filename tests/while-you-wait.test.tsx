@@ -3,6 +3,7 @@ import { act } from 'preact/test-utils';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { Component } from 'obsidian';
+import { DEFAULT_SETTINGS } from '../src/settings/settings';
 import { WhileYouWait, cardsFor } from '../src/components/jobs/WhileYouWait';
 import type { QardServices } from '../src/views/services';
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -167,4 +168,48 @@ it('prefers a due check when there is time, and lets you switch activity', async
   expect(buttons('Check · Dirichlet draws')[0]?.getAttribute('aria-pressed')).toBe('true');
   await click(buttons('Cards · 2')[0]);
   expect(host.textContent).toContain('Front other');
+});
+
+it('keeps the role and estimate in one metadata row while hiding provider details behind info', async () => {
+  const current = services.reviews.getSnapshot();
+  let showAgent = true;
+  services.reviews.getSnapshot = () => ({
+    ...current,
+    settings: { ...DEFAULT_SETTINGS, showAgent },
+  });
+  services.jobs = { estimate: () => 240_000 } as unknown as QardServices['jobs'];
+  const cancel = vi.fn();
+  const render = () =>
+    act(async () => {
+      root.render(
+        <WhileYouWait
+          services={services}
+          title="Planning your lesson…"
+          context={{ kind: 'lesson' }}
+          job={{ kind: 'map', startedAt: Date.now() - 60_000 }}
+          cancel={cancel}
+        />,
+      );
+    });
+  await render();
+  await tick();
+  const meta = host.querySelector('.qard-wait-meta');
+  expect(meta?.classList.contains('qard-jobs-meta')).toBe(true);
+  expect(meta?.querySelector('.qard-jobs-role')?.textContent).toBe('Tutor');
+  expect(meta?.querySelector('.qard-agent-info')?.getAttribute('title')).toBe(
+    'Claude Code · haiku',
+  );
+  expect(meta?.querySelector('.qard-wait-estimate')?.textContent).toContain(
+    'elapsed · about 3 min left',
+  );
+  expect(host.querySelector('.qard-job-controls')?.firstElementChild?.className).toBe(
+    'qard-job-info',
+  );
+  expect(host.textContent).not.toContain('30 seconds or more');
+  await click(host.querySelector('.qard-job-controls button'));
+  expect(cancel).toHaveBeenCalledOnce();
+  showAgent = false;
+  await render();
+  expect(host.querySelector('.qard-jobs-role')).toBeNull();
+  expect(host.querySelector('.qard-wait-estimate')?.textContent).toContain('elapsed');
 });

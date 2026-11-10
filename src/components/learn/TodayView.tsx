@@ -1,7 +1,7 @@
 import { plural } from '../common/labels';
 import { teach } from './lesson-navigation';
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
-import { ArrowRight, ChevronRight, Play } from 'lucide-react';
+import { ArrowRight, ChevronRight, Info, Play } from 'lucide-react';
 import type { QardServices } from '../../views/services';
 import { InlineMarkdown } from '../Markdown';
 import type { Today, TodayItem } from '../../learn/learn-types';
@@ -114,7 +114,7 @@ export function TodayView({ services, nav }: { services: QardServices; nav: Lear
   const open = (item: TodayItem) => (item.check ? nav.check(item.check) : undefined);
   const presentStates = [...new Set([...today.checks, ...today.lessons].map((item) => item.state))];
   const objectiveTitle = (item: TodayItem) => (
-    <span className="qard-objective-title qard-today-row-copy">
+    <>
       <span className="qard-objective-status">
         <span className="qard-objective-status-size" aria-hidden="true">
           {presentStates.map((state) => (
@@ -127,7 +127,7 @@ export function TodayView({ services, nav }: { services: QardServices; nav: Lear
         <InlineMarkdown text={item.title} path={item.mastery} services={services} />
       </span>
       <span className="qard-muted qard-learning-row-course">{item.course}</span>
-    </span>
+    </>
   );
   return (
     <div className="qard-doc qard-today">
@@ -248,10 +248,16 @@ export function TodayView({ services, nav }: { services: QardServices; nav: Lear
       )}
       {today.lessons.length > 0 && (
         <section>
-          <h2>Lessons</h2>
-          <p className="qard-muted qard-small">
-            Optional. These objectives need teaching before they can be checked.
-          </p>
+          <div className="qard-section-heading">
+            <h2>Lessons</h2>
+            <span
+              className="qard-section-info"
+              title="Optional. These objectives need teaching before they can be checked."
+              aria-label="Optional. These objectives need teaching before they can be checked."
+            >
+              <Info size={14} />
+            </span>
+          </div>
           <div className="qard-doc-rows">
             {today.lessons.map((l) => (
               <button

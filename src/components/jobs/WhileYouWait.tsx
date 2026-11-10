@@ -137,6 +137,14 @@ export function WhileYouWait({
     [activity, setActivity] = useState<Activity>(),
     [engaged, setEngaged] = useState(false);
   const left = timeLeft(job ? services.jobs?.estimate(job.kind) : undefined, job?.startedAt, now);
+  const elapsedSeconds =
+    job?.startedAt === undefined
+      ? undefined
+      : Math.max(0, Math.round((now - job.startedAt) / 1000));
+  const elapsed =
+    elapsedSeconds === undefined
+      ? undefined
+      : `${Math.floor(elapsedSeconds / 60)}:${String(elapsedSeconds % 60).padStart(2, '0')} elapsed`;
   const contextKey = JSON.stringify(context),
     latest = useRef(context);
   latest.current = context;
@@ -222,21 +230,31 @@ export function WhileYouWait({
             </button>
           </div>
         ) : (
-          <div className="qard-wait-head">
-            <div className="qard-wait-heading">
-              <Waiting text={title} />
-              {job && <AgentLabel services={services} role={roleOf(job.kind)} />}
+          <>
+            {job && (
+              <div className="qard-jobs-meta qard-wait-meta">
+                <AgentLabel services={services} role={roleOf(job.kind)} compact />
+                <span className="qard-jobs-time qard-wait-estimate">
+                  {elapsed ?? 'Running'}
+                  {left ? ` · ${left}` : ''}
+                </span>
+              </div>
+            )}
+            <div className="qard-wait-head">
+              <div className="qard-wait-heading">
+                <Waiting text={title} />
+              </div>
             </div>
-            {left && <span className="qard-wait-estimate">{left}</span>}
-          </div>
+          </>
         )}
         {!engaged && (
           <p className="qard-wait-description">
             {detail && <>{detail} </>}You can leave this page. Qard will notify you when it's ready.
           </p>
         )}
-        {!ready && hint}
-        {!ready && <JobControls services={services} job={job} cancel={cancel} start={start} />}
+        {!ready && (
+          <JobControls services={services} job={job} cancel={cancel} start={start} hint={hint} />
+        )}
       </div>
       {options &&
         (available.length ? (

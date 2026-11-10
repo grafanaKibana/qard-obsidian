@@ -24,10 +24,12 @@ export function AgentLabel({
   services,
   role,
   info = false,
+  compact = false,
 }: {
   services: QardServices;
   role: AgentRole;
   info?: boolean;
+  compact?: boolean;
 }) {
   // Subscribe to a plain string of just the fields shown, so an unchanged value never causes a re-render loop.
   const key = useSyncExternalStore(services.reviews.subscribe ?? noSubscription, () => {
@@ -41,8 +43,18 @@ export function AgentLabel({
   }
   const [provider = '', model = ''] = key.split('\u0000');
   const name = model.trim() || defaultModel(provider as AgentProvider, role) || 'default model';
+  const description = `${CONNECTIONS[provider] ?? provider} · ${name}`;
+  if (compact) {
+    return (
+      <span className="qard-jobs-role">
+        <span className="qard-agent-info" title={description} aria-label={description}>
+          <Info size={14} aria-hidden="true" />
+        </span>
+        {ROLES[role]}
+      </span>
+    );
+  }
   if (info) {
-    const description = `${CONNECTIONS[provider] ?? provider} · ${name}`;
     return (
       <span className="qard-agent-info" title={description} aria-label={description}>
         <Info size={14} aria-hidden="true" />

@@ -887,6 +887,7 @@
   --qard-space-2: 8px;
   --qard-space-5: 20px;
   --qard-gap-actions: var(--qard-space-2);
+  --qard-question-action-width: calc(var(--qard-font-control) * 4 + var(--qard-space-6));
   --qard-inset-panel: var(--qard-space-5);
   --qard-radius-surface: 12px;
   --qard-radius-floating: 10px;
@@ -3150,11 +3151,12 @@ body.qard-focus-active .status-bar {
   align-items: center;
   gap: 12px;
   padding: 7px 0;
-  border-top: 1px solid var(--qard-border);
+  border-top: 0;
 }
 
-.qard-doc-row:first-of-type {
-  border-top: 0;
+.qard-doc-row + .qard-doc-row,
+.qard-app button.qard-row-button + button.qard-row-button {
+  border-top: 1px solid var(--qard-border);
 }
 
 .qard-doc-row .qard-muted {
@@ -3207,22 +3209,13 @@ body.qard-focus-active .status-bar {
 .qard-test-steps {
   display: flex;
   align-items: center;
-  gap: var(--qard-gap-actions);
+  gap: 0;
   flex-wrap: wrap;
   margin-bottom: 18px;
 }
 
-.qard-test-step,
-.qard-lesson-crumb {
-  display: inline-flex;
-  max-width: 100%;
-  align-items: center;
-  gap: var(--qard-gap-actions);
-  min-width: 0;
-}
-
-.qard-test-step > svg,
-.qard-lesson-crumb > svg {
+.qard-test-steps > svg,
+.qard-lesson-trail > svg {
   flex-shrink: 0;
 }
 
@@ -3999,7 +3992,7 @@ body.qard-focus-active .status-bar {
   display: flex;
   width: 100%;
   justify-content: flex-start;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: var(--qard-gap-actions);
   margin-bottom: var(--qard-gap-actions);
   padding: var(--qard-space-3) var(--qard-space-4);
@@ -4018,9 +4011,15 @@ body.qard-focus-active .status-bar {
   white-space: nowrap;
 }
 
-.qard-resume > span:first-child {
-  flex: 1 1 160px;
+.qard-resume > :not(svg) {
   min-width: 0;
+}
+
+.qard-resume > :first-child {
+  flex: 1 1 auto;
+}
+
+.qard-resume > span:first-child {
   overflow-wrap: anywhere;
 }
 
@@ -4034,6 +4033,7 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-resume > svg {
+  flex: 0 0 auto;
   color: var(--qard-muted);
 }
 
@@ -4101,7 +4101,6 @@ body.qard-focus-active .status-bar {
   width: 100%;
   justify-content: flex-start;
   border: 0;
-  border-top: 1px solid var(--qard-border);
   border-radius: 0;
   min-height: 42px;
   padding: 7px 4px;
@@ -4113,7 +4112,8 @@ body.qard-focus-active .status-bar {
   background: var(--qard-soft);
 }
 
-.qard-row-button > span:first-of-type:not(.qard-check, .qard-objective-title) {
+.qard-row-button:not(.qard-today-learning-row)
+  > span:first-of-type:not(.qard-check, .qard-objective-title) {
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -4341,10 +4341,10 @@ body.qard-focus-active .status-bar {
 .qard-ask {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding-top: 16px;
+  gap: var(--qard-gap-actions);
+  padding-top: var(--qard-gap-actions);
   border-top: 1px solid var(--qard-border);
-  margin-top: 8px;
+  margin: 0;
 }
 
 .qard-ask .qard-inline-form {
@@ -5251,7 +5251,7 @@ body.qard-focus-active .status-bar {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 0;
   max-width: 720px;
   margin: 0 auto 14px;
   font-size: var(--qard-font-control);
@@ -5449,7 +5449,7 @@ body.qard-focus-active .status-bar {
   align-items: flex-start;
 }
 
-.qard-wait-status .qard-job-controls.is-stuck span {
+.qard-wait-status .qard-job-controls.is-stuck span:not(.qard-job-info) {
   flex: 1 1 200px;
   line-height: 1.6;
 }
@@ -5914,7 +5914,7 @@ div.qard-ask-q {
   flex-wrap: nowrap;
   align-items: stretch;
   gap: var(--qard-gap-actions);
-  margin-top: var(--qard-space-1);
+  margin: 0;
 }
 
 .qard-app .qard-ask-input textarea {
@@ -5978,7 +5978,7 @@ div.qard-ask-q {
   border: 1px solid color-mix(in srgb, var(--text-warning, #d9822b) 35%, var(--qard-border));
 }
 
-.qard-job-controls.is-stuck span {
+.qard-job-controls.is-stuck span:not(.qard-job-info) {
   flex: 1;
   min-width: 0;
   overflow-wrap: anywhere;
@@ -8622,18 +8622,27 @@ div.qard-ask-q {
   gap: var(--qard-gap-actions);
 }
 
-.qard-lesson-plan-actions > input {
-  flex: 1 1 220px;
+.qard-lesson-revise-controls {
+  display: flex;
+  flex: 999 1 260px;
+  min-width: 0;
+  align-items: stretch;
+  gap: var(--qard-gap-actions);
+}
+
+.qard-lesson-revise-controls > input {
+  flex: 1 1 0;
   min-width: 0;
 }
 
-.qard-lesson-plan-actions > button {
+.qard-lesson-revise-controls > button {
   flex: 0 0 auto;
   white-space: nowrap;
 }
 
-.qard-lesson-start {
-  margin-left: auto;
+.qard-lesson-plan-actions > button.qard-lesson-start {
+  flex: 1 0 auto;
+  white-space: nowrap;
 }
 
 .qard-panel form.qard-ask-input {
@@ -8651,28 +8660,91 @@ div.qard-ask-q {
   width: auto;
 }
 
-.qard-app .qard-today-row-copy {
-  grid-template-columns: auto minmax(0, 1fr) auto;
+.qard-app button.qard-today-learning-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, auto) auto;
+  gap: var(--qard-gap-actions);
+  align-items: center;
+  padding-inline: 0;
+}
+
+.qard-today-learning-row > .qard-objective-status {
+  justify-self: start;
+}
+
+.qard-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--qard-gap-actions);
+  margin-bottom: 10px;
+}
+
+.qard-app .qard-doc .qard-section-heading h2 {
+  margin: 0;
+}
+
+.qard-section-info,
+.qard-job-info {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  color: var(--qard-muted);
+  cursor: help;
+}
+
+.qard-job-controls > .qard-job-info {
+  margin-right: auto;
+}
+
+.qard-wait-meta {
+  align-self: stretch;
+}
+
+.qard-app .qard-learn-map-action {
+  white-space: nowrap;
+}
+
+.qard-time > .qard-heading {
+  flex-wrap: wrap;
+}
+
+.qard-time > .qard-heading > div:first-child {
+  flex: 999 1 260px;
+}
+
+.qard-time-period {
+  flex: 1 1 auto;
+}
+
+.qard-lesson-check-actions {
+  padding-bottom: var(--qard-gap-actions);
+}
+
+.qard-app button.qard-question-action {
+  width: var(--qard-question-action-width);
+  min-width: var(--qard-question-action-width);
+  flex: 0 0 var(--qard-question-action-width);
+  white-space: nowrap;
+}
+
+.qard-lesson .qard-lesson-navigation {
+  margin-top: var(--qard-gap-actions);
+  padding-top: 0;
+  border-top: 0;
+  gap: var(--qard-gap-actions);
 }
 
 @container qard-workspace (max-width: 640px) {
   .qard-app button.qard-today-learning-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: var(--qard-gap-actions);
-    align-items: center;
-  }
-
-  .qard-app .qard-today-learning-row > .qard-objective-title {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr) auto;
     grid-template-areas:
-      'state course'
-      'title title';
+      'state course course'
+      'title title action';
     gap: var(--qard-space-1) var(--qard-gap-actions);
-    align-items: center;
   }
 
-  .qard-today-learning-row .qard-objective-status {
+  .qard-today-learning-row > .qard-objective-status {
     grid-area: state;
   }
 
@@ -8689,13 +8761,47 @@ div.qard-ask-q {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-align: right;
   }
 
   .qard-learning-row-action {
+    grid-area: action;
     place-self: center end;
   }
 
-  .qard-today .qard-doc-footer > button {
+  .qard-today .qard-doc-footer > button,
+  .qard-lesson .qard-lesson-navigation > button:last-child {
     width: 100%;
+    flex: 1 1 100%;
+    margin-left: 0;
   }
+
+  .qard-app .qard-desk-create button {
+    justify-content: center;
+  }
+}
+
+.qard-resume-copy {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+  gap: var(--qard-space-1) var(--qard-gap-actions);
+}
+
+.qard-resume-copy > .qard-resume-label,
+.qard-resume-copy > .qard-resume-context {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--qard-font-meta);
+}
+
+.qard-resume-context {
+  text-align: right;
+}
+
+.qard-resume-title {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  min-width: 0;
 }

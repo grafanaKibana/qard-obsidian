@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { ArrowRight, ChevronRight } from 'lucide-react';
 import type { QardServices } from '../../views/services';
 import type { Lesson } from '../../learn/learn-types';
@@ -57,21 +57,19 @@ function LessonTrail({
         {lesson.course ?? 'Course'}
       </button>
       {objective?.group && (
-        <span className="qard-lesson-crumb">
+        <>
           <ChevronRight size={14} aria-hidden="true" />
           <button className="qard-link" onClick={open}>
             {objective.group}
           </button>
-        </span>
+        </>
       )}
       {objective && (
         <>
-          <span className="qard-lesson-crumb">
-            <ChevronRight size={14} aria-hidden="true" />
-            <button className="qard-link" onClick={open}>
-              {objective.label || objective.title}
-            </button>
-          </span>
+          <ChevronRight size={14} aria-hidden="true" />
+          <button className="qard-link" onClick={open}>
+            {objective.label || objective.title}
+          </button>
           <StateChip state={objective.state} />
         </>
       )}
@@ -221,7 +219,13 @@ function LessonProbe({
             <p className="qard-muted">
               The tutor is checking your notes and what you already know about {lesson.topic}.
             </p>
-            <TutorHint services={services} />
+            <JobControls
+              services={services}
+              job={probing}
+              cancel={() => services.learn.cancel(path, 'probe')}
+              start={() => void services.learn.probe(path)}
+              hint={<TutorHint services={services} />}
+            />
           </>
         )}
       </div>
@@ -238,7 +242,13 @@ function LessonProbe({
               <AgentLabel services={services} role="tutor" />
             </Waiting>
             <p className="qard-muted">Reading your answers to decide where to start.</p>
-            <TutorHint services={services} />
+            <JobControls
+              services={services}
+              job={mapping}
+              cancel={() => services.learn.cancel(path, 'map')}
+              start={() => void services.learn.submitProbe(path)}
+              hint={<TutorHint services={services} />}
+            />
           </>
         )}
       </div>
@@ -378,23 +388,25 @@ function LessonMapView({
           }
         }}
       >
-        <input
-          aria-label="Ask for changes to the plan"
-          placeholder={busy ? 'Revising…' : 'Ask for changes, e.g. skip the proof'}
-          value={change}
-          disabled={busy}
-          onChange={(e) => setChange(e.target.value)}
-        />
-        <button type="submit" className="qard-text-button" disabled={busy || !change.trim()}>
-          Revise
-        </button>
+        <div className="qard-lesson-revise-controls">
+          <input
+            aria-label="Ask for changes to the plan"
+            placeholder={busy ? 'Revising…' : 'Ask for changes, e.g. skip the proof'}
+            value={change}
+            disabled={busy}
+            onChange={(e) => setChange(e.target.value)}
+          />
+          <button type="submit" className="qard-text-button" disabled={busy || !change.trim()}>
+            Revise
+          </button>
+        </div>
         <button
           type="button"
           className="qard-primary qard-lesson-start"
           disabled={busy}
           onClick={() => void services.learn.acceptMap(path)}
         >
-          Start lesson
+          Start
           <ArrowRight size={15} />
         </button>
       </form>
@@ -436,7 +448,7 @@ function LessonSteps({
     <div className="qard-test qard-lesson">
       <div className="qard-test-steps" aria-label="Steps">
         {lesson.map!.steps.map((s, i) => (
-          <span className="qard-test-step" key={i}>
+          <Fragment key={i}>
             {i > 0 && <ChevronRight size={14} aria-hidden="true" />}
             <button
               className={i === index ? 'is-current' : lesson.state[i]?.mark ? 'is-done' : ''}
@@ -447,7 +459,7 @@ function LessonSteps({
               {i + 1}. <InlineMarkdown text={s.title} path={where} services={services} />
               {lesson.state[i]?.mark ? ' ✓' : ''}
             </button>
-          </span>
+          </Fragment>
         ))}
       </div>
       <div className="qard-test-heading">
@@ -525,8 +537,7 @@ function LessonSteps({
                 onChange={(patch) => services.learn.answerStep(path, patch)}
               />
               <JobError job={tutor} retry={() => void services.learn.checkStep(path)} />
-              {running(tutor) && <TutorHint services={services} />}
-              <div className="qard-panel-actions">
+              <div className="qard-panel-actions qard-lesson-check-actions">
                 {running(tutor) ? (
                   <>
                     <Waiting text="Checking…">
@@ -540,7 +551,7 @@ function LessonSteps({
                   </>
                 ) : (
                   <button
-                    className="qard-primary"
+                    className="qard-primary qard-question-action"
                     disabled={!answered(step.check, st?.answer)}
                     onClick={() => void services.learn.checkStep(path)}
                   >

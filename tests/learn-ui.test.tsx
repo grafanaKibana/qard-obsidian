@@ -254,7 +254,7 @@ it('a lesson plan is shown for approval before teaching starts', async () => {
     'What your answers showStart from pLSA. You know the $\\theta_i \\sim \\mathrm{Dir}(\\alpha)$ step.',
   );
   expect(host.textContent).toContain('Dirichlet draws');
-  await click(buttons('Start lesson')[0]);
+  await click(buttons('Start')[0]);
   await tick();
   expect(host.textContent).toContain('Writing this step…');
 });

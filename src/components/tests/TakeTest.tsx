@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { ChevronRight, Flag } from 'lucide-react';
 import type { QardServices } from '../../views/services';
 import type { Confidence, Question, SectionStatus } from '../../tests/test-types';
@@ -109,7 +109,7 @@ export function TakeTest({
         {test.sections.map((s, i) => {
           const st = attempt?.sections[s.id]?.status ?? 'open';
           return (
-            <span className="qard-test-step" key={s.id}>
+            <Fragment key={s.id}>
               {i > 0 && <ChevronRight size={14} aria-hidden="true" />}
               <button
                 className={
@@ -129,7 +129,7 @@ export function TakeTest({
                     ? ' · marking'
                     : ''}
               </button>
-            </span>
+            </Fragment>
           );
         })}
       </div>

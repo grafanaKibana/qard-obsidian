@@ -289,10 +289,8 @@ it('leads learning rows with their present states and groups the Today summary',
     'New',
   ]);
   for (const row of rows) {
-    expect(row.firstElementChild?.classList.contains('qard-objective-title')).toBe(true);
-    expect(row.querySelector('.qard-objective-title')?.firstElementChild).toBe(
-      row.querySelector('.qard-objective-status'),
-    );
+    expect(row.firstElementChild?.classList.contains('qard-objective-status')).toBe(true);
+    expect(row.firstElementChild).toBe(row.querySelector('.qard-objective-status'));
     expect(row.querySelector('.qard-objective-status-size')?.textContent).toBe('TaughtGapNew');
     expect(row.classList.contains('qard-today-learning-row')).toBe(true);
     expect(row.querySelector('.qard-learning-row-course')?.textContent).toBe('Networks');

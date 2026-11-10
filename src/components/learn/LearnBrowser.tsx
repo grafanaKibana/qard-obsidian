@@ -83,7 +83,7 @@ export function LearnBrowser({
           </button>
         )}
         <button onClick={nav.today}>Today</button>
-        <button className="qard-primary" onClick={() => nav.mapCourse()}>
+        <button className="qard-primary qard-learn-map-action" onClick={() => nav.mapCourse()}>
           <Plus size={16} />
           Map a course
         </button>
@@ -131,10 +131,12 @@ export function LearnBrowser({
       {pending?.proposals.map((p) => (
         <div key={p.folder} className="qard-deletable-row">
           <button className="qard-resume" onClick={() => nav.mapCourse(p.folder)}>
-            <span className="qard-muted">Ready to review</span>
-            <strong>
-              {p.course} · {plural(p.objectives.length, 'objective')}
-            </strong>
+            <span className="qard-resume-copy">
+              <span className="qard-muted qard-resume-label">Ready to review</span>
+              <strong className="qard-resume-title">
+                {p.course} · {plural(p.objectives.length, 'objective')}
+              </strong>
+            </span>
             <ChevronRight size={16} />
           </button>
           <DeleteLearnItem services={services} kind="mapping" path={p.folder} />
@@ -142,19 +144,23 @@ export function LearnBrowser({
       ))}
       {pending?.updates.map((u) => (
         <button key={u.mastery} className="qard-resume" onClick={() => nav.course(u.mastery)}>
-          <span className="qard-muted">Update ready</span>
-          <strong>{u.course}</strong>
+          <span className="qard-resume-copy">
+            <span className="qard-muted qard-resume-label">Update ready</span>
+            <strong className="qard-resume-title">{u.course}</strong>
+          </span>
           <ChevronRight size={16} />
         </button>
       ))}
       {open.map((l) => (
         <div key={l.path} className="qard-deletable-row">
           <button className="qard-resume" onClick={() => nav.lesson(l.path)}>
-            <span className="qard-muted">Continue lesson</span>
-            <strong>
-              <InlineMarkdown text={l.title} path={l.path} services={services} />
-            </strong>
-            {l.course && <span className="qard-muted">{l.course}</span>}
+            <span className="qard-resume-copy">
+              <span className="qard-muted qard-resume-label">Continue lesson</span>
+              {l.course && <span className="qard-muted qard-resume-context">{l.course}</span>}
+              <strong className="qard-resume-title">
+                <InlineMarkdown text={l.title} path={l.path} services={services} />
+              </strong>
+            </span>
             <ChevronRight size={16} />
           </button>
           <DeleteLearnItem services={services} kind="lesson" path={l.path} />

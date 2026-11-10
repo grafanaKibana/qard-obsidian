@@ -65,7 +65,11 @@ export function StudyTimeView({ services }: { services: QardServices }) {
             Time you spend actively studying in Qard, by course and activity.
           </p>
         </div>
-        <div className="qard-segmented" role="tablist" aria-label="Study time period">
+        <div
+          className="qard-segmented qard-time-period"
+          role="tablist"
+          aria-label="Study time period"
+        >
           {RANGES.map((r, index) => (
             <button
               key={r.id}
