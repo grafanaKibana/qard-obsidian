@@ -3510,6 +3510,9 @@ body.qard-focus-active .status-bar {
   justify-content: space-between;
   gap: 24px;
   padding: 18px 0;
+}
+
+.qard-suggestion + .qard-suggestion {
   border-top: 1px solid var(--qard-border);
 }
 
@@ -5532,6 +5535,11 @@ body.qard-focus-active .status-bar {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.qard-job-status {
+  width: 100%;
+  min-width: 0;
 }
 
 .qard-wait-status {
@@ -8906,12 +8914,12 @@ div.qard-ask-q {
   gap: var(--qard-gap-actions);
   align-items: center;
   padding: var(--qard-row-padding);
-  border-radius: var(--qard-radius-badge);
-  background: color-mix(in srgb, var(--qard-row-accent) 4%, var(--qard-bg));
+  border-radius: 0;
+  background: transparent;
 }
 
 .qard-app button.qard-today-learning-row:enabled:hover {
-  background: color-mix(in srgb, var(--qard-row-accent) 10%, var(--qard-bg));
+  background: var(--qard-soft);
 }
 
 .qard-today-learning-row > .qard-objective-status {

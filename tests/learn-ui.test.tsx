@@ -1025,3 +1025,126 @@ it('selected check deletion returns to Learn', async () => {
   expect(files.has(MASTERY)).toBe(true);
   expect(deleted).toHaveBeenCalledOnce();
 });
+
+it.each(['checking', 'retrying', 'closing'] as const)(
+  'uses the shared task panel while %s and preserves cancellation',
+  async (stage) => {
+    const startedAt = Date.now() - 60_000;
+    const kind = stage === 'closing' ? 'close' : 'tutor';
+    const id = stage === 'retrying' ? '0-retry' : stage === 'checking' ? '0' : '';
+    vi.spyOn(services.learn, 'job').mockImplementation((_path, task, taskId = '') =>
+      task === kind && taskId === id ? { kind, id, startedAt } : undefined,
+    );
+    const cancel = vi.spyOn(services.learn, 'cancel').mockImplementation(() => {});
+    services.jobs = { estimate: () => 240_000 } as unknown as QardServices['jobs'];
+    const current = services.reviews.getSnapshot();
+    services.reviews.getSnapshot = () => ({
+      ...current,
+      settings: { ...reviewSnapshot.settings, showAgent: true },
+    });
+    const { path } = await openRecap(
+      stage === 'closing'
+        ? { close: undefined }
+        : {
+            close: undefined,
+            finishedAt: undefined,
+            accepted: true,
+            map: {
+              title: 'Generic contracts',
+              plan: '',
+              mermaid: '',
+              steps: [{ title: 'Preserve a relationship', why: 'Connect the types.' }],
+            },
+            steps: [
+              {
+                title: 'Preserve a relationship',
+                explain: 'Type parameters preserve a relationship.',
+                connect: '',
+                checkFirst: false,
+                check: {
+                  id: 'check',
+                  type: 'short',
+                  prompt: 'Why use a type parameter?',
+                  marks: 1,
+                  rubric: [{ point: 'Preserves the relationship.', marks: 1 }],
+                  model: 'It preserves a relationship.',
+                },
+                misconceptions: [],
+              },
+            ],
+            state: [
+              {
+                asks: [],
+                ...(stage === 'retrying'
+                  ? {
+                      mark: {
+                        score: 0,
+                        awarded: [false],
+                        annotations: [],
+                        mistake: 'incomplete',
+                        feedback: 'Try preserving a relationship.',
+                      },
+                    }
+                  : {}),
+              },
+            ],
+          },
+    );
+    const panel = host.querySelector('.qard-job-status');
+    expect(panel?.classList.contains('qard-wait-status')).toBe(true);
+    expect(panel?.querySelector('.qard-wait-heading')?.textContent).toContain(
+      stage === 'closing' ? 'Wrapping up…' : 'Checking…',
+    );
+    expect(panel?.querySelector('.qard-jobs-role')?.textContent).toBe(
+      stage === 'closing' ? 'Writer' : 'Tutor',
+    );
+    expect(panel?.querySelector('.qard-agent-info')?.getAttribute('title')).toBeTruthy();
+    expect(panel?.querySelector('.qard-wait-estimate')?.textContent).toContain(
+      'elapsed · about 3 min left',
+    );
+    expect(panel?.querySelector('.qard-agent')).toBeNull();
+    expect(panel?.querySelector('.qard-job-controls button')?.getAttribute('type')).toBe('button');
+    await click(panel?.querySelector('.qard-job-controls button'));
+    expect(cancel).toHaveBeenCalledWith(path, kind, ...(id ? [id] : []));
+  },
+);
+
+it('opens the completed lesson note with a named icon button', async () => {
+  await openRecap({
+    close: { summary: '', cards: [], cardState: {}, note: 'Notes/Lesson.md' },
+  });
+  const note = host.querySelector('button[aria-label="Open lesson note"]');
+  expect(note?.classList.contains('qard-icon-button')).toBe(true);
+  expect(note?.querySelector('svg')).not.toBeNull();
+  expect(note?.textContent).toBe('');
+  await click(note);
+  expect(services.app.workspace.openLinkText).toHaveBeenCalledWith('Notes/Lesson.md', '', true);
+  expect(host.textContent).not.toContain('Delayed retention checks');
+});
+
+it('opens and closes diagnostic guidance from its info button without submitting answers', async () => {
+  const submit = vi.spyOn(services.learn, 'submitProbe');
+  await openRecap({
+    close: undefined,
+    finishedAt: undefined,
+    probe: { questions: [], answers: {} },
+    map: undefined,
+  });
+  const info = host.querySelector<HTMLButtonElement>(
+    'button[aria-label="About diagnostic questions"]',
+  )!;
+  const help = document.getElementById(info.getAttribute('aria-controls')!)!;
+  expect(info.type).toBe('button');
+  expect(info.getAttribute('aria-expanded')).toBe('false');
+  expect(help.hidden).toBe(true);
+  expect(info.title).toBe(help.textContent);
+  expect(info.parentElement?.textContent).toContain('Diagnostic · Programming');
+  await click(info);
+  expect(info.getAttribute('aria-expanded')).toBe('true');
+  expect(help.hidden).toBe(false);
+  expect(help.textContent).toContain('They do not establish mastery');
+  await click(info);
+  expect(info.getAttribute('aria-expanded')).toBe('false');
+  expect(help.hidden).toBe(true);
+  expect(submit).not.toHaveBeenCalled();
+});

@@ -32,7 +32,7 @@ export function JobControls({
       <div className="qard-job-controls is-stuck" role="status">
         {help}
         <span>Nothing is working on this right now.</span>
-        <button className="qard-primary" onClick={start}>
+        <button type="button" className="qard-primary" onClick={start}>
           Start again
         </button>
       </div>
@@ -56,6 +56,7 @@ export function JobControls({
         </span>
       )}
       <button
+        type="button"
         className={compact ? 'qard-icon-button' : stuck ? 'qard-primary' : 'qard-text-button'}
         aria-label={compact ? 'Cancel' : undefined}
         title={compact ? 'Cancel' : undefined}

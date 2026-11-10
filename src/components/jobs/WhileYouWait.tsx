@@ -7,15 +7,13 @@ import type { QardCard } from '../../cards/card-types';
 import type { Rating } from '../../review/scheduler';
 import { scheduler } from '../../review/scheduler';
 import { questions } from '../../tests/test-types';
-import { timeLeft } from '../../jobs/job-clock';
 import { InlineMarkdown, Markdown } from '../Markdown';
 import { Waiting } from '../common/FeedbackStatus';
 import { useTestFolder } from '../tests/useTestFolder';
 import { CheckView } from '../learn/CheckView';
-import { useTick } from './RunningJobs';
 import { AgentLabel } from './AgentLabel';
-import { JobControls } from './JobControls';
-import { roleOf } from '../../jobs/job-clock';
+import { JobStatus } from './JobStatus';
+import { useTick } from './RunningJobs';
 
 /**
  * What the wait is for, which decides what is worth doing meanwhile:
@@ -136,15 +134,6 @@ export function WhileYouWait({
   const [options, setOptions] = useState<Options>(),
     [activity, setActivity] = useState<Activity>(),
     [engaged, setEngaged] = useState(false);
-  const left = timeLeft(job ? services.jobs?.estimate(job.kind) : undefined, job?.startedAt, now);
-  const elapsedSeconds =
-    job?.startedAt === undefined
-      ? undefined
-      : Math.max(0, Math.round((now - job.startedAt) / 1000));
-  const elapsed =
-    elapsedSeconds === undefined
-      ? undefined
-      : `${Math.floor(elapsedSeconds / 60)}:${String(elapsedSeconds % 60).padStart(2, '0')} elapsed`;
   const contextKey = JSON.stringify(context),
     latest = useRef(context);
   latest.current = context;
@@ -174,7 +163,7 @@ export function WhileYouWait({
   // The default: a due check when there's time for one, then cards, a missed point, or the notes.
   const remaining =
     job?.startedAt && services.jobs?.estimate(job.kind) !== undefined
-      ? services.jobs.estimate(job.kind)! - (Date.now() - job.startedAt)
+      ? services.jobs.estimate(job.kind)! - (now - job.startedAt)
       : undefined;
   const available = useMemo(() => {
     if (!options) {
@@ -218,44 +207,34 @@ export function WhileYouWait({
 
   return (
     <div className="qard-wait">
-      <div className="qard-wait-status">
-        {ready && engaged ? (
-          <div className="qard-wait-ready" role="status">
-            <CheckIcon size={16} />
-            <strong>{readyLabel}</strong>
-            <span className="qard-spacer" />
-            <button className="qard-primary" onClick={onContinue}>
-              Continue
-              <ArrowRight size={15} />
-            </button>
-          </div>
-        ) : (
-          <>
-            {job && (
-              <div className="qard-jobs-meta qard-wait-meta">
-                <AgentLabel services={services} role={roleOf(job.kind)} compact />
-                <span className="qard-jobs-time qard-wait-estimate">
-                  {elapsed ?? 'Running'}
-                  {left ? ` · ${left}` : ''}
-                </span>
-              </div>
-            )}
-            <div className="qard-wait-head">
-              <div className="qard-wait-heading">
-                <Waiting text={title} />
-              </div>
+      <JobStatus
+        services={services}
+        title={title}
+        job={job}
+        cancel={cancel}
+        start={start}
+        hint={hint}
+        ready={ready}
+        heading={
+          ready && engaged ? (
+            <div className="qard-wait-ready" role="status">
+              <CheckIcon size={16} />
+              <strong>{readyLabel}</strong>
+              <span className="qard-spacer" />
+              <button className="qard-primary" onClick={onContinue}>
+                Continue
+                <ArrowRight size={15} />
+              </button>
             </div>
-          </>
-        )}
+          ) : undefined
+        }
+      >
         {!engaged && (
           <p className="qard-wait-description">
             {detail && <>{detail} </>}You can leave this page. Qard will notify you when it's ready.
           </p>
         )}
-        {!ready && (
-          <JobControls services={services} job={job} cancel={cancel} start={start} hint={hint} />
-        )}
-      </div>
+      </JobStatus>
       {options &&
         (available.length ? (
           <section className="qard-wait-body">

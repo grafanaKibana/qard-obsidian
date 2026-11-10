@@ -1,5 +1,5 @@
-import { Fragment, useEffect, useState } from 'react';
-import { ArrowRight, ChevronRight, Info } from 'lucide-react';
+import { Fragment, useEffect, useId, useState } from 'react';
+import { ArrowRight, ChevronRight, Info, FileText } from 'lucide-react';
 import type { QardServices } from '../../views/services';
 import type { Lesson } from '../../learn/learn-types';
 import type { Objective } from '../../learn/mastery';
@@ -14,6 +14,7 @@ import { useLearn } from './useLearn';
 import { type LearnNav } from '../../views/navigation';
 import { WhileYouWait, useHold, type WaitContext } from '../jobs/WhileYouWait';
 import { JobControls } from '../jobs/JobControls';
+import { JobStatus } from '../jobs/JobStatus';
 import { tidyMermaid } from '../../learn/mermaid';
 import { DrawButton, FigureView } from './FigureView';
 import { firstSentences } from '../../learn/learn-schema';
@@ -207,6 +208,8 @@ function LessonProbe({
   lesson: Lesson;
 }) {
   const { job } = useLearn(services);
+  const [showHelp, setShowHelp] = useState(false);
+  const helpId = useId();
   const probing = job(path, 'probe'),
     mapping = job(path, 'map'),
     probe = lesson.probe;
@@ -263,13 +266,17 @@ function LessonProbe({
       <div className="qard-test-heading">
         <div>
           <span className="qard-muted qard-diagnostic-label">
-            <span
-              className="qard-section-info"
+            <button
+              type="button"
+              className="qard-icon-button qard-section-info"
               title={DIAGNOSTIC_HELP}
-              aria-label={DIAGNOSTIC_HELP}
+              aria-label="About diagnostic questions"
+              aria-expanded={showHelp}
+              aria-controls={helpId}
+              onClick={() => setShowHelp(!showHelp)}
             >
               <Info size={14} aria-hidden="true" />
-            </span>
+            </button>
             Diagnostic · {lesson.course ?? 'Before we start'}
           </span>
           <h1>
@@ -281,6 +288,9 @@ function LessonProbe({
           </h1>
         </div>
       </div>
+      <p id={helpId} className="qard-muted qard-small" hidden={!showHelp}>
+        {DIAGNOSTIC_HELP}
+      </p>
       {probe.questions.map((q, i) => (
         <AnswerInput
           key={q.id}
@@ -547,16 +557,12 @@ function LessonSteps({
               <JobError job={tutor} retry={() => void services.learn.checkStep(path)} />
               <div className="qard-panel-actions qard-lesson-check-actions">
                 {running(tutor) ? (
-                  <>
-                    <Waiting text="Checking…">
-                      <AgentLabel services={services} role="tutor" />
-                    </Waiting>
-                    <JobControls
-                      services={services}
-                      job={tutor}
-                      cancel={() => services.learn.cancel(path, 'tutor', String(index))}
-                    />
-                  </>
+                  <JobStatus
+                    services={services}
+                    title="Checking…"
+                    job={tutor}
+                    cancel={() => services.learn.cancel(path, 'tutor', String(index))}
+                  />
                 ) : (
                   <button
                     className="qard-primary qard-question-action"
@@ -621,16 +627,12 @@ function LessonSteps({
                     />
                     <div className="qard-panel-actions">
                       {running(retrying) ? (
-                        <>
-                          <Waiting text="Checking…">
-                            <AgentLabel services={services} role="tutor" />
-                          </Waiting>
-                          <JobControls
-                            services={services}
-                            job={retrying}
-                            cancel={() => services.learn.cancel(path, 'tutor', `${index}-retry`)}
-                          />
-                        </>
+                        <JobStatus
+                          services={services}
+                          title="Checking…"
+                          job={retrying}
+                          cancel={() => services.learn.cancel(path, 'tutor', `${index}-retry`)}
+                        />
                       ) : (
                         <button type="submit" disabled={!retry.trim()}>
                           Try again
@@ -762,20 +764,13 @@ function LessonClose({
         {closing?.error ? (
           <JobError job={closing} retry={() => void services.learn.close(path)} />
         ) : (
-          <>
-            <Waiting text="Wrapping up…">
-              <AgentLabel services={services} role="writer" />
-            </Waiting>
-            <JobControls
-              services={services}
-              job={closing}
-              cancel={() => services.learn.cancel(path, 'close')}
-              start={() => void services.learn.close(path)}
-            />
-            <p className="qard-muted">
-              Saving the lesson, suggesting cards and writing your next check.
-            </p>
-          </>
+          <JobStatus
+            services={services}
+            title="Wrapping up…"
+            job={closing}
+            cancel={() => services.learn.cancel(path, 'close')}
+            start={() => void services.learn.close(path)}
+          />
         )}
       </div>
     );
@@ -815,7 +810,7 @@ function LessonClose({
             <StateChip state={objective.state} />
             <span className="qard-muted">
               {objective.due
-                ? `First check ${relativeDay(objective.due, isoDay(Date.now()))}. Getting it right straight after a lesson doesn't count yet.`
+                ? `First check ${relativeDay(objective.due, isoDay(Date.now()))}.`
                 : ''}
             </span>
           </p>
@@ -919,10 +914,12 @@ function LessonClose({
       <div className="qard-doc-footer is-end">
         {close.note && (
           <button
-            className="qard-text-button"
+            className="qard-icon-button"
+            aria-label="Open lesson note"
+            title="Open lesson note"
             onClick={() => void services.app.workspace.openLinkText(close.note!, '', true)}
           >
-            Open lesson note
+            <FileText size={16} aria-hidden="true" />
           </button>
         )}
         {lesson.mastery && <button onClick={() => nav.course(lesson.mastery!)}>Course</button>}
