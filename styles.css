@@ -8362,6 +8362,7 @@ div.qard-ask-q {
   .qard-app .qard-desk-create button {
     flex: 1 1 auto;
     width: auto;
+    justify-content: center;
     padding-inline: var(--qard-space-2);
   }
 
@@ -8996,10 +8997,6 @@ div.qard-ask-q {
     width: 100%;
     flex: 1 1 100%;
     margin-left: 0;
-  }
-
-  .qard-app .qard-desk-create button {
-    justify-content: center;
   }
 }
 
