@@ -761,6 +761,79 @@ it('keeps expanded-map focus inside its dialog and exposes keyboard node focus',
   }
 });
 
+it('reveals a resumed lesson step and bottom navigation without moving the page or undoing manual strip scrolling', async () => {
+  const bounds = vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (
+    this: Element,
+  ) {
+    if (this.matches('.qard-test-steps')) return new DOMRect(100, 0, 300, 34);
+    if (this.matches('.qard-test-steps > button')) {
+      const strip = this.parentElement!;
+      const index = [...strip.querySelectorAll('button')].indexOf(this as HTMLButtonElement);
+      return new DOMRect(100 + index * 150 - strip.scrollLeft, 0, 150, 34);
+    }
+    return new DOMRect();
+  });
+  const width = vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockImplementation(function (
+    this: HTMLElement,
+  ) {
+    return this.matches('.qard-test-steps') ? 300 : 0;
+  });
+  try {
+    const path = 'Qard/Lessons/scrolling.json';
+    const steps = Array.from({ length: 8 }, (_, i) => ({
+      title: `Transport topic ${i + 1}`,
+      explain: 'Explanation.',
+      connect: 'Connection.',
+      checkFirst: false,
+      check: q(`step-${i}`),
+      misconceptions: [],
+    }));
+    files.set(
+      path,
+      JSON.stringify({
+        version: 1,
+        createdAt: 1,
+        topic: 'Transport',
+        notes: [],
+        accepted: true,
+        current: 5,
+        map: {
+          title: 'Transport',
+          plan: '',
+          mermaid: '',
+          steps: steps.map((s) => ({ title: s.title, why: 'Apply it.' })),
+        },
+        steps,
+        state: steps.map(() => ({ asks: [] })),
+      }),
+    );
+    host.scrollTop = 70;
+    await act(async () => root.render(<LessonView services={services} nav={nav} path={path} />));
+    await tick();
+    await tick();
+    const strip = host.querySelector<HTMLDivElement>('.qard-test-steps')!;
+    expect(strip.querySelector('[aria-current="step"]')?.textContent).toContain(
+      '6. Transport topic 6',
+    );
+    expect(strip.scrollLeft).toBe(600);
+    expect(host.scrollTop).toBe(70);
+    strip.scrollLeft = 75;
+    await act(async () => root.render(<LessonView services={services} nav={nav} path={path} />));
+    await tick();
+    expect(strip.scrollLeft).toBe(75);
+    await click(buttons('Next step')[0]);
+    await tick();
+    expect(strip.querySelector('[aria-current="step"]')?.textContent).toContain(
+      '7. Transport topic 7',
+    );
+    expect(strip.scrollLeft).toBe(750);
+    expect(host.scrollTop).toBe(70);
+  } finally {
+    bounds.mockRestore();
+    width.mockRestore();
+  }
+});
+
 it('a lesson links to its place on the map, and the map continues it rather than starting another', async () => {
   files.set(
     MASTERY,

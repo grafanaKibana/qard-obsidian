@@ -17,6 +17,7 @@ import { JobControls } from '../jobs/JobControls';
 import { tidyMermaid } from '../../learn/mermaid';
 import { DrawButton, FigureView } from './FigureView';
 import { firstSentences } from '../../learn/learn-schema';
+import { useCurrentStepScroll } from '../common/useCurrentStepScroll';
 
 /** Where the lesson sits: course › topic › objective, each opening the course map at that place. */
 function LessonTrail({
@@ -432,6 +433,7 @@ function LessonSteps({
     step = lesson.steps[index],
     st = lesson.state[index],
     plan = lesson.map!.steps[index];
+  const stepsRef = useCurrentStepScroll(index);
   const writing = job(path, 'steps'),
     tutor = job(path, 'tutor', String(index)),
     retrying = job(path, 'tutor', `${index}-retry`),
@@ -446,7 +448,7 @@ function LessonSteps({
   const explain = step && (!step.checkFirst || !!st?.mark);
   return (
     <div className="qard-test qard-lesson">
-      <div className="qard-test-steps" aria-label="Steps">
+      <div className="qard-test-steps" aria-label="Steps" ref={stepsRef}>
         {lesson.map!.steps.map((s, i) => (
           <Fragment key={i}>
             {i > 0 && <ChevronRight size={14} aria-hidden="true" />}

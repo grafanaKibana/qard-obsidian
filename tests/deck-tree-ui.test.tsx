@@ -86,10 +86,43 @@ it('nests decks under their parents, opens real decks and studies a whole subtre
   // Genetics has no cards of its own: its row folds the branch and does not open a deck.
   await click(row('Genetics'));
   expect(open).toHaveBeenCalledTimes(1);
-  expect(names()).toEqual(['Biology', 'Cells', 'Genetics', 'Chemistry']);
+  expect(row('Genetics').getAttribute('aria-expanded')).toBe('false');
+  const geneticsChildren = row('Genetics').closest('.qard-deck-node')!.lastElementChild!;
+  expect(geneticsChildren.classList.contains('is-collapsed')).toBe(true);
+  expect(geneticsChildren.classList.contains('has-deck')).toBe(false);
   await click(button('Collapse Biology'));
-  expect(names()).toEqual(['Biology', 'Chemistry']);
   expect(button('Expand Biology').getAttribute('aria-expanded')).toBe('false');
+  // Collapse is a display state: descendants stay mounted for compact-pane recovery.
+  expect(names()).toEqual(['Biology', 'Cells', 'Genetics', 'DNA', 'Chemistry']);
+});
+
+it('retains a collapsed real parent subtree for compact panes without changing deck actions', async () => {
+  const open = vi.fn(),
+    studyDecks = vi.fn();
+  library(true, { open, studyDecks });
+  const parent = host.querySelector('.qard-deck-node')!;
+  const children = parent.querySelector(':scope > .qard-deck-children')!;
+  const cells = children.querySelector('button.qard-deck')!;
+  expect(children.classList.contains('has-deck')).toBe(true);
+  expect(children.classList.contains('is-collapsed')).toBe(false);
+
+  await click(button('Collapse Biology'));
+  expect(children.classList.contains('is-collapsed')).toBe(true);
+  expect(parent.querySelector(':scope > .qard-deck-children')).toBe(children);
+  expect(children.querySelector('button.qard-deck')).toBe(cells);
+  expect(button('Expand Biology').getAttribute('aria-expanded')).toBe('false');
+
+  await click(parent.querySelector(':scope > .qard-deck-row > button.qard-deck')!);
+  expect(open).toHaveBeenCalledExactlyOnceWith('Biology');
+  expect(children.classList.contains('is-collapsed')).toBe(true);
+  await click(button('Study Biology and its subdecks'));
+  expect(studyDecks).toHaveBeenCalledWith(
+    expect.arrayContaining(['Biology', 'Biology::Cells', 'Biology::Genetics::DNA']),
+  );
+
+  await click(button('Expand Biology'));
+  expect(children.classList.contains('is-collapsed')).toBe(false);
+  expect(children.querySelector('button.qard-deck')).toBe(cells);
 });
 
 it('opens a deck through its row button without a redundant chevron action', async () => {

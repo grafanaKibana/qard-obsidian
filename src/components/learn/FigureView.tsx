@@ -55,8 +55,10 @@ export function FigureView({
             {left ? ` · ${left}` : ''}
           </span>
         </div>
-        <Waiting text={figure ? 'Redrawing the figure…' : 'Drawing a figure…'} />
-        <JobControls services={services} job={job} cancel={cancel} />
+        <div className="qard-figure-status">
+          <Waiting text={figure ? 'Redrawing the figure…' : 'Drawing a figure…'} />
+          <JobControls services={services} job={job} cancel={cancel} compact />
+        </div>
       </div>
     );
   }

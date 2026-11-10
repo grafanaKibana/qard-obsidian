@@ -128,7 +128,13 @@ export function DeckBrowser({
             )}
           </div>
         </div>
-        {parent && open && <div className="qard-deck-children">{node.children.map(row)}</div>}
+        {parent && (
+          <div
+            className={`qard-deck-children${open ? '' : ' is-collapsed'}${deck ? ' has-deck' : ''}`}
+          >
+            {node.children.map(row)}
+          </div>
+        )}
       </div>
     );
   };

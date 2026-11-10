@@ -5733,10 +5733,14 @@ body.qard-focus-active .status-bar {
 
 .qard-usage-legend {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 0 var(--qard-gap-actions);
+  justify-content: flex-start;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  gap: var(--qard-space-4);
   font-size: var(--qard-font-meta);
   color: var(--qard-muted);
   margin-top: -12px;
@@ -5744,6 +5748,7 @@ body.qard-focus-active .status-bar {
 
 .qard-usage-legend > span {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   padding: var(--qard-space-1) var(--qard-gap-actions);
@@ -8390,6 +8395,10 @@ div.qard-ask-q {
   margin-left: var(--qard-inset-compact);
 }
 
+.qard-deck-children.is-collapsed {
+  display: none;
+}
+
 .qard-app .qard-deck-row > button.qard-deck-toggle,
 .qard-app .qard-deck-actions > button {
   flex: 0 0 auto;
@@ -8457,6 +8466,10 @@ div.qard-ask-q {
 
   .qard-deck-study-label {
     display: none;
+  }
+
+  .qard-deck-children.is-collapsed.has-deck {
+    display: grid;
   }
 
   .qard-study-desk .qard-deck-row {
@@ -8811,6 +8824,7 @@ div.qard-ask-q {
 }
 
 @container qard-workspace (max-width: 640px) {
+  .qard-app .qard-lesson-check-actions > button.qard-question-action,
   .qard-today .qard-doc-footer > button,
   .qard-lesson .qard-lesson-navigation > button:last-child {
     width: 100%;
@@ -8880,15 +8894,28 @@ div.qard-ask-q {
   flex-basis: 100%;
 }
 
-.qard-figure.is-drawing > .qard-waiting {
-  flex: 1 0 100%;
+.qard-figure-status {
+  display: flex;
+  flex-wrap: wrap;
+  flex-basis: 100%;
+  align-items: center;
+  gap: var(--qard-gap-actions);
+  min-width: 0;
+}
+
+.qard-figure-status > .qard-waiting {
+  flex: 1 1 0;
   flex-wrap: nowrap;
   margin: 0;
 }
 
-.qard-figure.is-drawing > .qard-job-controls {
-  flex-basis: 100%;
-  justify-content: flex-end;
+.qard-figure-status .qard-job-controls {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.qard-figure-status .qard-job-controls.is-stuck {
+  flex: 1 1 100%;
 }
 
 .qard-figure-redraw-actions {
@@ -8951,4 +8978,24 @@ div.qard-ask-q {
   .qard-time .qard-usage-table {
     font-size: var(--qard-font-meta);
   }
+}
+
+.qard-resume-intrinsic {
+  display: inline-block;
+  width: max-content;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.qard-resume-copy.is-inline > .qard-resume-context {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+.qard-resume-copy.is-inline > .qard-resume-title {
+  grid-column: 1;
 }

@@ -169,6 +169,84 @@ it('reviews a marked answer: underlines, linked notes, mark scheme and panels', 
   expect(host.querySelectorAll('.qard-rail-item')).toHaveLength(2);
 });
 
+it('reveals a resumed test section and the next section while preserving manual strip scrolling between changes', async () => {
+  const bounds = vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (
+    this: Element,
+  ) {
+    if (this.matches('.qard-test-steps')) return new DOMRect(100, 0, 300, 34);
+    if (this.matches('.qard-test-steps > button')) {
+      const strip = this.parentElement!;
+      const index = [...strip.querySelectorAll('button')].indexOf(this as HTMLButtonElement);
+      return new DOMRect(100 + index * 150 - strip.scrollLeft, 0, 150, 34);
+    }
+    return new DOMRect();
+  });
+  const width = vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockImplementation(function (
+    this: HTMLElement,
+  ) {
+    return this.matches('.qard-test-steps') ? 300 : 0;
+  });
+  const originalScroll = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'scrollIntoView');
+  const outerScroll = vi.fn();
+  Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
+    configurable: true,
+    value: outerScroll,
+  });
+  try {
+    const sections = Array.from({ length: 8 }, (_, i) => ({
+      ...TEST.sections[0],
+      id: `section-${i}`,
+      title: `Transport section ${i + 1}`,
+      questions: [{ ...TEST.sections[0]!.questions[1], id: `question-${i}` }],
+    }));
+    files['Qard/Tests/t/test.json'] = JSON.stringify({ ...TEST, sections });
+    files['Qard/Tests/t/attempt.json'] = JSON.stringify({
+      version: 1,
+      startedAt: 1,
+      sections: Object.fromEntries(sections.slice(0, 5).map((s) => [s.id, { status: 'marked' }])),
+      answers: {},
+      marks: {},
+      review: {},
+    });
+    const settings = services.reviews.getSnapshot().settings;
+    await services.reviews.saveSettings({
+      ...settings,
+      tests: { ...settings.tests, marking: 'end' },
+    });
+    host.scrollTop = 70;
+    await act(async () =>
+      root.render(<TakeTest services={services} nav={nav} folder="Qard/Tests/t" />),
+    );
+    await tick();
+    await tick();
+    const strip = host.querySelector<HTMLDivElement>('.qard-test-steps')!;
+    expect(strip.querySelector('[aria-current="step"]')?.textContent).toBe('Transport section 6');
+    expect(strip.scrollLeft).toBe(600);
+    strip.scrollLeft = 75;
+    await act(async () =>
+      root.render(<TakeTest services={services} nav={nav} folder="Qard/Tests/t" />),
+    );
+    await tick();
+    expect(strip.scrollLeft).toBe(75);
+    await click(buttons('Next section')[0]);
+    await tick();
+    expect(strip.querySelector('[aria-current="step"]')?.textContent).toBe('Transport section 7');
+    expect(strip.scrollLeft).toBe(750);
+    expect(host.scrollTop).toBe(70);
+    expect(
+      outerScroll.mock.contexts.every(
+        (node) => node !== strip && !(node as HTMLElement).matches('.qard-test-steps button'),
+      ),
+    ).toBe(true);
+  } finally {
+    bounds.mockRestore();
+    width.mockRestore();
+    if (originalScroll)
+      Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', originalScroll);
+    else delete (HTMLElement.prototype as Partial<HTMLElement>).scrollIntoView;
+  }
+});
+
 it('takes a test: answers autosave and a section can be submitted', async () => {
   files['Qard/Tests/t/attempt.json'] = JSON.stringify({
     version: 1,

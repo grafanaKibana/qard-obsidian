@@ -1,6 +1,6 @@
 import { plural } from '../common/labels';
 import { DeleteLearnItem } from './DeleteLearnItem';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ChartColumn, ChevronRight, Clock, FileText, Plus } from 'lucide-react';
 import type { QardServices } from '../../views/services';
 import type { Mastery } from '../../learn/mastery';
@@ -154,13 +154,7 @@ export function LearnBrowser({
       {open.map((l) => (
         <div key={l.path} className="qard-deletable-row">
           <button className="qard-resume" onClick={() => nav.lesson(l.path)}>
-            <span className="qard-resume-copy">
-              <span className="qard-muted qard-resume-label">Continue lesson</span>
-              {l.course && <span className="qard-muted qard-resume-context">{l.course}</span>}
-              <strong className="qard-resume-title">
-                <InlineMarkdown text={l.title} path={l.path} services={services} />
-              </strong>
-            </span>
+            <ResumeLessonCopy lesson={l} services={services} />
             <ChevronRight size={16} />
           </button>
           <DeleteLearnItem services={services} kind="lesson" path={l.path} />
@@ -217,5 +211,59 @@ export function LearnBrowser({
         </section>
       )}
     </>
+  );
+}
+
+/** Keep course context beside a short title, while long titles retain the full row. */
+function ResumeLessonCopy({ lesson, services }: { lesson: LessonSummary; services: QardServices }) {
+  const copy = useRef<HTMLSpanElement>(null);
+  const [inline, setInline] = useState(false);
+  useEffect(() => {
+    const element = copy.current;
+    if (!element || !lesson.course) {
+      setInline(false);
+      return;
+    }
+    const label = element.querySelector<HTMLElement>('.qard-resume-label .qard-resume-intrinsic')!,
+      title = element.querySelector<HTMLElement>('.qard-resume-title .qard-resume-intrinsic')!,
+      context = element.querySelector<HTMLElement>('.qard-resume-context .qard-resume-intrinsic')!;
+    const measure = () => {
+      const width = element.getBoundingClientRect().width;
+      const gap = parseFloat(getComputedStyle(element).columnGap) || 0;
+      const main = Math.max(
+        label.scrollWidth,
+        label.getBoundingClientRect().width,
+        title.scrollWidth,
+        title.getBoundingClientRect().width,
+      );
+      const contextWidth = Math.max(context.scrollWidth, context.getBoundingClientRect().width);
+      setInline(width > 0 && main + contextWidth + gap <= width);
+    };
+    measure();
+    if (typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    const observer = new ResizeObserver(measure);
+    for (const target of [element, label, title, context]) {
+      observer.observe(target);
+    }
+    return () => observer.disconnect();
+  }, [lesson.title, lesson.course, lesson.path]);
+  return (
+    <span ref={copy} className={`qard-resume-copy${inline ? ' is-inline' : ''}`}>
+      <span className="qard-muted qard-resume-label">
+        <span className="qard-resume-intrinsic">Continue lesson</span>
+      </span>
+      {lesson.course && (
+        <span className="qard-muted qard-resume-context">
+          <span className="qard-resume-intrinsic">{lesson.course}</span>
+        </span>
+      )}
+      <strong className="qard-resume-title">
+        <span className="qard-resume-intrinsic">
+          <InlineMarkdown text={lesson.title} path={lesson.path} services={services} />
+        </span>
+      </strong>
+    </span>
   );
 }

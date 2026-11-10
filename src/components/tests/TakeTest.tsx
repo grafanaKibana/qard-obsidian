@@ -10,6 +10,7 @@ import { type TestNav } from '../../views/navigation';
 import { WhileYouWait, useHold } from '../jobs/WhileYouWait';
 import { AgentLabel } from '../jobs/AgentLabel';
 import { LoadingIndicator } from '../common/LoadingIndicator';
+import { useCurrentStepScroll } from '../common/useCurrentStepScroll';
 
 const CONFIDENCE: { id: Confidence; label: string }[] = [
   { id: 'sure', label: 'Sure' },
@@ -31,6 +32,7 @@ export function TakeTest({
     attempt = entry?.attempt;
   const [index, setIndex] = useState<number>();
   const hold = useHold();
+  const stepsRef = useCurrentStepScroll(index, !!test && !hold.held);
   const marking = services.reviews.getSnapshot().settings.tests.marking;
   const top = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -105,7 +107,7 @@ export function TakeTest({
   const doneScore = done && scoreOf(test, attempt, done);
   return (
     <div className="qard-test" ref={top}>
-      <div className="qard-test-steps" aria-label="Sections">
+      <div className="qard-test-steps" aria-label="Sections" ref={stepsRef}>
         {test.sections.map((s, i) => {
           const st = attempt?.sections[s.id]?.status ?? 'open';
           return (

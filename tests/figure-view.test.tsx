@@ -32,7 +32,11 @@ afterEach(async () => {
 });
 const click = async (label: string) => {
   await act(async () => {
-    [...host.querySelectorAll('button')].find((button) => button.textContent === label)!.click();
+    [...host.querySelectorAll('button')]
+      .find(
+        (button) => button.textContent === label || button.getAttribute('aria-label') === label,
+      )!
+      .click();
   });
 };
 const type = async (value: string) => {
@@ -99,6 +103,11 @@ it('shows compact illustrator metadata and timing while preserving job cancellat
     '1:00 elapsed · about 3 min left',
   );
   expect(host.textContent).toContain('Redrawing the figure…');
+  const stop = host.querySelector('.qard-figure-status button')!;
+  expect(stop.getAttribute('aria-label')).toBe('Cancel');
+  expect(stop.getAttribute('title')).toBe('Cancel');
+  expect(stop.textContent).toBe('');
+  expect(stop.querySelector('svg')).not.toBeNull();
   await click('Cancel');
   expect(cancel).toHaveBeenCalledOnce();
 });
@@ -131,7 +140,7 @@ it('shows drawing progress, the figure with its caption, and redraws with a note
   expect(host.textContent).toContain('Drawing a figure…');
   expect(host.querySelector('.qard-jobs-role')?.textContent).toBe('Illustrator');
   await act(async () => {
-    [...host.querySelectorAll('button')].find((b) => b.textContent === 'Cancel')!.click();
+    host.querySelector<HTMLButtonElement>('[aria-label="Cancel"]')!.click();
   });
   expect(cancel).toHaveBeenCalled();
   await show(figure);
@@ -156,4 +165,26 @@ it('shows drawing progress, the figure with its caption, and redraws with a note
   expect(draw).toHaveBeenCalledWith('label the mode');
   await show(undefined, { kind: 'figure', error: 'Python 3 was not found.' });
   expect(host.textContent).toContain('Python 3 was not found.Try again');
+});
+
+it('keeps overdue figure guidance and cancellation with the compact stop icon', async () => {
+  const cancel = vi.fn();
+  await act(async () =>
+    root.render(
+      <FigureView
+        services={services}
+        path="Networks.md"
+        figure={figure}
+        job={{ kind: 'figure', startedAt: Date.now() - 20 * 60_000 }}
+        draw={vi.fn()}
+        cancel={cancel}
+        dismiss={vi.fn()}
+      />,
+    ),
+  );
+  expect(host.querySelector('.qard-figure-status .is-stuck')?.textContent).toContain(
+    'much longer than usual',
+  );
+  await click('Cancel');
+  expect(cancel).toHaveBeenCalledOnce();
 });
