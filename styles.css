@@ -903,7 +903,6 @@
   --qard-inset-compact: var(--qard-space-4);
   --qard-workspace-gutter: 28px;
   --qard-page-max-width: 1440px;
-  --qard-reading-measure: 72ch;
   --qard-study-card-width: 860px;
   --qard-row-accent: var(--qard-blue);
   --qard-row-padding: var(--qard-space-3) var(--qard-space-4);
@@ -1746,12 +1745,6 @@
   line-height: 1.65;
   overflow-wrap: anywhere;
   user-select: text;
-}
-
-:where(.qard-doc-body, .qard-lesson-explain, .qard-lesson-connect)
-  > .qard-markdown
-  :is(p, ul, ol, blockquote) {
-  max-width: var(--qard-reading-measure);
 }
 
 .qard-markdown .qard-md-pending {
@@ -2704,7 +2697,6 @@ body.qard-focus-active .status-bar {
 
 .qard-library-heading p {
   line-height: 1.65;
-  max-width: 48ch;
 }
 
 .qard-library-heading > .qard-actions {
