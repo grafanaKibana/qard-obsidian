@@ -1,10 +1,10 @@
 {
   "before": "70056821914f0dae910b52a20f1fa3329b04d0ac",
-  "after": "46caf39bd24f14785e868d4d033bc98f6b689c9f",
+  "after": "2acdfc5d12dd66b2271a4c200bf3242ceb8dc6c9",
   "comparisons": 48,
   "deviceScaleFactor": 2,
   "clock": "2026-11-09T12:00Z for browser fixtures; native identical live renderer/settings",
-  "capture": "Upstream main to latest PR17 only. 47 browser pairs freshly captured using matching fixtures. Added active checking/wrapping and completed-lesson suggestions; Today lists are transparent. Native Mermaid pair is unchanged because its renderer/settings were not modified. No intermediate revisions.",
+  "capture": "Upstream main to latest PR17 only. Fresh 620px dark sidebar pair replaces a redundant desktop library pair; the other 47 comparisons retain their previous captures. The only code change moves compact action centering from 640px to the existing 600px breakpoint, leaving their capture widths unaffected. No intermediate PR revisions are shown.",
   "maximumExamplesPerGroup": 3,
   "scenes": [
     {
@@ -109,10 +109,11 @@
       "touch": true
     },
     {
-      "name": "decks-desktop",
+      "name": "create-boundary",
       "screen": "app",
-      "width": 1440,
-      "crop": ".qard-desk-library"
+      "width": 620,
+      "theme": "dark",
+      "crop": ".qard-desk-review"
     },
     {
       "name": "nested-phone",
@@ -357,7 +358,7 @@
     "after-checking-phone.png": "3abfeed5d5f30d640869791e8a0c8d907e030ae99344c7050d34022ee4163f04",
     "after-completed-desktop.png": "50470e86631175ed5bfd9da4d000f3504f42d006512c79ac33038ad37a29020c",
     "after-completed-phone.png": "c10ad5b19683520ea0bad17353910438569fc4443997bc5abcac79ad656cfc90",
-    "after-decks-desktop.png": "dad2b2e7a17e7e6d0b6c2c137ed3589db4735539ea0f00ebcadb7805f231f352",
+    "after-create-boundary.png": "38f01b1d84511f907bfe99a9bd907a5b86033ab40f8034cb25202e3a7b4fabfe",
     "after-decks-phone.png": "0316fea3cf646ec119e6244f087b19cfdff8db27cf6eb1bf9f8ac8ba38306205",
     "after-exam-mobile.png": "8c85de352fcd8b631f839c4fcce1ad7e7a00d31d90db8bdc33ae7dd9ad151a12",
     "after-figure-redraw-desktop.png": "18431881e73ab757520491d9a4eeeee0b6a5451a53c73535f4c3fe9e41f5a787",
@@ -405,7 +406,7 @@
     "before-checking-phone.png": "15682b57b6d01b6f4d054ea51e1313a4682758b000ee12b97c48d5740f529e18",
     "before-completed-desktop.png": "6261531fb92262cbcac6d528aff6c7b4597a3a351663118045393c64206f7d25",
     "before-completed-phone.png": "561eed044138a309f56ee23632aebeab47b6802dbd564be29e740801301d4096",
-    "before-decks-desktop.png": "b6615d834bd7c304ec971af2d40318957e6fa96d61f0f7a8723dcaae13b26c7a",
+    "before-create-boundary.png": "251896e5e6dec9bb403b1fef8baf029068f48e8e80a7d94ad4353f7fd206da61",
     "before-decks-phone.png": "623878cc2f0d1915877c7064c3d7ecad011e965c9f1675d7766c199a64b285e4",
     "before-exam-mobile.png": "10198204da5227ad42d27f8f7ccaf435c6220fa5519facc696a1e45da1321e77",
     "before-figure-redraw-desktop.png": "2f478f1020cbba8e3799c9ad1b2c3cfde5a3c8bdf8b9a66a5f5aff32d4ef5743",
