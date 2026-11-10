@@ -1,26 +1,23 @@
-# Final combined UI verification
+# Combined visual refinements — PR #11
 
-Final source `e31b7d83f9123d5d1fdb78342d750be5b2308fcc`. Baseline: fork main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
+Fork main `70056821914f0dae910b52a20f1fa3329b04d0ac` compared with source `9aec6249abba6e17e39c31b53ab19223af614aa2`.
 
-## Latest refinements
+Implemented the three preceding audit findings and the four requested refinements. Today checks and lessons group under course subheadings, keyed by course file identity. Status and title stay inline with a trailing action. Rows no longer repeat course labels. Check readiness, retries, teaching, and original order inside each course are preserved.
 
-- Compact Today metadata puts the status at the start and course at the end. Titles align with section headings; Teach/chevrons share the trailing edge. The optional lesson explanation is an info tooltip at the end of its heading row.
-- Lesson action label is Start. Input+Revise remain in one flex group; Start fills its line when it wraps.
-- Lesson trail and test steps use direct step/chevron/step siblings, shared button padding and zero horizontal/vertical CSS gaps.
-- Waiting role/time uses the full available content width with the existing jobs-meta treatment. Provider/model details remain in the role info tooltip. CLI latency guidance moves to an info icon at the start of JobControls.
-- Document rows have separator borders only between items.
-- Study-time period controls expand to the full row when they wrap below the heading.
-- Mobile Create & study button content is centered. Map a course is a single-line label.
-- Resume chevrons stay in a fixed, non-wrapping outer row. Long lesson/update/proposal text uses a readable metadata/title grid rather than squeezing text into tiny columns.
-- Lesson Check and Ask share an action-width token. There is one separator above Ask, no separator below it, no empty history list/header, no Ask/form margins, and an 8px separator inset on each side. Mobile Next step is full width.
+Mobile deck rows reclaim management-button space, remove chevrons, retain Study, and use the deck button's stretched hit area to open through row padding. Desktop management actions remain separate. Virtual parent rows retain branch folding, with plus/minus disclosure on desktop. Compact row/badge gaps match 12px insets; desktop row/badge/action gaps match 16px insets. Shallow nesting remains.
 
-## Fresh validation
+Ask fields use symmetric vertical padding derived from the control height and current line box. Empty placeholders stay on one line, and entered multiline text can grow with its button. The populated Study time legend wraps complete swatch/label items. Figure redraw gives the field a full compact row, with Redraw/Cancel together below; desktop keeps its inline form. Running figures reuse compact role/info and elapsed/estimate metadata.
 
-- `npm run check`: **768 tests across95 suites**, formatter, TypeScript, ESLint, Stylelint, build and release checks passed on the combined changes.
-- **144 focused assertions** passed in both themes at320,375,390,600,768 and1100px: row alignment, tooltip placement, first-row borders, plan wrapping, input/Revise grouping, shared action widths, Ask spacing, mobile Next width, direct zero-gap trails, Learn label wrapping, long resume containment, period-selector width, centered mobile create controls and waiting metadata.
-- **216 integrated scenes** passed across light/dark, three phone widths, tablet, desktop and narrow desktop panes: no runtime errors, horizontal overflow or sampled out-of-bounds panels.
-- **33 matched main-to-final pairs /66 images** captured without runtime errors. Each comparison uses equal columns and matching content/settings; at most three examples per group. The capture manifest records conditions and all image hashes.
-- Native isolated Obsidian confirms plan/Ask field and button heights34px, Check/Ask widths76px, a full-width358px mobile Next step, and no footer separator. Temporary in-memory lesson fixtures were removed and the app returned to Learn.
-- The isolated install matches the final source build. DevBook plugin files, global Obsidian vault configuration and installed app hashes remain unchanged. No DESIGN.md was added.
+`npm run check` passed: 773 tests in 95 suites, formatting, TypeScript, ESLint, Stylelint, production build, and release metadata/install-file checks. The independent source review reported no actionable issues. Twenty targeted queue/deck/figure tests passed before the complete suite.
 
-Keyboard accessibility was outside this visual pass. Mobile checks use touch emulation and narrow panes, not physical iPhone/Safari testing. The separate test app remains open; no development server was launched.
+264 integrated light/dark pane/device scenarios passed with no runtime errors, main horizontal overflow or sampled out-of-bounds panels.
+
+84 focused browser assertions passed across 320/375/390/600/768/1100px, both light and dark: six complete legend items; compact/desktop redraw layout; figure role metadata width; grouped check/lesson labels and inline alignment; one-line empty Ask vertical alignment; multiline growth; mobile deck visibility and full-row hit area; row and badge gaps at least equal to padding.
+
+36 matched main-to-latest screenshot pairs captured without runtime errors. New figure examples cover redraw on mobile/desktop and compact running metadata. Today captures contain two course groups. Study time contains all six activities at 320px. Lesson controls use the same representative question on both revisions. No intermediate PR revision is used as a before image. Maximum three examples per group, two equal image columns, and click-through full-resolution images.
+
+Native isolated Obsidian verification passed: plan/Ask controls 34px; empty placeholder has equal 6.90234px top/bottom padding with an 18.2px line box; Check/Ask widths both 76px; Next step spans the compact row with no top border. Temporary in-memory lessons and the pane-width override were removed; isolated app returned to Learn. Test plugin install hashes match the final source build.
+
+DevBook plugin, global Obsidian configuration, and installed app hashes remain unchanged. The isolated app remains open. No development server was started. Mobile validation uses touch/pane simulation, not a physical iPhone. Keyboard accessibility was outside scope.
+
+The detector retained three existing semantic message/answer side-border warnings; none was introduced by this patch. No further polishing cycle was run after the bounded correction/confirmation pass.
