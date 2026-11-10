@@ -1,3 +1,19 @@
+# Study results, questions and task controls
+
+Latest source `e3e35267e8182a570be8a212c2af2e759252b060`. Baseline is upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
+
+- Study card and preview prose fills the content area. Long-form lesson and document prose keeps its reading measure.
+- Completion header aligns title and metrics in one row when they fit. The chart uses the study card's desktop width. Plot axes and difficulty labels share the same edges, rating labels align with points, and the dashed line marks the median. Review actions use shorter labels.
+- The diagnostic help is a native disclosure with a bare info icon and the original hover text. The question prompt uses medium weight and answer content uses normal weight.
+- Running task rows use the compact inset for padding and gap. Active wait panels center the cancel icon beside the text and retain recovery controls for stalled jobs.
+- All 84 focused browser cases passed at 320, 390, 768, 1100 and 1440px pane widths plus a 390px pane in a wide window, in both themes. Checks cover actual card and preview text bounds, prose measure, chart axes and rating columns, header alignment, question font weight, diagnostic disclosure, task padding and inline cancellation.
+- Formatting, typecheck, ESLint, CSS lint, 791 tests in 96 suites, build and release checks passed. Impeccable layout and typography scans returned no findings.
+- Sixteen refreshed main-to-latest screenshot pairs include two new completed-session examples. Other comparisons retain prior captures.
+- The isolated Obsidian installation matches the built plugin. Protected file hashes match the pre-change snapshot.
+- The hosted review service reported its usage limit. GitHub has no unresolved review threads.
+
+## Prior verification at `2acdfc5`
+
 # Sidebar breakpoint verification
 
 Latest source: `2acdfc5d12dd66b2271a4c200bf3242ceb8dc6c9`. Baseline remains upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.

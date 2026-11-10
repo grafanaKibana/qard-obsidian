@@ -1,19 +1,14 @@
 {
-  "source_head": "2acdfc5d12dd66b2271a4c200bf3242ceb8dc6c9",
+  "source_head": "e3e35267e8182a570be8a212c2af2e759252b060",
   "upstream_pr": "https://github.com/kylianmarceau/qard-obsidian/pull/17",
   "code_review": {
-    "commit_sha": "2acdfc5d12dd66b2271a4c200bf3242ceb8dc6c9",
-    "status": "not_yet_reported",
-    "has_any_findings": null,
-    "has_unresolved_findings": null
+    "commit_sha": "e3e35267e8182a570be8a212c2af2e759252b060",
+    "has_any_findings": true,
+    "has_unresolved_findings": true,
+    "status": "failed"
   },
-  "previous_code_review": {
-    "commit_sha": "46caf39bd24f14785e868d4d033bc98f6b689c9f",
-    "has_any_findings": false,
-    "has_unresolved_findings": false,
-    "status": "completed"
-  },
-  "summary_updated_at": "2026-11-10T20:08:59Z",
+  "summary_updated_at": "2026-11-10T22:13:53Z",
+  "review_note": "Hosted Codex review did not run because the service reported its usage limit. GitHub lists no unresolved review threads.",
   "threads": [
     {
       "id": "PRRT_kwDOUx8Fs861vy2T",
