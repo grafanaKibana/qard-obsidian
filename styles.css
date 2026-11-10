@@ -3290,11 +3290,10 @@ body.qard-focus-active .status-bar {
   flex-direction: column;
   gap: 12px;
   padding: 26px 0;
-  border-top: 1px solid var(--qard-border);
 }
 
-.qard-test-heading + .qard-q {
-  border-top: 0;
+.qard-q + .qard-q {
+  border-top: 1px solid var(--qard-border);
 }
 
 .qard-q-meta {
@@ -6729,6 +6728,34 @@ div.qard-ask-q {
 .qard-exam-details dd {
   margin: 0;
   text-align: right;
+}
+
+.qard-exam-details .qard-exam-study-days {
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.qard-exam-weekdays {
+  display: inline-flex;
+  gap: var(--qard-space-1);
+  vertical-align: middle;
+}
+
+.qard-exam-weekdays > span {
+  display: grid;
+  place-items: center;
+  width: var(--qard-space-6);
+  height: var(--qard-space-6);
+  border-radius: var(--qard-radius-badge);
+  background: var(--qard-soft);
+  color: var(--qard-muted);
+  font-size: var(--qard-font-meta);
+  line-height: 1;
+}
+
+.qard-exam-weekdays > .is-selected {
+  background: var(--qard-tint);
+  color: var(--qard-blue);
 }
 
 .qard-exam-details p {

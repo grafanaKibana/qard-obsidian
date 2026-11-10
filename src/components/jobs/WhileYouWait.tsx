@@ -182,7 +182,7 @@ export function WhileYouWait({
     }
     const list: { id: Activity; label: string }[] = [];
     if (options.check) {
-      list.push({ id: 'check', label: `Check · ${options.check.title}` });
+      list.push({ id: 'check', label: 'Check' });
     }
     if (options.cards.length) {
       list.push({

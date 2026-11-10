@@ -269,10 +269,6 @@ function LessonProbe({
           </h1>
         </div>
       </div>
-      <p className="qard-muted">
-        A few quick questions first, so the lesson starts from what you already know. Say "I don't
-        know" rather than guessing.
-      </p>
       {probe.questions.map((q, i) => (
         <AnswerInput
           key={q.id}

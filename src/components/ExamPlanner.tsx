@@ -8,7 +8,7 @@ import { ExamCalendar } from './exams/ExamCalendar';
 import { plural } from './common/labels';
 import type { QardCard } from '../cards/card-types';
 import type { QardServices } from '../views/services';
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 export function ExamPlanner({
   services,
   start,
@@ -269,13 +269,21 @@ export function ExamPlanner({
                 {expanded === plan.id && (
                   <div className="qard-exam-details">
                     <dl>
-                      <div>
+                      <div className="qard-exam-study-days">
                         <dt>Study days</dt>
                         <dd>
-                          {[1, 2, 3, 4, 5, 6, 0]
-                            .filter((day) => plan.weekdays.includes(day))
-                            .map((day) => DAYS[day])
-                            .join(', ')}
+                          <span className="qard-exam-weekdays">
+                            {[1, 2, 3, 4, 5, 6, 0].map((day) => (
+                              <span
+                                key={day}
+                                className={plan.weekdays.includes(day) ? 'is-selected' : undefined}
+                                title={`${DAYS[day]}: ${plan.weekdays.includes(day) ? 'Study day' : 'Rest day'}`}
+                                aria-label={`${DAYS[day]}: ${plan.weekdays.includes(day) ? 'Study day' : 'Rest day'}`}
+                              >
+                                {DAYS[day]!.charAt(0)}
+                              </span>
+                            ))}
+                          </span>
                         </dd>
                       </div>
                       <div>
