@@ -1,22 +1,24 @@
-# PR #11 — code review fixes
+# PR #11 — waiting checks, question flow and plan details
 
-Source: `e1ea1e7cf6bf52646f27b53a475ac2607f8e45fc`. Baseline: fork main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
+Source: `e8749bb0c4f8ec7b7d47234f4e496a39ba873e98`. Baseline: fork main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
 
-Addressed all outstanding review threads. The earlier real-parent compact expansion finding was already fixed in d674610 and was verified before resolution. Two further fixes are included in this commit:
+Latest refinements:
 
-- StudyCard retains face containers but mounts Markdown/CardContent only in the active face, including an initially revealed card. Hidden faces no longer trigger zero-width Mermaid layout. Active-face height, basic/cloze/image behavior and renderer cleanup are preserved.
-- Virtual parent groups, which have no detail route, retain Deck options and Rename group through a compact More menu. Real compact decks keep streamlined controls. Desktop management remains inline. Menu actions do not open/fold the deck accidentally. A nested rename dialog owns cancellation while open; pending operations and eventual errors survive Escape.
+- While-you-wait activity chip reads Check. Its content retains the full check heading and switching behavior.
+- Removed the redundant lesson-probe introduction, as requested.
+- Plan details show seven read-only weekday initials. Existing spacing, metadata, radius and theme tokens define neutral/rest and selected/study appearances. Full weekday and status remain in tooltips. On the narrowest panes, the intact seven-day row wraps beneath Study days instead of overflowing.
+- Question borders occur only between adjacent question articles. This also covers marked checks with an outcome inserted above the first question.
 
-`npm run check` passed: 784 tests in 96 suites, formatting, TypeScript, ESLint, Stylelint, build and release checks. Final CSS lint/build passed. Regression tests cover both face directions, initially revealed state, unchanged-state render stability and cleanup, sibling-cloze undo behavior, group management callback identity and deferred rename errors.
+`npm run check` passed on this source: 784 tests in 96 suites; formatting, TypeScript, ESLint, Stylelint, build and release checks. The existing waiting-activity test was updated to require the short Check label and retains switching coverage. Independent read-only source review found no actionable regressions.
 
-264 integrated light/dark pane/device scenarios passed without runtime errors, unintended main horizontal overflow or sampled out-of-bounds panels.
+18 focused rendered cases passed in light/dark themes at 320/390/1100px: first question has no border, second retains its separator, probe introduction is absent, waiting Check chip has no title suffix, weekday initials/order/selection/rest styling match the saved plan, and content stays within the pane with no unintended horizontal overflow.
 
-16 rendered management assertions passed at 320/390/1100px in both themes: compact menu containment and stacking, native rename dialog, options screen, no real-deck navigation, desktop menu hidden and inline options retained.
+40 browser screenshot pairs freshly captured from main/latest, including the probe and waiting-check flows, without runtime errors. All latest captures have no unintended main horizontal overflow. Main retains the pre-existing nested-deck and Study time overflow visible in those comparisons. Plan fixtures use Monday–Friday in both phases so neutral and selected weekday states are visible.
 
-Real Obsidian Mermaid validation uses the actual public Markdown renderer through a temporary isolated test harness. Each phase uses its own Qard source/CSS, with the installed Qard stylesheet temporarily disabled and restored. Main renders hidden content into a measurable 308px target. Latest does not mount hidden answer Markdown; first reveal renders Mermaid in a visible 324px target, producing all 3 nodes. The diagram is 207.1×278px and readable within the 390px pane. Harness plugin, globals, DOM, render interception and temporary styles are unloaded/restored; its two owned files are removed.
+The unchanged native Obsidian Mermaid pair is retained from the previous verified source e1ea1e7: StudyCard, Markdown and applicable native-card styles are unchanged. The capture manifest identifies this retained scene explicitly. Together there are 41 pairs, 82 images, equal before/after columns and no more than three examples per group. No intermediate revision is used as before.
 
-39 main-to-latest screenshot pairs: 38 matched browser fixtures plus one native Mermaid pair. The new compact group menu and real diagram examples are included in existing relevant groups, with at most three examples per group, two equal columns and full-resolution links. Main’s virtual-group actions are inline; the latest example opens its compact menu to show the equivalent actions. No intermediate revision serves as before.
+Earlier verification on e1ea1e7 covered 264 integrated responsive scenarios, 16 rendered group-management checks, and real Obsidian Mermaid rendering. These are prior-head evidence, not additional freshly rerun cases. Latest-head verification is stated above.
 
-The isolated plugin install matches the final source build and is reloaded on Learn. DevBook plugin files, global Obsidian configuration and installed app hashes remain unchanged. Separate test app remains open; no development server started. Mobile coverage is simulated pane/touch input, not physical iPhone/Safari.
+The new build is installed and reloaded only in the isolated Obsidian test vault, returned to Learn. Test plugin files match the build; DevBook plugin files, global Obsidian configuration and installed app hashes remain unchanged. Separate test app remains open; no development server was started. Phone coverage uses simulated touch/pane input, not physical iPhone/Safari. Keyboard accessibility remains outside the visual audit.
 
-GitHub code review completed at 2026-11-10T09:24:39Z for exact source e1ea1e7cf6bf52646f27b53a475ac2607f8e45fc with has_any_findings:false and has_unresolved_findings:false. All 6 review threads are resolved; no review was dismissed to clear findings. Hosted pull-request workflow runs were absent for this fork head, so test claims refer to local checks and isolated/browser validation.
+All six review threads remain resolved. The latest automated review state reported by GitHub is saved in review-state.json with its source commit; the current local source review found no issues. The PR remains open and unmerged.

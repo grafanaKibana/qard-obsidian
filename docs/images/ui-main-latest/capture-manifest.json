@@ -1,10 +1,10 @@
 {
   "before": "70056821914f0dae910b52a20f1fa3329b04d0ac",
-  "after": "e1ea1e7cf6bf52646f27b53a475ac2607f8e45fc",
-  "comparisons": 39,
+  "after": "e8749bb0c4f8ec7b7d47234f4e496a39ba873e98",
+  "comparisons": 41,
   "deviceScaleFactor": 2,
   "clock": "2026-11-09T12:00Z for browser fixtures; native identical live renderer/settings",
-  "capture": "Only main versus final PR:38 matched browser pairs and one real Obsidian Mermaid pair. Each native phase uses its own component/CSS, with common Obsidian renderer and390px pane. Virtual controls are inline on main, exposed through opened compact menu on latest. No intermediate revisions.",
+  "capture": "Only fork main versus latest PR: 40 freshly matched browser pairs. The unchanged native Mermaid pair is retained from e1ea1e7: StudyCard, Markdown and applicable native-card CSS are unchanged in this revision. Weekday fixtures use Mon\u2013Fri in both phases. No intermediate revision serves as before.",
   "maximumExamplesPerGroup": 3,
   "scenes": [
     {
@@ -277,6 +277,20 @@
       "theme": "dark"
     },
     {
+      "name": "probe-phone",
+      "screen": "lesson",
+      "variant": "probe",
+      "width": 390,
+      "touch": true
+    },
+    {
+      "name": "waiting-check-desktop",
+      "screen": "wait",
+      "variant": "check",
+      "width": 1100,
+      "theme": "dark"
+    },
+    {
       "name": "mcq-dark",
       "screen": "mcq",
       "width": 390,
@@ -286,16 +300,13 @@
     },
     {
       "name": "mermaid-native-phone",
-      "screen": "native-study-card",
       "width": 390,
       "native": true,
-      "renderer": "Obsidian MarkdownRenderer with Mermaid",
-      "interaction": "initially hidden then revealed",
-      "styles": "phase-specific Qard stylesheet"
+      "retainedFrom": "e1ea1e7"
     }
   ],
   "hashes": {
-    "after-builder-phone.png": "2f206ab5b85ebe530a15284b5d90a7477c25cdd9ebfc66319761a91d212f70df",
+    "after-builder-phone.png": "0eb26f292357fb162ff4d8c3d9d6d525634c81336f38e5dd2c6c09b54a81aba4",
     "after-decks-desktop.png": "c80c95be79e8b6588e88a6e4ab890ad92288650d733563418f9ea6068f79cb94",
     "after-decks-phone.png": "c604290d4b8d810d0e236fee7419a6a9f03a849165ca2040eb93f89d2eff5275",
     "after-exam-mobile.png": "8c85de352fcd8b631f839c4fcce1ad7e7a00d31d90db8bdc33ae7dd9ad151a12",
@@ -305,11 +316,11 @@
     "after-group-menu-phone.png": "843e3730d397eb6a93d3ac9b818ecd09f2423f7ffdf12ddb6523ebb1be4d1ae0",
     "after-learn-desktop.png": "71b2cb4bd33135f7b4bd180029dce2c53767bed12d4c9f4125ad412e73ed95d0",
     "after-learn-phone.png": "c1bda60ffdc92350011a4a7f56e4a50de7a89294ca1ffcd3fd1b0aadacd3d958",
-    "after-lesson-check-first-phone.png": "d5b31f4a03768427091e4d40a31554035b634e3c91de6ad7ded5030d3a26ca71",
+    "after-lesson-check-first-phone.png": "3664d768c3448b5e0bde7295a83e1546875bcdc7c5802c7976acb96865f7c225",
     "after-lesson-plan-phone.png": "740e0d5e6c3f185421ce19ec5c1fb273c20396f4ae58e774bb5cb7d31971d355",
-    "after-lesson-resume-phone.png": "a4e1dcfea958efd11e191947444c9ebf1aa4459a0e7658b278beae2e1de52a07",
-    "after-lesson-step-desktop.png": "11fffdddb30ec35b3b5eb26f8d4ff06375a0834e3d7c92d6a9b6e19e18272c6c",
-    "after-lesson-step-phone.png": "4ac0ba070da59f02a15c61499520c6310ffc35f9d217bd2b7559e0d253d57650",
+    "after-lesson-resume-phone.png": "f8fd57ceae7fdc785ec7e01dfe12effa484ef301a479c380e8f7ad76b769c76c",
+    "after-lesson-step-desktop.png": "643b9e30b7fedd4c234a60d3180fc8db5e6a23cbabe2e6af67af190065b5a2cb",
+    "after-lesson-step-phone.png": "0d3c73b50a2276575b048f7278298bb4c82c0760f8b095ebb75adfd7c3a1c2b7",
     "after-map-desktop.png": "0bfe720c940063c84024402ae51fae35537d72539d34ee79befcbe4770322ac9",
     "after-map-phone.png": "b1bd766b3ded4bdb103ff4c3fdb73719cbd7ebe3120fe655bbfb4b9ea0229edd",
     "after-masks-desktop.png": "015672dde84295f4c833d5f645b575c67a35431d14057447dab0b7e374039e80",
@@ -321,8 +332,9 @@
     "after-objectives-phone.png": "4fc34e0cd559965f0c8db0d05dfb5bc8c87f0d7b8ca6f08fc24a3cc5d6704c11",
     "after-options-desktop.png": "e8fe5f1125382494fb96544543cb1bc4f0380c312a79b4e28176e03e32d752c7",
     "after-options-phone.png": "7b4d2eec1992ac2b05aa76d12c71ad888a30f8e341be9821c3dfaf43ab5c3c1f",
-    "after-plans-desktop.png": "5b95ac08e8a0ec7ce8f99715a7c690a887c6a8b3673f8dc700904a34262a1677",
-    "after-plans-phone.png": "d5c70af05ef69cd1cb077dc39668a29e15b05c005825a003fadbbdc9893a5a9e",
+    "after-plans-desktop.png": "435df00763c7da1ab1c6fea0f38652019d159783c35babe1b199bd1c1bfe695f",
+    "after-plans-phone.png": "23919827f561ee86e0f86f6cf03ed1d6eb0abd56fd8725e8b14265fe43171c0c",
+    "after-probe-phone.png": "e93235817064f1735bb9209d5168a3506a1a77c2e434552fb24720d625838c9f",
     "after-reading-phone.png": "bbe484e130e2ad8edc13d9c9e9b434865128966aa41c3bd307e3d93f3e4b67b0",
     "after-repair-phone.png": "aa84627afd40b317d796f4eda3bde13c17e153acc2959aebb39c16613371736a",
     "after-statistics-phone.png": "da7cb51b2500cfbed4836e78be3ec80c5714f3254a02e08b4bac24f51f1c40de",
@@ -332,6 +344,7 @@
     "after-today-phone.png": "7935d84543c616af5f2b6465d3f36b3e0584c909f193a91f55fd6a33dc2dd7e1",
     "after-types-desktop.png": "f76e1f8865c3b7f5be23d924f454855d26b573a280b1a955496de1409fa9b6cc",
     "after-types-phone.png": "cb7835a4a2c2182fe7bf8207441d509733b16c28c4ccc78cafc464f03fb8d21f",
+    "after-waiting-check-desktop.png": "5182006f31067b4d1b208a4094b33865c666d154fbd7843ba43bacb6a98d5060",
     "after-waiting-desktop.png": "34a1c09dd0596f698b7880aba1320664a30363a3a6126c6b7e93157fe4524cee",
     "after-waiting-phone.png": "b5783d7298ed8e2443ef082df80aaaed5947941310782a68b748705fe1eb7408",
     "before-builder-phone.png": "e63b753c0d62615f08a779ef4fa55e7efacbbf8ba2ec14bbeb9d0d33321a5297",
@@ -360,8 +373,9 @@
     "before-objectives-phone.png": "f613ad179566a76f31b4cfb46fa4715091a56fafa441cb0dbe9144714d5bf811",
     "before-options-desktop.png": "6667c8686d512e950340682ca418d4c2f5964c348193ceadf0b5a5e06416592d",
     "before-options-phone.png": "1aec7a3a4f29ea3c61ba9c487432116f3df7fbbc3b875e1915066b0cdf01edfa",
-    "before-plans-desktop.png": "a6441c1f23e611cef116df544650a9d7cb57616f1896d5246b4c46d9fffb97b9",
-    "before-plans-phone.png": "57a10290a0c0768cd55c212259da29e355763af7ac5c8a23105086b176cc02f3",
+    "before-plans-desktop.png": "2b5f27df8b0c4973a1303ec0ebe307000af072d77420fe0b1e42b69fccbfcad9",
+    "before-plans-phone.png": "b662e52df293236779212ac39c1d7f25bb4e08ae11ecf3e4fbf67527b9ccebb5",
+    "before-probe-phone.png": "df650b33757b6bf5b580a220e29d4b3c65a0260cc5884ce88b7c8e2fc14179c4",
     "before-reading-phone.png": "9297183458d2a9c4846d037ae9729be73a8187a7a33c3688123a22f4950781ea",
     "before-repair-phone.png": "4a1471f475d6b03207100c8820b34e74ccd68b5eca562cd9d62a0d43713062cf",
     "before-statistics-phone.png": "d79b7d05e8511e63f2c06b0cf03cc46fd966a9f6763ca9aa6fc51b1ee71bf14c",
@@ -369,8 +383,9 @@
     "before-time-phone.png": "acee0a78488f079459fe012fbf0891162f4320ab7c0c2f0cb776a5bff0f11058",
     "before-today-desktop.png": "008774c0c7b57f7b92a77bbc999a884217569b49db7b7458d6f3120232a325f2",
     "before-today-phone.png": "ad26f5c4932ff153e8c3b752ded8f319476a9081bb537db1c0a0552914396c7b",
-    "before-types-desktop.png": "91fbda2ced30ca3251b5782bd08731108963277728158da910d5d026b51fc4d1",
+    "before-types-desktop.png": "677d72b135e064f35c210b20bae1e4330dedfbae164bf2624f1cec10d940789f",
     "before-types-phone.png": "58a7b806b65396a8b553b13f8a06bf57e3317f2798d484140f46bc6f68f05462",
+    "before-waiting-check-desktop.png": "b88e3f56553d9dfc1d2ce3e563163ab24bc1c273a331d274d015213d35bc1773",
     "before-waiting-desktop.png": "203754d4220d8254d4034732c51d61769026857da3ef4600bc722e4f3de1f608",
     "before-waiting-phone.png": "9424786a678c40c2ddc724ec4ee3ff278129cc0b2aa20e9a3cf4a695acd91012"
   }
