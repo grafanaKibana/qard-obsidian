@@ -1,19 +1,17 @@
-# Upstream PR #17 — row spacing and trailing metadata correction
+# Upstream PR #17 — question metadata and diagnostic guidance
 
-Source: `af6f4726547314e523caf6f174d18387645a0439`. Baseline: upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
+Source: `7421ae04a978b9a073f942f3f4802c36cb53a3d4`. Baseline: upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
 
-Mobile tabs now use space-around. Row stacks own 8px spacing; summary/resume rows and saved-session sections have no extra margins. This removes the saved-session 28px exception and the specificity conflict that let course rows combine margin with grid gap. Empty row stacks do not create spacing.
+Active common questions and practice-test questions place Question X and Choose an answer/Write an answer in the same metadata row with space-between. Both labels inherit one metadata font, normal weight, line height and color. Scored mark counts remain beside the question label. Answer instructions are absent when inputs are locked.
 
-Source, generated-card and test status labels use the centered trailing rail. Today counts share their explicit 12px normal metadata font and 1.5 line height. Trailing labels remain on one line, with containment for long text. Titles retain their existing measured/truncated behavior.
+The lesson diagnostic header has an info icon before Diagnostic. Its native tooltip preserves the complete user-supplied explanation. The existing learning-stage UI presentation pattern was reused; diagnostic questions hide mark counts through an optional showMarks prop, while scored questions preserve their default marks. No grading/service behavior changed.
 
-Learn rows place the independent discard action before the final decorative chevron. Navigation extends its hit area across the row using the established deck-row pattern; discard sits above that hit area. Title clicks and chevron clicks navigate, while discard opens its own confirmation without navigating.
+Full `npm run check` passed: 786 tests in 96 suites, formatting, TypeScript, ESLint, Stylelint, build and release checks. The layout detector returned no findings. Independent source review found no actionable issue.
 
-Full `npm run check` passed: 786 tests in 96 suites, formatting, TypeScript, ESLint, Stylelint, build and release checks. Final CSS formatting/lint/build passed after the mobile trailing-label adjustment. The layout detector returned no findings. Independent source review found no actionable regression.
+56 rendered cases passed across diagnostics, checks, practice tests and lesson questions in light/dark themes at 320px touch, 390px touch, 768px touch, 1280px laptop, 1440px laptop, 1920px desktop and a 390px desktop split pane. Checks prove identical computed font/color, same-line alignment, alignment at opposite metadata-row edges, scored-mark preservation, diagnostic-mark hiding, exact tooltip wording, icon-first placement and no visible explanatory paragraph. No runtime errors or unintended main horizontal overflow occurred.
 
-196 page cases passed across 14 screens, seven pane/device configurations and light/dark themes, without unintended overflow. An additional 36 focused cases passed: exact 8px visual gaps across saved/source/Today/test and Learn rows; zero row margins; identical metadata font family/size/weight/line height; centered single-line trailing labels; space-around end/inter-item spacing; swapped delete/chevron geometry and hit targets; actual cancel/delete-isolation and chevron-navigation flows; and multiple-session spacing through the normal notifying session API. An initial fixture-loader check did not notify the UI; it was corrected to use startSession, with no product change required.
+43 published browser pairs were freshly captured from upstream main/latest. The diagnostic fixture uses an MCQ and a written question in both phases; existing diagnostic/check/practice/lesson examples cover the refinements. The screenshot count remains 44 pairs/88 images including the unchanged native Mermaid pair. Two equal columns, at most three examples per group, no intermediate revision as before. Earlier 196 page and 36 row/action cases were verified on af6f472; those unchanged paths are prior-head evidence, not additional current reruns.
 
-43 published browser pairs were freshly captured from upstream main/latest. Existing library and Learn examples cover these corrections; the screenshot count stays at 44 pairs/88 images including the unchanged native Mermaid pair. Two equal columns, no more than three examples per group, no intermediate revision as before. Phone coverage uses browser touch/pane simulation, not physical iPhone/Safari. Keyboard accessibility auditing remains outside scope.
+The final build is installed only in isolated Obsidian. DevBook, global configuration and the installed app are outside task writes, with protected hashes checked against this turn's baseline. The separate test app remains open. Mobile coverage is browser touch/pane simulation, not physical iPhone/Safari. Keyboard accessibility auditing remains outside scope.
 
-The final build is installed only in isolated Obsidian. DevBook, global configuration and the installed app are outside task writes, and protected hashes are checked against this turn's baseline. The separate test app remains open.
-
-Both earlier upstream review threads remain resolved. Review status is recorded with its exact commit in review-state.json. The PR remains open and unmerged.
+Both earlier upstream review threads are resolved. GitHub review state is recorded with its own exact source commit in review-state.json. The PR remains open and unmerged.
