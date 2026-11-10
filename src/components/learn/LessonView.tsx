@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from 'react';
-import { ArrowRight, ChevronRight } from 'lucide-react';
+import { ArrowRight, ChevronRight, Info } from 'lucide-react';
 import type { QardServices } from '../../views/services';
 import type { Lesson } from '../../learn/learn-types';
 import type { Objective } from '../../learn/mastery';
@@ -18,6 +18,9 @@ import { tidyMermaid } from '../../learn/mermaid';
 import { DrawButton, FigureView } from './FigureView';
 import { firstSentences } from '../../learn/learn-schema';
 import { useCurrentStepScroll } from '../common/useCurrentStepScroll';
+
+const DIAGNOSTIC_HELP =
+  'These diagnostic questions choose where the lesson starts and update evidence about prerequisites. They do not establish mastery of this lesson\'s objective. Choose "I don\'t know" when you cannot answer.';
 
 /** Where the lesson sits: course › topic › objective, each opening the course map at that place. */
 function LessonTrail({
@@ -259,7 +262,16 @@ function LessonProbe({
     <div className="qard-test">
       <div className="qard-test-heading">
         <div>
-          <span className="qard-muted">Lesson · {lesson.course ?? 'Before we start'}</span>
+          <span className="qard-muted qard-diagnostic-label">
+            <span
+              className="qard-section-info"
+              title={DIAGNOSTIC_HELP}
+              aria-label={DIAGNOSTIC_HELP}
+            >
+              <Info size={14} aria-hidden="true" />
+            </span>
+            Diagnostic · {lesson.course ?? 'Before we start'}
+          </span>
           <h1>
             <InlineMarkdown
               text={lesson.topic}
@@ -278,6 +290,7 @@ function LessonProbe({
           locked={false}
           path={lesson.notes[0] ?? path}
           label={`Question ${i + 1}`}
+          showMarks={false}
           onChange={(patch) => services.learn.answerProbe(path, q.id, patch)}
         />
       ))}

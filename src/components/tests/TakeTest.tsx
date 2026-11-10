@@ -247,10 +247,10 @@ function QuestionBlock({
   return (
     <article className="qard-q">
       <div className="qard-q-meta">
-        <span>Question {number}</span>
         <span>
-          {q.marks} {q.marks === 1 ? 'mark' : 'marks'}
+          Question {number} · {q.marks} {q.marks === 1 ? 'mark' : 'marks'}
         </span>
+        {!locked && <span>{q.type === 'mcq' ? 'Choose an answer' : 'Write an answer'}</span>}
       </div>
       <div className="qard-q-prompt">
         <Markdown text={q.prompt} path={path} services={services} />

@@ -3300,9 +3300,24 @@ body.qard-focus-active .status-bar {
 
 .qard-q-meta {
   display: flex;
+  align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--qard-gap-actions);
   font-size: var(--qard-font-meta);
+  font-weight: var(--qard-weight-normal);
+  line-height: 1.5;
   color: var(--qard-muted);
+}
+
+.qard-q-meta > span + span {
+  text-align: right;
+}
+
+.qard-diagnostic-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--qard-gap-actions);
 }
 
 .qard-q-prompt .qard-markdown {

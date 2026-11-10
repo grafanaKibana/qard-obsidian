@@ -20,6 +20,7 @@ export function AnswerInput({
   locked,
   path,
   label,
+  showMarks = true,
 }: {
   services: QardServices;
   question: Question;
@@ -28,15 +29,17 @@ export function AnswerInput({
   locked: boolean;
   path: string;
   label: string;
+  showMarks?: boolean;
 }) {
   const unknown = !!answer?.unknown;
   return (
     <article className="qard-q">
       <div className="qard-q-meta">
-        <span>{label}</span>
         <span>
-          {q.marks} {q.marks === 1 ? 'mark' : 'marks'}
+          {label}
+          {showMarks && ` · ${q.marks} ${q.marks === 1 ? 'mark' : 'marks'}`}
         </span>
+        {!locked && <span>{q.type === 'mcq' ? 'Choose an answer' : 'Write an answer'}</span>}
       </div>
       <div className="qard-q-prompt">
         <Markdown text={q.prompt} path={path} services={services} />
