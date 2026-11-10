@@ -3,11 +3,11 @@
   "upstream_pr": "https://github.com/kylianmarceau/qard-obsidian/pull/17",
   "code_review": {
     "commit_sha": "6ad9e47724c993eba9f0178f8627da0c7ab020e5",
-    "has_any_findings": null,
-    "has_unresolved_findings": null,
-    "status": "running"
+    "has_any_findings": false,
+    "has_unresolved_findings": false,
+    "status": "completed"
   },
-  "summary_updated_at": "2026-11-10T15:21:31Z",
+  "summary_updated_at": "2026-11-10T15:30:47Z",
   "threads": [
     {
       "id": "PRRT_kwDOUx8Fs861vy2T",

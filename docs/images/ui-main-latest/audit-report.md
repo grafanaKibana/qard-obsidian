@@ -19,4 +19,4 @@ Two regressions were added to the existing learn UI suite; all 24 tests in that 
 
 The final build is installed only in the separate Obsidian test vault. DevBook, global Obsidian configuration and the installed app are outside task writes; protected hashes are checked against this turn’s baseline. The separate test app is left open. Mobile coverage is simulated browser touch/panes, not physical iPhone/Safari. Keyboard accessibility auditing remains excluded; the specifically requested navigation review regression is fixed and tested.
 
-The PR remains open and unmerged. Exact-head GitHub review status and resolved thread IDs are recorded in review-state.json.
+The PR remains open and unmerged. GitHub upstream code review completed at 2026-11-10T15:30:47Z on this exact source head with no findings and no unresolved findings. Both upstream threads are resolved. review-state.json records the result and thread IDs.
