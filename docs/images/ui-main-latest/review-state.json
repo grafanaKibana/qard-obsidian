@@ -1,19 +1,22 @@
 {
+  "source_head": "6ad9e47724c993eba9f0178f8627da0c7ab020e5",
+  "upstream_pr": "https://github.com/kylianmarceau/qard-obsidian/pull/17",
   "code_review": {
-    "commit_sha": "3afe5074b83e72f2b066aacfc13b98cc374376e3",
-    "has_any_findings": false,
-    "has_unresolved_findings": false,
-    "status": "completed"
-  },
-  "security_review": {
-    "commit_sha": null,
+    "commit_sha": "6ad9e47724c993eba9f0178f8627da0c7ab020e5",
     "has_any_findings": null,
     "has_unresolved_findings": null,
-    "status": null
+    "status": "running"
   },
-  "updated_at": "2026-11-10T14:34:25Z",
-  "source_head": "3afe5074b83e72f2b066aacfc13b98cc374376e3",
-  "review_pr": "https://github.com/grafanaKibana/qard-obsidian/pull/11",
-  "upstream_pr": "https://github.com/kylianmarceau/qard-obsidian/pull/17",
-  "upstream_unresolved_threads": 0
+  "summary_updated_at": "2026-11-10T15:21:31Z",
+  "threads": [
+    {
+      "id": "PRRT_kwDOUx8Fs861vy2T",
+      "resolved": true
+    },
+    {
+      "id": "PRRT_kwDOUx8Fs861vy2X",
+      "resolved": true
+    }
+  ],
+  "unresolved_threads": 0
 }
