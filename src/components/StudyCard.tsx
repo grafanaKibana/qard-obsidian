@@ -14,8 +14,8 @@ export function StudyCard({
   services: QardServices;
 }) {
   const special = readCardFormat(card.frontMarkdown).kind !== 'basic';
-  // Keep both faces mounted so embeds are ready when revealed. The hidden
-  // face is inert and excluded from the accessibility tree, including its links.
+  // Keep the face containers stable, but render their content only while visible:
+  // Markdown embeds such as Mermaid need measurable DOM during their initial render.
   return (
     <div className="qard-study-stage">
       <div className={'qard-study-card' + (revealed ? ' is-revealed' : '')}>
@@ -25,12 +25,14 @@ export function StudyCard({
           inert={revealed}
         >
           <div className="qard-study-question">
-            <CardContent
-              front={card.frontMarkdown}
-              path={card.sourceFile}
-              services={services}
-              revealed={false}
-            />
+            {!revealed && (
+              <CardContent
+                front={card.frontMarkdown}
+                path={card.sourceFile}
+                services={services}
+                revealed={false}
+              />
+            )}
           </div>
         </article>
         <article
@@ -38,19 +40,23 @@ export function StudyCard({
           aria-hidden={!revealed}
           inert={!revealed}
         >
-          <div className="qard-study-question">
-            <CardContent
-              front={card.frontMarkdown}
-              back={special ? card.backMarkdown : undefined}
-              path={card.sourceFile}
-              services={services}
-              revealed={special}
-            />
-          </div>
-          {!special && (
-            <div className="qard-study-answer">
-              <Markdown text={card.backMarkdown} path={card.sourceFile} services={services} />
-            </div>
+          {revealed && (
+            <>
+              <div className="qard-study-question">
+                <CardContent
+                  front={card.frontMarkdown}
+                  back={special ? card.backMarkdown : undefined}
+                  path={card.sourceFile}
+                  services={services}
+                  revealed={special}
+                />
+              </div>
+              {!special && (
+                <div className="qard-study-answer">
+                  <Markdown text={card.backMarkdown} path={card.sourceFile} services={services} />
+                </div>
+              )}
+            </>
           )}
         </article>
       </div>

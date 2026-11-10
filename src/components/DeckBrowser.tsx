@@ -1,7 +1,16 @@
 import { DeleteItem } from './DeleteItem';
 import { RenameItem } from './RenameItem';
-import { useState, type ReactNode } from 'react';
-import { ArrowRight, Minus, ClipboardCheck, Plus, Search, Play, Settings2 } from 'lucide-react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import {
+  ArrowRight,
+  Minus,
+  ClipboardCheck,
+  Plus,
+  Search,
+  Play,
+  Settings2,
+  MoreHorizontal,
+} from 'lucide-react';
 import type { Deck } from '../cards/card-types';
 import { buildDeckTree, type DeckNode } from '../decks/deck-index';
 import { DeckBadge } from './DeckBadge';
@@ -62,6 +71,7 @@ export function DeckBrowser({
       parent = node.children.length > 0,
       open = !collapsed.includes(node.name);
     const below = node.cards - (deck?.cards.length ?? 0);
+    const groupMenu = !deck && parent && (options || rename);
     return (
       <div key={node.name} className="qard-deck-node">
         <div className="qard-deletable-row qard-deck-row">
@@ -91,7 +101,10 @@ export function DeckBrowser({
               </small>
             </span>
           </button>
-          <div className={`qard-deck-actions${parent && studyDecks ? ' has-study' : ''}`}>
+          <div
+            className={`qard-deck-actions${parent && studyDecks ? ' has-study' : ''}${groupMenu ? ' has-group-menu' : ''}`}
+          >
+            {groupMenu && <DeckGroupMenu name={node.name} options={options} rename={rename} />}
             {parent && options && (
               <button
                 className="qard-icon-button"
@@ -105,7 +118,7 @@ export function DeckBrowser({
               <RenameItem
                 label={`Rename deck ${deck?.name ?? node.name}`}
                 current={deck?.name ?? node.name}
-                description="Every note holding these cards is updated, and subdecks move with it. Review history, deck options and exam plans are kept. An existing deck's name merges the two."
+                description={DECK_RENAME_DESCRIPTION}
                 rename={(name) => rename(deck?.name ?? node.name, name)}
               />
             )}
@@ -245,5 +258,84 @@ export function DeckBrowser({
         </aside>
       </div>
     </>
+  );
+}
+
+const DECK_RENAME_DESCRIPTION =
+  "Every note holding these cards is updated, and subdecks move with it. Review history, deck options and exam plans are kept. An existing deck's name merges the two.";
+
+/** Virtual groups have no detail screen; keep their management actions reachable in compact panes. */
+function DeckGroupMenu({
+  name,
+  options,
+  rename,
+}: {
+  name: string;
+  options?: (name: string) => void;
+  rename?: (name: string, to: string) => Promise<void>;
+}) {
+  const [open, setOpen] = useState(false);
+  const container = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const element = container.current;
+    if (!open || !element) {
+      return;
+    }
+    const doc = element.ownerDocument;
+    const outside = (event: PointerEvent) => {
+      if (!element.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !element.querySelector('dialog[open]')) {
+        setOpen(false);
+      }
+    };
+    doc.addEventListener('pointerdown', outside);
+    doc.addEventListener('keydown', escape);
+    return () => {
+      doc.removeEventListener('pointerdown', outside);
+      doc.removeEventListener('keydown', escape);
+    };
+  }, [open]);
+  return (
+    <div ref={container} className={`qard-deck-group-menu${open ? ' is-open' : ''}`}>
+      <button
+        className="qard-icon-button"
+        aria-label={`Manage group ${name}`}
+        title={`Manage group ${name}`}
+        aria-expanded={open}
+        onClick={() => setOpen(!open)}
+      >
+        <MoreHorizontal size={16} />
+      </button>
+      {open && (
+        <div className="qard-deck-group-popover" role="group" aria-label={`Actions for ${name}`}>
+          {options && (
+            <button
+              onClick={() => {
+                setOpen(false);
+                options(name);
+              }}
+            >
+              <Settings2 size={16} />
+              Deck options
+            </button>
+          )}
+          {rename && (
+            <RenameItem
+              label={`Rename deck ${name}`}
+              current={name}
+              description={DECK_RENAME_DESCRIPTION}
+              rename={(to) => rename(name, to)}
+              renamed={() => setOpen(false)}
+            >
+              Rename group
+            </RenameItem>
+          )}
+        </div>
+      )}
+    </div>
   );
 }

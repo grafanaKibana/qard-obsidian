@@ -202,11 +202,12 @@ it('reveals only the active image region, rates through the existing controls, a
     back = host.querySelector('.qard-study-back')!;
   expect(front.querySelectorAll('.qard-image-mask')).toHaveLength(2);
   expect(front.querySelectorAll('.is-answer')).toHaveLength(0);
-  expect(back.querySelectorAll('.is-answer')).toHaveLength(1);
-  expect(back.querySelector('.is-answer')?.getAttribute('aria-label')).toBe('Revealed region 1');
+  expect(back.querySelectorAll('.is-answer')).toHaveLength(0);
   expect(host.textContent).not.toContain('Open source');
   await click(button('Reveal answer Space'));
   expect(back.getAttribute('aria-hidden')).toBe('false');
+  expect(back.querySelectorAll('.is-answer')).toHaveLength(1);
+  expect(back.querySelector('.is-answer')?.getAttribute('aria-label')).toBe('Revealed region 1');
   await act(async () => {
     host.dispatchEvent(new KeyboardEvent('keydown', { key: '3', bubbles: true }));
     await services.reviews.flush();

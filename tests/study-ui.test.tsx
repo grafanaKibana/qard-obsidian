@@ -2,7 +2,8 @@
 import { act } from 'preact/test-utils';
 import { createRoot, type Root } from 'react-dom/client';
 import { beforeEach, afterEach, expect, it, vi } from 'vitest';
-import { Component } from 'obsidian';
+import { Component, MarkdownRenderer } from 'obsidian';
+import { StudyCard } from '../src/components/StudyCard';
 import { StudyView } from '../src/views/StudyView';
 import { ReviewStore } from '../src/review/review-store';
 import { parseCards } from '../src/cards/parser';
@@ -496,3 +497,51 @@ it('registers study commands that follow the same rules as the buttons', async (
   expect(commands).toBeUndefined();
   root = createRoot(host);
 });
+
+it.each([false, true])(
+  'renders Markdown only in the attached visible face, initially revealed=%s',
+  async (initiallyRevealed) => {
+    const frontDiagram = '```mermaid\ngraph TD\n A[Question] --> B[Recall]\n```';
+    const backDiagram = '```mermaid\ngraph TD\n A[Answer] --> B[Reason]\n```';
+    const card = { ...cards[0]!, frontMarkdown: frontDiagram, backMarkdown: backDiagram };
+    const rendered: { text: string; hidden: string | null; connected: boolean }[] = [];
+    vi.spyOn(MarkdownRenderer, 'render').mockImplementation(async (_app, text, el) => {
+      // Mermaid measures its target immediately; a hidden ancestor cannot be fixed
+      // later merely by toggling the article's visibility.
+      rendered.push({
+        text,
+        hidden: el.closest('.qard-study-face')!.getAttribute('aria-hidden'),
+        connected: el.isConnected,
+      });
+      el.textContent = text;
+    });
+    const show = async (revealed: boolean) => {
+      await act(async () =>
+        root.render(<StudyCard card={card} revealed={revealed} services={services} />),
+      );
+    };
+    await show(initiallyRevealed);
+    const front = host.querySelector('.qard-study-front')!,
+      back = host.querySelector('.qard-study-back')!;
+    expect(host.querySelector('.qard-study-face[aria-hidden="true"] .qard-markdown')).toBeNull();
+    expect(rendered.map((item) => item.text)).toEqual(
+      initiallyRevealed ? [frontDiagram, backDiagram] : [frontDiagram],
+    );
+    const firstCount = rendered.length;
+    await show(initiallyRevealed);
+    expect(rendered).toHaveLength(firstCount);
+    await show(!initiallyRevealed);
+    expect(host.querySelector('.qard-study-front')).toBe(front);
+    expect(host.querySelector('.qard-study-back')).toBe(back);
+    expect(rendered).toHaveLength(3);
+    expect(rendered.every((item) => item.hidden === 'false' && item.connected)).toBe(true);
+    expect(host.querySelector('.qard-study-face[aria-hidden="true"] .qard-markdown')).toBeNull();
+    await show(!initiallyRevealed);
+    expect(rendered).toHaveLength(3);
+    await show(initiallyRevealed);
+    expect(rendered.every((item) => item.hidden === 'false' && item.connected)).toBe(true);
+    expect((services.owner as unknown as { children: Set<unknown> }).children.size).toBe(
+      initiallyRevealed ? 2 : 1,
+    );
+  },
+);

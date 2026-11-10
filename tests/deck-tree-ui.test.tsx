@@ -213,3 +213,96 @@ it('clears a deck’s own options when both fields are emptied', async () => {
   );
   expect(save).toHaveBeenCalledWith({});
 });
+
+it('keeps virtual parent options and rename reachable without opening a real deck', async () => {
+  const options = vi.fn(),
+    rename = vi.fn(async () => {}),
+    open = vi.fn();
+  library(true, { options, rename, open });
+  await click(button('Manage group Biology::Genetics'));
+  const menu = host.querySelector('.qard-deck-group-popover')!;
+  expect(menu.getAttribute('aria-label')).toBe('Actions for Biology::Genetics');
+  await click([...menu.querySelectorAll('button')].find((x) => x.textContent === 'Deck options')!);
+  expect(options).toHaveBeenCalledExactlyOnceWith('Biology::Genetics');
+  expect(host.querySelector('.qard-deck-group-popover')).toBeNull();
+  expect(open).not.toHaveBeenCalled();
+  const previous = HTMLDialogElement.prototype.showModal;
+  HTMLDialogElement.prototype.showModal = function () {
+    this.setAttribute('open', '');
+  };
+  try {
+    await click(button('Manage group Biology::Genetics'));
+    const renameButton = host.querySelector<HTMLButtonElement>(
+      '.qard-deck-group-popover button[aria-label="Rename deck Biology::Genetics"]',
+    )!;
+    await click(renameButton);
+    const dialog = host.querySelector<HTMLDialogElement>('.qard-deck-group-popover dialog')!;
+    expect(dialog.hasAttribute('open')).toBe(true);
+    await act(async () => {
+      const input = dialog.querySelector('input')!;
+      input.value = 'Inheritance';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    await act(async () => {
+      dialog
+        .querySelector('form')!
+        .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    });
+    expect(rename).toHaveBeenCalledExactlyOnceWith('Biology::Genetics', 'Inheritance');
+    expect(host.querySelector('.qard-deck-group-popover')).toBeNull();
+    expect(open).not.toHaveBeenCalled();
+    expect(host.querySelector('[aria-label="Manage group Biology"]')).toBeNull();
+  } finally {
+    HTMLDialogElement.prototype.showModal = previous;
+  }
+});
+
+it('lets a pending group rename own Escape and keeps its eventual error visible', async () => {
+  let rejectRename!: (error: Error) => void;
+  const rename = vi.fn(
+    () =>
+      new Promise<void>((_resolve, reject) => {
+        rejectRename = reject;
+      }),
+  );
+  library(true, { rename });
+  const previous = HTMLDialogElement.prototype.showModal;
+  HTMLDialogElement.prototype.showModal = function () {
+    this.setAttribute('open', '');
+  };
+  try {
+    await click(button('Manage group Biology::Genetics'));
+    await click(
+      host.querySelector(
+        '.qard-deck-group-popover button[aria-label="Rename deck Biology::Genetics"]',
+      )!,
+    );
+    const dialog = host.querySelector<HTMLDialogElement>('.qard-deck-group-popover dialog')!;
+    await act(async () => {
+      const input = dialog.querySelector('input')!;
+      input.value = 'Inheritance';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    await act(async () => {
+      dialog
+        .querySelector('form')!
+        .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    });
+    expect(rename).toHaveBeenCalledOnce();
+    expect(
+      [...dialog.querySelectorAll('button')].find((x) => x.textContent === 'Renaming…')?.disabled,
+    ).toBe(true);
+    await act(async () => {
+      dialog
+        .querySelector('input')!
+        .dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      dialog.dispatchEvent(new Event('cancel', { cancelable: true }));
+    });
+    expect(dialog.isConnected).toBe(true);
+    expect(host.querySelector('.qard-deck-group-popover')).not.toBeNull();
+    await act(async () => rejectRename(new Error('Could not update the group.')));
+    expect(dialog.querySelector('[role=alert]')?.textContent).toBe('Could not update the group.');
+  } finally {
+    HTMLDialogElement.prototype.showModal = previous;
+  }
+});
