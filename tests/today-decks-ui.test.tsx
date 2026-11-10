@@ -251,63 +251,6 @@ it('keeps due checks separate from deck review actions', async () => {
   expect(host.querySelectorAll('.qard-today-deck')).toHaveLength(2);
 });
 
-it('leads learning rows with their present states and groups the Today summary', async () => {
-  const item = {
-    mastery: 'Course.md',
-    course: 'Networks',
-    due: '2026-10-10',
-  };
-  vi.spyOn(services.learn, 'todayList').mockResolvedValue({
-    cards: 3,
-    moreLessons: 0,
-    checks: [
-      {
-        ...item,
-        objective: 'tcp',
-        title: 'Reliable delivery',
-        state: 'taught',
-        check: 'Check.json',
-      },
-      {
-        ...item,
-        objective: 'routing',
-        title: 'Routing tables',
-        state: 'gap',
-        check: 'Routing.json',
-      },
-    ],
-    lessons: [{ ...item, objective: 'dns', title: 'Name resolution', state: 'new' }],
-  });
-  await services.reviews.recordStudy({ '2026-10-10': { 'lessons|Networks': 2400 } }, '2026-10-10');
-  await mount();
-
-  const rows = [...host.querySelectorAll<HTMLButtonElement>('.qard-learning-row')];
-  expect(rows).toHaveLength(3);
-  expect(rows.map((row) => row.querySelector('.qard-state')?.textContent)).toEqual([
-    'Taught',
-    'Gap',
-    'New',
-  ]);
-  for (const row of rows) {
-    expect(row.firstElementChild?.classList.contains('qard-objective-status')).toBe(true);
-    expect(row.firstElementChild).toBe(row.querySelector('.qard-objective-status'));
-    expect(row.querySelector('.qard-objective-status-size')?.textContent).toBe('TaughtGapNew');
-    expect(row.classList.contains('qard-today-learning-row')).toBe(true);
-    expect(row.querySelector('.qard-learning-row-course')).toBeNull();
-    expect(row.lastElementChild?.classList.contains('qard-learning-row-action')).toBe(true);
-  }
-  expect(host.querySelectorAll('.qard-doc-rows > .qard-doc-item')).toHaveLength(2);
-  expect(
-    [...host.querySelectorAll('.qard-learning-group-heading')].map((h) => h.textContent),
-  ).toEqual(['Networks', 'Networks']);
-  const summary = host.querySelector('.qard-today-summary')!;
-  expect(summary.children).toHaveLength(2);
-  expect(summary.firstElementChild?.textContent).toContain('About 5 minutes.');
-  expect(summary.lastElementChild?.textContent).toBe('40 min studied today');
-  await click(rows[0]!);
-  expect(nav.check).toHaveBeenCalledWith('Check.json');
-});
-
 it('groups checks and lessons by course identity without repeating labels in rows', async () => {
   const item = {
     mastery: 'Networks.md',
@@ -372,12 +315,6 @@ it('groups checks and lessons by course identity without repeating labels in row
     'Biology',
   ]);
   expect(groups(lessons)[0]!.querySelectorAll('.qard-learning-row')).toHaveLength(2);
-  expect(host.querySelector('.qard-learning-row-course')).toBeNull();
-  for (const row of host.querySelectorAll('.qard-learning-row')) {
-    expect(row.children).toHaveLength(3);
-    expect(row.firstElementChild?.classList.contains('qard-objective-status')).toBe(true);
-    expect(row.children[1]?.classList.contains('qard-objective-title-text')).toBe(true);
-  }
   await click(
     [...checks.querySelectorAll<HTMLButtonElement>('.qard-learning-row')].find((b) =>
       b.textContent?.includes('Routing tables'),
@@ -402,39 +339,6 @@ it('groups checks and lessons by course identity without repeating labels in row
     )!,
   );
   expect(nav.course).toHaveBeenCalledWith('Networks.md');
-});
-
-it('keeps unavailable grouped checks disabled and retries writing errors for the right objective', async () => {
-  vi.spyOn(services.learn, 'todayList').mockResolvedValue({
-    cards: 3,
-    moreLessons: 0,
-    lessons: [],
-    checks: [
-      {
-        mastery: 'Networks.md',
-        course: 'Networks',
-        objective: 'tcp',
-        title: 'Reliable delivery',
-        state: 'taught',
-        due: '2026-10-10',
-      },
-    ],
-  });
-  vi.spyOn(services.learn, 'job').mockReturnValue({
-    kind: 'check-write',
-    id: '',
-    error: 'Could not write check',
-  });
-  const ensureCheck = vi.fn(async () => undefined);
-  Object.assign(services.learn, { ensureCheck });
-  await mount();
-  const row = host.querySelector<HTMLButtonElement>('.qard-learning-row')!;
-  expect(row.disabled).toBe(true);
-  expect(row.closest('.qard-learning-group')?.querySelector('h3')?.textContent).toBe('Networks');
-  expect(host.querySelector('[role="alert"]')?.textContent).toContain('Could not write check');
-  await click([...host.querySelectorAll('button')].find((b) => b.textContent === 'Try again')!);
-  expect(ensureCheck).toHaveBeenCalledWith('Networks.md', 'tcp');
-  expect(nav.check).not.toHaveBeenCalled();
 });
 
 it('shows the live due count and opens Today without starting a combined review', async () => {

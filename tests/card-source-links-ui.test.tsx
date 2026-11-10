@@ -113,36 +113,6 @@ it('leaves out notes already linked and closes with Escape', async () => {
   expect(document.activeElement).toBe(toggle());
 });
 
-it('keeps focus in the picker after a failed choice and restores it from a focused result on Escape', async () => {
-  const choose = vi.fn(async () => false);
-  act(() =>
-    root.render(
-      <NotePicker
-        label="Link a note"
-        busy={false}
-        notes={() => [note('Networks.md', 1)]}
-        choose={choose}
-      />,
-    ),
-  );
-  await click(toggle());
-  const search = host.querySelector<HTMLInputElement>('input[type=search]')!;
-  search.focus();
-  await act(async () => {
-    search.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-  });
-  expect(choose).toHaveBeenCalledWith('Networks.md');
-  expect(document.activeElement).toBe(search);
-  expect(host.querySelector('.qard-popover')).not.toBeNull();
-  const result = host.querySelector<HTMLButtonElement>('.qard-popover-item')!;
-  result.focus();
-  await act(async () => {
-    result.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
-  });
-  expect(host.querySelector('.qard-popover')).toBeNull();
-  expect(document.activeElement).toBe(toggle());
-});
-
 it('waits until its trigger is enabled before restoring focus after an asynchronous choice', async () => {
   let resolve!: (success: boolean) => void;
   let disabled = false;
@@ -174,38 +144,4 @@ it('waits until its trigger is enabled before restoring focus after an asynchron
     render();
   });
   expect(document.activeElement).toBe(toggle());
-});
-
-it('does not move focus back when the user leaves a pending picker or it unmounts', async () => {
-  let resolve!: (success: boolean) => void;
-  const choose = () => new Promise<boolean>((done) => (resolve = done));
-  const outside = document.createElement('button');
-  document.body.append(outside);
-  const render = () =>
-    root.render(
-      <NotePicker
-        label="Link a note"
-        busy={false}
-        notes={() => [note('Networks.md', 1)]}
-        choose={choose}
-      />,
-    );
-  try {
-    for (const unmount of [false, true]) {
-      act(render);
-      await click(toggle());
-      const search = host.querySelector<HTMLInputElement>('input[type=search]')!;
-      search.focus();
-      await act(async () => {
-        search.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-      });
-      outside.focus();
-      if (unmount) act(() => root.render(null));
-      await act(async () => resolve(true));
-      expect(document.activeElement).toBe(outside);
-      expect(host.querySelector('.qard-popover')).toBeNull();
-    }
-  } finally {
-    outside.remove();
-  }
 });

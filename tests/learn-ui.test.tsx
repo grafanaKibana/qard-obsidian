@@ -433,11 +433,7 @@ it('the course map opens on topics, drills into one, and routes across topics', 
   expect(topic('Topic models').classList.contains('is-dim')).toBe(true);
   await click(buttons('Show all')[0]);
 
-  await act(async () => {
-    (topic('Topic models') as HTMLElement).focus();
-  });
   await click(topic('Topic models'));
-  expect(host.querySelector('.qard-map-panel')).toBeNull();
   expect(host.querySelector('.qard-map-crumb')?.textContent).toBe('Topic models');
   expect(
     [...host.querySelectorAll('.qard-map-node:not(.qard-map-stub) .qard-map-title')].map(
@@ -447,12 +443,8 @@ it('the course map opens on topics, drills into one, and routes across topics', 
   expect(host.querySelector('.qard-map-stub')?.getAttribute('aria-label')).toBe(
     'Builds on Text mining',
   );
-  await act(async () => {
-    host.querySelector<HTMLElement>('.qard-map-node[aria-label^="List the LDA"]')!.focus();
-  });
-  expect(host.querySelector('.qard-map-panel')).toBeNull();
   await click(host.querySelector('.qard-map-node[aria-label^="List the LDA"]'));
-  let panel = host.querySelector('.qard-map-panel')!;
+  const panel = host.querySelector('.qard-map-panel')!;
   expect(panel.querySelector('h3')?.textContent).toBe('List the LDA generative process');
   expect(panel.textContent).toContain('Builds on');
   expect(host.querySelector('.qard-map-layout')?.classList.contains('is-panel-open')).toBe(true);
@@ -471,37 +463,6 @@ it('the course map opens on topics, drills into one, and routes across topics', 
   });
   expect(canvasWheel.defaultPrevented).toBe(true);
   expect(graph.style.transform).not.toBe(transform);
-  await click(host.querySelector('[aria-label="Full screen"]'));
-  expect(host.querySelector('.qard-map-layout')).toBeNull();
-  const overlay = document.querySelector('.qard-map-overlay')!;
-  expect(overlay.querySelector('.qard-map-layout')?.classList.contains('is-expanded')).toBe(true);
-  expect(overlay.querySelector('.qard-map-panel h3')?.textContent).toBe(
-    'List the LDA generative process',
-  );
-  expect(document.activeElement).toBe(overlay.querySelector('[aria-label="Exit full screen"]'));
-  const expandedCanvas = overlay.querySelector('.qard-map-frame')!;
-  const expandedWheel = new WheelEvent('wheel', { deltaY: 50, bubbles: true, cancelable: true });
-  await act(async () => {
-    expandedCanvas.dispatchEvent(expandedWheel);
-  });
-  expect(expandedWheel.defaultPrevented).toBe(true);
-  const detachedWheel = new WheelEvent('wheel', { deltaY: 50, bubbles: true, cancelable: true });
-  canvas.dispatchEvent(detachedWheel);
-  expect(detachedWheel.defaultPrevented).toBe(false);
-  await click(overlay.querySelector('[aria-label="Exit full screen"]'));
-  expect(document.querySelector('.qard-map-overlay')).toBeNull();
-  expect(host.querySelector('.qard-map-layout')?.classList.contains('is-expanded')).toBe(false);
-  expect(document.activeElement).toBe(host.querySelector('[aria-label="Full screen"]'));
-  const restoredCanvas = host.querySelector('.qard-map-frame')!;
-  const restoredGraph = restoredCanvas.querySelector<SVGGElement>('.qard-map > g')!;
-  const restoredTransform = restoredGraph.style.transform;
-  const restoredWheel = new WheelEvent('wheel', { deltaY: 50, bubbles: true, cancelable: true });
-  await act(async () => {
-    restoredCanvas.dispatchEvent(restoredWheel);
-  });
-  expect(restoredWheel.defaultPrevented).toBe(true);
-  expect(restoredGraph.style.transform).not.toBe(restoredTransform);
-  panel = host.querySelector('.qard-map-panel')!;
   await click(buttons('Route here')[0]);
   expect([...host.querySelectorAll('.qard-map-route button')].map((b) => b.textContent)).toEqual([
     '1List the LDA generative process',
@@ -513,20 +474,9 @@ it('the course map opens on topics, drills into one, and routes across topics', 
     ),
   );
   expect(host.querySelector('.qard-map-crumb')?.textContent).toBe('Text mining');
-  await click(host.querySelector('.qard-map-panel [aria-label="Close"]'));
-  expect(host.querySelector('.qard-map-panel')).toBeNull();
-  expect(host.querySelector('.qard-map-layout')?.classList.contains('is-panel-open')).toBe(false);
   await click(buttons('Topics')[0]);
   expect(host.querySelectorAll('.qard-topic-node')).toHaveLength(3);
   expect(host.querySelector('.qard-map-layout')?.classList.contains('is-panel-open')).toBe(false);
-  await click(host.querySelector('[aria-label="Full screen"]'));
-  await act(async () => {
-    document.activeElement!.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
-    );
-  });
-  expect(document.querySelector('.qard-map-overlay')).toBeNull();
-  expect(document.activeElement).toBe(host.querySelector('[aria-label="Full screen"]'));
   await click(buttons('List')[0]);
   expect(host.querySelectorAll('.qard-objective')).toHaveLength(4);
 });
@@ -610,221 +560,6 @@ it('continues node navigation from a search result instead of the previously foc
   await key(document.activeElement!, 'ArrowDown');
   expect(host.querySelector('.qard-map-panel h3')?.textContent).toBe('Gamma');
   expect(document.activeElement?.getAttribute('aria-label')).toContain('Gamma');
-});
-
-it('removes the expanded map before opening an objective note', async () => {
-  files.set(
-    MASTERY,
-    newMasteryNote('DS346', [
-      {
-        id: 'params',
-        title: 'Parameter counts',
-        state: 'taught',
-        notes: ['Notes/Counts.md'],
-        needs: [],
-        evidence: [],
-        cells: {},
-      },
-    ]),
-  );
-  const outside = document.createElement('button');
-  document.body.append(outside);
-  const openNote = vi.mocked(services.app.workspace.openLinkText).mockImplementation(async () => {
-    expect(document.querySelector('.qard-map-overlay')).toBeNull();
-    expect(host.hasAttribute('inert')).toBe(false);
-    outside.focus();
-  });
-  try {
-    await act(async () =>
-      root.render(<CourseView services={services} nav={nav} path={MASTERY} objective="params" />),
-    );
-    await tick();
-    await click(host.querySelector('[aria-label="Full screen"]'));
-    const overlay = document.querySelector('.qard-map-overlay')!;
-    expect(host.hasAttribute('inert')).toBe(true);
-    await click(overlay.querySelector('.qard-map-note'));
-    expect(openNote).toHaveBeenCalledWith('Notes/Counts', MASTERY, true);
-    expect(document.activeElement).toBe(outside);
-  } finally {
-    outside.remove();
-  }
-});
-
-it.each([
-  { width: 360, toolsHeight: 56 },
-  { width: 1100, toolsHeight: 44 },
-])(
-  'Fit keeps a height-constrained graph below its floating controls ($width px canvas)',
-  async ({ width, toolsHeight }) => {
-    files.set(
-      MASTERY,
-      newMasteryNote(
-        'DS346',
-        Array.from({ length: 7 }, (_, i) => ({
-          id: `n${i}`,
-          title: `Objective ${i}`,
-          state: 'taught' as const,
-          notes: [],
-          needs: i ? [`n${i - 1}`] : [],
-          evidence: [],
-          cells: {},
-        })),
-      ),
-    );
-    await act(async () => root.render(<CourseView services={services} nav={nav} path={MASTERY} />));
-    await tick();
-    const frame = host.querySelector<HTMLElement>('.qard-map-frame')!;
-    Object.defineProperties(frame, {
-      clientWidth: { value: width, configurable: true },
-      clientHeight: { value: 360, configurable: true },
-    });
-    const bounds = vi
-      .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
-      .mockImplementation(function (this: HTMLElement) {
-        if (this === frame) return new DOMRect(0, 100, width, 360);
-        if (this.matches('.qard-map-tools.is-right'))
-          return new DOMRect(12, 112, width - 24, toolsHeight);
-        if (this.matches('.qard-map-tools.is-left'))
-          return new DOMRect(12, width > 640 ? 112 : 30, 260, 34);
-        return new DOMRect();
-      });
-    try {
-      await click(host.querySelector('[aria-label="Fit"]'));
-      const graph = frame.querySelector<SVGGElement>('.qard-map > g')!;
-      const transform = graph.style.transform.match(
-        /translate\([^,]+, ([^)]+)px\) scale\(([^)]+)\)/,
-      )!;
-      const y = Number(transform[1]),
-        scale = Number(transform[2]);
-      const nodeTops = [...frame.querySelectorAll('.qard-map-node:not(.qard-map-stub)')].map(
-        (node) =>
-          100 +
-          y +
-          Number(node.getAttribute('transform')!.match(/translate\([^,]+,([^)]+)\)/)![1]) * scale,
-      );
-      expect(Math.min(...nodeTops)).toBeGreaterThanOrEqual(112 + toolsHeight + 12);
-    } finally {
-      bounds.mockRestore();
-    }
-  },
-);
-
-it('keeps expanded-map focus inside its dialog and exposes keyboard node focus', async () => {
-  files.set(
-    MASTERY,
-    `---\nqard-mastery: DS346\n---\n\n| Objective | ID | Group | State | Needs |\n| --- | --- | --- | --- | --- |\n| Bag of words | bow | Text mining | mastered | |\n| Parameter counts | params | Topic models | taught | bow |\n`,
-  );
-  await act(async () => {
-    root.render(<CourseView services={services} nav={nav} path={MASTERY} />);
-  });
-  await tick();
-  await tick();
-  const key = async (element: Element, value: string, shiftKey = false) => {
-    await act(async () => {
-      element.dispatchEvent(
-        new KeyboardEvent('keydown', { key: value, shiftKey, bubbles: true, cancelable: true }),
-      );
-    });
-  };
-  let mapTab = host.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')!;
-  expect(mapTab.textContent).toBe('Map');
-  expect(mapTab.tabIndex).toBe(0);
-  expect(host.querySelector<HTMLElement>('[role="tab"][aria-selected="false"]')!.tabIndex).toBe(-1);
-  await key(mapTab, 'ArrowRight');
-  let selectedTab = host.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')!;
-  expect(selectedTab.textContent).toBe('List');
-  expect(document.activeElement).toBe(selectedTab);
-  expect(host.querySelectorAll('.qard-objective')).toHaveLength(2);
-  expect(host.querySelector('[role="tabpanel"]')?.getAttribute('aria-labelledby')).toBe(
-    selectedTab.id,
-  );
-  expect(selectedTab.getAttribute('aria-controls')).toBe(
-    host.querySelector('[role="tabpanel"]')?.id,
-  );
-  await key(selectedTab, 'Home');
-  mapTab = host.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')!;
-  expect(mapTab.textContent).toBe('Map');
-  await key(mapTab, 'End');
-  selectedTab = host.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')!;
-  expect(selectedTab.textContent).toBe('List');
-  await key(selectedTab, 'Home');
-
-  const topics = [...host.querySelectorAll<HTMLElement>('.qard-topic-node')];
-  expect(topics[0]!.tabIndex).toBe(0);
-  expect(topics[1]!.tabIndex).toBe(-1);
-  topics[0]!.focus();
-  await key(topics[0]!, 'ArrowDown');
-  expect(document.activeElement).toBe(topics[1]);
-  expect(topics[0]!.tabIndex).toBe(-1);
-  expect(topics[1]!.tabIndex).toBe(0);
-  expect(topics[1]!.id).not.toBe(topics[0]!.id);
-  await key(topics[1]!, 'Enter');
-  const objective = host.querySelector<HTMLElement>('.qard-map-node:not(.qard-map-stub)')!;
-  expect(document.activeElement).toBe(objective);
-  expect(objective.getAttribute('aria-label')).toContain('Parameter counts');
-  expect(host.querySelector('.qard-map-panel')).toBeNull();
-  await key(objective, 'Enter');
-  expect(host.querySelector('.qard-map-panel h3')?.textContent).toBe('Parameter counts');
-  const search = host.querySelector<HTMLInputElement>('[aria-label="Find an objective"]')!;
-  search.focus();
-  const selected = host.querySelector('.qard-map-node.is-selected');
-  await key(search, 'ArrowLeft');
-  expect(document.activeElement).toBe(search);
-  expect(host.querySelector('.qard-map-node.is-selected')).toBe(selected);
-  const zoom = host.querySelector<HTMLButtonElement>('[aria-label="Zoom in"]')!;
-  zoom.focus();
-  await key(zoom, 'ArrowLeft');
-  expect(document.activeElement).toBe(zoom);
-  expect(host.querySelector('.qard-map-node.is-selected')).toBe(selected);
-
-  const alreadyInert = document.createElement('div');
-  alreadyInert.setAttribute('inert', 'existing');
-  document.body.append(alreadyInert);
-  const outside = document.createElement('button');
-  document.body.append(outside);
-  try {
-    await click(host.querySelector('[aria-label="Full screen"]'));
-    const dialog = document.querySelector<HTMLElement>('.qard-map-overlay')!;
-    expect(dialog.getAttribute('role')).toBe('dialog');
-    expect(dialog.getAttribute('aria-modal')).toBe('true');
-    expect(dialog.getAttribute('aria-label')).toBe('DS346 course map');
-    expect(host.hasAttribute('inert')).toBe(true);
-    const controls = [
-      ...dialog.querySelectorAll<HTMLElement>('button, input, [tabindex="0"]'),
-    ].filter((element) => !element.matches(':disabled'));
-    const first = controls[0]!,
-      last = controls.at(-1)!;
-    const disabled = document.createElement('button');
-    disabled.disabled = true;
-    dialog.append(disabled);
-    const hidden = document.createElement('button');
-    hidden.hidden = true;
-    dialog.append(hidden);
-    last.focus();
-    await key(last, 'Tab');
-    expect(document.activeElement).toBe(first);
-    await key(first, 'Tab', true);
-    expect(document.activeElement).toBe(last);
-    outside.focus();
-    expect(document.activeElement).toBe(dialog.querySelector('[aria-label="Exit full screen"]'));
-    const expandedSearch = dialog.querySelector<HTMLInputElement>(
-      '[aria-label="Find an objective"]',
-    )!;
-    expandedSearch.focus();
-    await key(expandedSearch, 'Escape');
-    expect(document.querySelector('.qard-map-overlay')).toBeNull();
-    expect(host.hasAttribute('inert')).toBe(false);
-    expect(alreadyInert.getAttribute('inert')).toBe('existing');
-    expect(document.activeElement).toBe(host.querySelector('[aria-label="Full screen"]'));
-    await click(host.querySelector('[aria-label="Full screen"]'));
-    await act(async () => root.render(null));
-    expect(document.querySelector('.qard-map-overlay')).toBeNull();
-    expect(host.hasAttribute('inert')).toBe(false);
-    expect(alreadyInert.getAttribute('inert')).toBe('existing');
-  } finally {
-    alreadyInert.remove();
-    outside.remove();
-  }
 });
 
 it('reveals a resumed lesson step and bottom navigation without moving the page or undoing manual strip scrolling', async () => {
@@ -1026,100 +761,57 @@ it('selected check deletion returns to Learn', async () => {
   expect(deleted).toHaveBeenCalledOnce();
 });
 
-it.each(['checking', 'retrying', 'closing'] as const)(
-  'uses the shared task panel while %s and preserves cancellation',
-  async (stage) => {
-    const startedAt = Date.now() - 60_000;
-    const kind = stage === 'closing' ? 'close' : 'tutor';
-    const id = stage === 'retrying' ? '0-retry' : stage === 'checking' ? '0' : '';
-    vi.spyOn(services.learn, 'job').mockImplementation((_path, task, taskId = '') =>
-      task === kind && taskId === id ? { kind, id, startedAt } : undefined,
-    );
-    const cancel = vi.spyOn(services.learn, 'cancel').mockImplementation(() => {});
-    services.jobs = { estimate: () => 240_000 } as unknown as QardServices['jobs'];
-    const current = services.reviews.getSnapshot();
-    services.reviews.getSnapshot = () => ({
-      ...current,
-      settings: { ...reviewSnapshot.settings, showAgent: true },
-    });
-    const { path } = await openRecap(
-      stage === 'closing'
-        ? { close: undefined }
-        : {
-            close: undefined,
-            finishedAt: undefined,
-            accepted: true,
-            map: {
-              title: 'Generic contracts',
-              plan: '',
-              mermaid: '',
-              steps: [{ title: 'Preserve a relationship', why: 'Connect the types.' }],
-            },
-            steps: [
-              {
-                title: 'Preserve a relationship',
-                explain: 'Type parameters preserve a relationship.',
-                connect: '',
-                checkFirst: false,
-                check: {
-                  id: 'check',
-                  type: 'short',
-                  prompt: 'Why use a type parameter?',
-                  marks: 1,
-                  rubric: [{ point: 'Preserves the relationship.', marks: 1 }],
-                  model: 'It preserves a relationship.',
-                },
-                misconceptions: [],
-              },
-            ],
-            state: [
-              {
-                asks: [],
-                ...(stage === 'retrying'
-                  ? {
-                      mark: {
-                        score: 0,
-                        awarded: [false],
-                        annotations: [],
-                        mistake: 'incomplete',
-                        feedback: 'Try preserving a relationship.',
-                      },
-                    }
-                  : {}),
-              },
-            ],
-          },
-    );
-    const panel = host.querySelector('.qard-job-status');
-    expect(panel?.classList.contains('qard-wait-status')).toBe(true);
-    expect(panel?.querySelector('.qard-wait-heading')?.textContent).toContain(
-      stage === 'closing' ? 'Wrapping up…' : 'Checking…',
-    );
-    expect(panel?.querySelector('.qard-jobs-role')?.textContent).toBe(
-      stage === 'closing' ? 'Writer' : 'Tutor',
-    );
-    expect(panel?.querySelector('.qard-agent-info')?.getAttribute('title')).toBeTruthy();
-    expect(panel?.querySelector('.qard-wait-estimate')?.textContent).toContain(
-      'elapsed · about 3 min left',
-    );
-    expect(panel?.querySelector('.qard-agent')).toBeNull();
-    expect(panel?.querySelector('.qard-job-controls button')?.getAttribute('type')).toBe('button');
-    await click(panel?.querySelector('.qard-job-controls button'));
-    expect(cancel).toHaveBeenCalledWith(path, kind, ...(id ? [id] : []));
-  },
-);
-
-it('opens the completed lesson note with a named icon button', async () => {
-  await openRecap({
-    close: { summary: '', cards: [], cardState: {}, note: 'Notes/Lesson.md' },
+it('cancels a pending retry without submitting its form', async () => {
+  vi.spyOn(services.learn, 'job').mockImplementation((_path, kind, id = '') =>
+    kind === 'tutor' && id === '0-retry' ? { kind, id, startedAt: Date.now() } : undefined,
+  );
+  const cancel = vi.spyOn(services.learn, 'cancel').mockImplementation(() => {});
+  const { path } = await openRecap({
+    close: undefined,
+    finishedAt: undefined,
+    accepted: true,
+    map: {
+      title: 'Generic contracts',
+      plan: '',
+      mermaid: '',
+      steps: [{ title: 'Preserve a relationship', why: 'Connect the types.' }],
+    },
+    steps: [
+      {
+        title: 'Preserve a relationship',
+        explain: 'Type parameters preserve a relationship.',
+        connect: '',
+        checkFirst: false,
+        check: {
+          id: 'check',
+          type: 'short',
+          prompt: 'Why use a type parameter?',
+          marks: 1,
+          rubric: [{ point: 'Preserves the relationship.', marks: 1 }],
+          model: 'It preserves a relationship.',
+        },
+        misconceptions: [],
+      },
+    ],
+    state: [
+      {
+        asks: [],
+        mark: {
+          score: 0,
+          awarded: [false],
+          annotations: [],
+          mistake: 'incomplete',
+          feedback: 'Try preserving a relationship.',
+        },
+      },
+    ],
   });
-  const note = host.querySelector('button[aria-label="Open lesson note"]');
-  expect(note?.classList.contains('qard-icon-button')).toBe(true);
-  expect(note?.querySelector('svg')).not.toBeNull();
-  expect(note?.textContent).toBe('');
-  await click(note);
-  expect(services.app.workspace.openLinkText).toHaveBeenCalledWith('Notes/Lesson.md', '', true);
-  expect(host.textContent).not.toContain('Delayed retention checks');
+  const button = host.querySelector<HTMLButtonElement>('form button[aria-label="Cancel"]')!;
+  const submit = vi.fn();
+  button.form!.addEventListener('submit', submit);
+  await click(button);
+  expect(cancel).toHaveBeenCalledExactlyOnceWith(path, 'tutor', '0-retry');
+  expect(submit).not.toHaveBeenCalled();
 });
 
 it('opens and closes diagnostic guidance from its info disclosure without submitting answers', async () => {

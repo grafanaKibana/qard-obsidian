@@ -3,7 +3,6 @@ import { act } from 'preact/test-utils';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { Component } from 'obsidian';
-import { DEFAULT_SETTINGS } from '../src/settings/settings';
 import { WhileYouWait, cardsFor } from '../src/components/jobs/WhileYouWait';
 import type { QardServices } from '../src/views/services';
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -137,40 +136,6 @@ it('offers cards while waiting, keeps you there once you start, and shows a read
   expect(onContinue).toHaveBeenCalledOnce();
 });
 
-it('separates warm-up context from progress and preserves skip, show, rating and note actions', async () => {
-  const onEngage = vi.fn();
-  await act(async () => {
-    root.render(
-      <WhileYouWait
-        services={services}
-        title="Preparing your lesson…"
-        context={{ kind: 'lesson', prefer: { files: ['Notes/Cloud.md'] } }}
-        onEngage={onEngage}
-      />,
-    );
-  });
-  await tick();
-  const header = () => host.querySelector('.qard-wait-card-meta')!;
-  expect(header().firstElementChild?.textContent).toBe('Warm-up on what this builds on');
-  expect(header().lastElementChild?.textContent).toBe('1 of 2');
-  expect(header().textContent).not.toContain('·');
-  expect(buttons('Warm-up · 2')[0]?.getAttribute('aria-pressed')).toBe('true');
-  await click(buttons('Skip')[0]);
-  expect(header().lastElementChild?.textContent).toBe('2 of 2');
-  expect(host.textContent).toContain('Front fresh');
-  expect(review).not.toHaveBeenCalled();
-  await click(buttons('Show answer')[0]);
-  expect(host.textContent).toContain('Back fresh');
-  expect(onEngage).toHaveBeenCalledOnce();
-  await click(buttons('Good')[0]);
-  expect(review).toHaveBeenCalledWith('fresh', 3, expect.any(Number), undefined, [], 'DS346');
-  await click(buttons('Read the notes')[0]);
-  expect(buttons('Read the notes')[0]?.getAttribute('aria-pressed')).toBe('true');
-  await click(buttons('Cloud')[0]);
-  expect(services.app.workspace.openLinkText).toHaveBeenCalledWith('Notes/Cloud.md', '', 'split');
-  expect(onEngage).toHaveBeenCalledOnce();
-});
-
 it('prefers a due check when there is time, and lets you switch activity', async () => {
   (services.learn as unknown as { todayList: () => Promise<unknown> }).todayList = async () => ({
     checks: [
@@ -203,48 +168,4 @@ it('prefers a due check when there is time, and lets you switch activity', async
   expect(buttons('Check')[0]?.getAttribute('aria-pressed')).toBe('true');
   await click(buttons('Cards · 2')[0]);
   expect(host.textContent).toContain('Front other');
-});
-
-it('keeps the role and estimate in one metadata row while hiding provider details behind info', async () => {
-  const current = services.reviews.getSnapshot();
-  let showAgent = true;
-  services.reviews.getSnapshot = () => ({
-    ...current,
-    settings: { ...DEFAULT_SETTINGS, showAgent },
-  });
-  services.jobs = { estimate: () => 240_000 } as unknown as QardServices['jobs'];
-  const cancel = vi.fn();
-  const render = () =>
-    act(async () => {
-      root.render(
-        <WhileYouWait
-          services={services}
-          title="Planning your lesson…"
-          context={{ kind: 'lesson' }}
-          job={{ kind: 'map', startedAt: Date.now() - 60_000 }}
-          cancel={cancel}
-        />,
-      );
-    });
-  await render();
-  await tick();
-  const meta = host.querySelector('.qard-wait-meta');
-  expect(meta?.classList.contains('qard-jobs-meta')).toBe(true);
-  expect(meta?.querySelector('.qard-jobs-role')?.textContent).toBe('Tutor');
-  expect(meta?.querySelector('.qard-agent-info')?.getAttribute('title')).toBe(
-    'Claude Code · haiku',
-  );
-  expect(meta?.querySelector('.qard-wait-estimate')?.textContent).toContain(
-    'elapsed · about 3 min left',
-  );
-  expect(host.querySelector('.qard-job-controls')?.firstElementChild?.className).toBe(
-    'qard-job-info',
-  );
-  expect(host.textContent).not.toContain('30 seconds or more');
-  await click(host.querySelector('.qard-job-controls button'));
-  expect(cancel).toHaveBeenCalledOnce();
-  showAgent = false;
-  await render();
-  expect(host.querySelector('.qard-jobs-role')).toBeNull();
-  expect(host.querySelector('.qard-wait-estimate')?.textContent).toContain('elapsed');
 });

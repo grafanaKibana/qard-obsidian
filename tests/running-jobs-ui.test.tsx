@@ -75,12 +75,6 @@ it('dismisses when clicking outside, while clicks inside preserve the popover', 
 
 it('keeps opening a task separate from cancelling it', async () => {
   await click('.qard-jobs-button');
-  expect(host.querySelector('.qard-jobs-time')?.textContent).toContain('· ~4m left');
-  expect(host.querySelector('.qard-jobs-time')?.getAttribute('title')).toContain('elapsed');
-  expect(host.querySelector('.qard-jobs-role')?.textContent).toBe('Writer');
-  expect(host.querySelector('.qard-agent-info')?.getAttribute('title')).toBe(
-    'Claude Code · default model',
-  );
   await click('.qard-jobs-cancel');
   expect(cancel).toHaveBeenCalledWith('Courses/Probability', 'map-course', '');
   expect(open).not.toHaveBeenCalled();

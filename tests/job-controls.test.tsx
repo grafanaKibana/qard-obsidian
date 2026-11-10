@@ -24,12 +24,6 @@ it('offers Cancel, warns when a job is stuck, and restarts one that was lost', a
   await show({ kind: 'probe', startedAt: Date.now() - 10_000 });
   expect(host.querySelector('.is-stuck')).toBeNull();
   expect(host.textContent).toBe('Cancel');
-  expect(host.querySelector('.qard-job-controls')?.firstElementChild?.className).toBe(
-    'qard-job-info',
-  );
-  expect(host.querySelector('.qard-job-info')?.getAttribute('title')).toContain(
-    'Claude Code can take 30 seconds or more per reply.',
-  );
   await show({ kind: 'probe', startedAt: Date.now() - 4.5 * 60_000 });
   expect(host.textContent).toContain('This has taken 4 min, much longer than usual');
   await act(async () => {

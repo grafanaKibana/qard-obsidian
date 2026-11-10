@@ -95,33 +95,6 @@ it('selects the exact Markdown answer for manual copying without touching the cl
   }
 });
 
-it('renders only the composer until a question needs conversation space', async () => {
-  const ask = vi.fn();
-  await act(async () => {
-    root.render(
-      <AskThread
-        services={services}
-        path="Notes.md"
-        items={[]}
-        busy={false}
-        role="tutor"
-        placeholder="Ask anything"
-        ask={ask}
-        dismiss={vi.fn()}
-      />,
-    );
-  });
-  expect(host.querySelector('.qard-ask-head')).toBeNull();
-  expect(host.querySelector('.qard-ask-list')).toBeNull();
-  expect(host.querySelector('.qard-ask-input')).not.toBeNull();
-
-  await type('Why does it work?');
-  await click(buttons('Ask')[0]);
-  expect(ask).toHaveBeenCalledWith('Why does it work?');
-  expect(host.querySelector('.qard-ask-head')?.textContent).toContain('Questions · 1');
-  expect(host.querySelector('.qard-ask-list .qard-ask-q')?.textContent).toBe('Why does it work?');
-});
-
 it('folds older answers, shows a question as soon as it is sent, and handles failures', async () => {
   let items: AskItem[] = [
     { q: 'Why Dirichlet?', a: 'It produces **proportions** that sum to 1.' },

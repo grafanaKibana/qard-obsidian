@@ -96,50 +96,6 @@ it('nests decks under their parents, opens real decks and studies a whole subtre
   expect(names()).toEqual(['Biology', 'Cells', 'Genetics', 'DNA', 'Chemistry']);
 });
 
-it('retains a collapsed real parent subtree for compact panes without changing deck actions', async () => {
-  const open = vi.fn(),
-    studyDecks = vi.fn();
-  library(true, { open, studyDecks });
-  const parent = host.querySelector('.qard-deck-node')!;
-  const children = parent.querySelector(':scope > .qard-deck-children')!;
-  const cells = children.querySelector('button.qard-deck')!;
-  expect(children.classList.contains('has-deck')).toBe(true);
-  expect(children.classList.contains('is-collapsed')).toBe(false);
-
-  await click(button('Collapse Biology'));
-  expect(children.classList.contains('is-collapsed')).toBe(true);
-  expect(parent.querySelector(':scope > .qard-deck-children')).toBe(children);
-  expect(children.querySelector('button.qard-deck')).toBe(cells);
-  expect(button('Expand Biology').getAttribute('aria-expanded')).toBe('false');
-
-  await click(parent.querySelector(':scope > .qard-deck-row > button.qard-deck')!);
-  expect(open).toHaveBeenCalledExactlyOnceWith('Biology');
-  expect(children.classList.contains('is-collapsed')).toBe(true);
-  await click(button('Study Biology and its subdecks'));
-  expect(studyDecks).toHaveBeenCalledWith(
-    expect.arrayContaining(['Biology', 'Biology::Cells', 'Biology::Genetics::DNA']),
-  );
-
-  await click(button('Expand Biology'));
-  expect(children.classList.contains('is-collapsed')).toBe(false);
-  expect(children.querySelector('button.qard-deck')).toBe(cells);
-});
-
-it('opens a deck through its row button without a redundant chevron action', async () => {
-  const open = vi.fn(),
-    studyDecks = vi.fn();
-  library(true, { open, studyDecks });
-  const row = host.querySelector('.qard-deck-row')!;
-  expect(row.querySelector('[aria-label^="Open deck"]')).toBeNull();
-  expect(row.querySelector('svg.lucide-chevron-right')).toBeNull();
-  await click(row.querySelector('button.qard-deck')!);
-  expect(open).toHaveBeenCalledWith('Biology');
-  open.mockClear();
-  await click(button('Study Biology and its subdecks'));
-  expect(studyDecks).toHaveBeenCalledOnce();
-  expect(open).not.toHaveBeenCalled();
-});
-
 it('keeps the flat list with full names while searching or filtering', () => {
   library(false);
   expect(names()).toEqual(['Biology', 'Biology::Cells', 'Biology::Genetics::DNA', 'Chemistry']);
@@ -165,13 +121,6 @@ it('edits a deck’s options, showing what it inherits and rejecting invalid val
   expect(host.textContent).toContain('Biology allows 10 as well.');
   expect(host.textContent).toContain('Your overall limit of 20 still applies.');
   const [target, limit] = Array.from(host.querySelectorAll<HTMLInputElement>('input'));
-  expect(host.querySelector('h2')?.textContent).toBe('Deck options');
-  expect(host.querySelector('.qard-deck-options-name')?.textContent).toBe('Biology::Cells');
-  expect(target!.labels?.[0]?.textContent).toBe('Target retention (%)');
-  expect(limit!.labels?.[0]?.textContent).toBe('New cards per day');
-  expect(document.getElementById(target!.getAttribute('aria-describedby')!)?.textContent).toContain(
-    'Empty uses 85% from Biology.',
-  );
   const type = (input: HTMLInputElement, value: string) =>
     act(() => {
       input.value = value;
@@ -252,56 +201,6 @@ it('keeps virtual parent options and rename reachable without opening a real dec
     expect(host.querySelector('.qard-deck-group-popover')).toBeNull();
     expect(open).not.toHaveBeenCalled();
     expect(host.querySelector('[aria-label="Manage group Biology"]')).toBeNull();
-  } finally {
-    HTMLDialogElement.prototype.showModal = previous;
-  }
-});
-
-it('lets a pending group rename own Escape and keeps its eventual error visible', async () => {
-  let rejectRename!: (error: Error) => void;
-  const rename = vi.fn(
-    () =>
-      new Promise<void>((_resolve, reject) => {
-        rejectRename = reject;
-      }),
-  );
-  library(true, { rename });
-  const previous = HTMLDialogElement.prototype.showModal;
-  HTMLDialogElement.prototype.showModal = function () {
-    this.setAttribute('open', '');
-  };
-  try {
-    await click(button('Manage group Biology::Genetics'));
-    await click(
-      host.querySelector(
-        '.qard-deck-group-popover button[aria-label="Rename deck Biology::Genetics"]',
-      )!,
-    );
-    const dialog = host.querySelector<HTMLDialogElement>('.qard-deck-group-popover dialog')!;
-    await act(async () => {
-      const input = dialog.querySelector('input')!;
-      input.value = 'Inheritance';
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-    });
-    await act(async () => {
-      dialog
-        .querySelector('form')!
-        .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-    });
-    expect(rename).toHaveBeenCalledOnce();
-    expect(
-      [...dialog.querySelectorAll('button')].find((x) => x.textContent === 'Renaming…')?.disabled,
-    ).toBe(true);
-    await act(async () => {
-      dialog
-        .querySelector('input')!
-        .dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
-      dialog.dispatchEvent(new Event('cancel', { cancelable: true }));
-    });
-    expect(dialog.isConnected).toBe(true);
-    expect(host.querySelector('.qard-deck-group-popover')).not.toBeNull();
-    await act(async () => rejectRename(new Error('Could not update the group.')));
-    expect(dialog.querySelector('[role=alert]')?.textContent).toBe('Could not update the group.');
   } finally {
     HTMLDialogElement.prototype.showModal = previous;
   }

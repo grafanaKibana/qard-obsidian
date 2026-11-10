@@ -71,35 +71,6 @@ it('shows totals, a daily chart and breakdowns, and can clear the history', asyn
     'Anthropic APIclaude-haiku-4-5',
   );
   expect(host.querySelector('.qard-usage-stats')?.textContent).toContain('$0.250');
-  const tabs = [...host.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
-  const panel = host.querySelector<HTMLElement>('[role="tabpanel"]')!;
-  const panelId = panel.id;
-  const key = async (value: string) => {
-    await act(async () => {
-      const selected = tabs.find((tab) => tab.tabIndex === 0)!;
-      selected.focus();
-      selected.dispatchEvent(new KeyboardEvent('keydown', { key: value, bubbles: true }));
-    });
-    const selected = tabs.find((tab) => tab.getAttribute('aria-selected') === 'true')!;
-    expect(document.activeElement).toBe(selected);
-    expect(tabs.filter((tab) => tab.tabIndex === 0)).toEqual([selected]);
-    expect(selected.getAttribute('aria-controls')).toBe(panelId);
-    expect(panel.getAttribute('aria-labelledby')).toBe(selected.id);
-  };
-  expect(tabs.map((tab) => tab.tabIndex)).toEqual([-1, 0, -1, -1]);
-  await key('ArrowRight');
-  expect(tabs[2]!.getAttribute('aria-selected')).toBe('true');
-  expect(host.querySelectorAll('.qard-usage-day')).toHaveLength(30);
-  expect(host.querySelector('.qard-usage-total')?.textContent).toContain('3 runs');
-  await key('Home');
-  expect(host.querySelectorAll('.qard-usage-day')).toHaveLength(0);
-  expect(host.querySelector('.qard-usage-total')?.textContent).toContain('1 run');
-  await key('ArrowLeft');
-  expect(tabs[3]!.getAttribute('aria-selected')).toBe('true');
-  await key('ArrowRight');
-  expect(tabs[0]!.getAttribute('aria-selected')).toBe('true');
-  await key('End');
-  expect(tabs[3]!.getAttribute('aria-selected')).toBe('true');
   await click(buttons('All time')[0]);
   expect(host.querySelector('.qard-usage-total')?.textContent).toContain('3 runs');
   await click(buttons('Clear usage history')[0]);

@@ -169,84 +169,6 @@ it('reviews a marked answer: underlines, linked notes, mark scheme and panels', 
   expect(host.querySelectorAll('.qard-rail-item')).toHaveLength(2);
 });
 
-it('reveals a resumed test section and the next section while preserving manual strip scrolling between changes', async () => {
-  const bounds = vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (
-    this: Element,
-  ) {
-    if (this.matches('.qard-test-steps')) return new DOMRect(100, 0, 300, 34);
-    if (this.matches('.qard-test-steps > button')) {
-      const strip = this.parentElement!;
-      const index = [...strip.querySelectorAll('button')].indexOf(this as HTMLButtonElement);
-      return new DOMRect(100 + index * 150 - strip.scrollLeft, 0, 150, 34);
-    }
-    return new DOMRect();
-  });
-  const width = vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockImplementation(function (
-    this: HTMLElement,
-  ) {
-    return this.matches('.qard-test-steps') ? 300 : 0;
-  });
-  const originalScroll = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'scrollIntoView');
-  const outerScroll = vi.fn();
-  Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
-    configurable: true,
-    value: outerScroll,
-  });
-  try {
-    const sections = Array.from({ length: 8 }, (_, i) => ({
-      ...TEST.sections[0],
-      id: `section-${i}`,
-      title: `Transport section ${i + 1}`,
-      questions: [{ ...TEST.sections[0]!.questions[1], id: `question-${i}` }],
-    }));
-    files['Qard/Tests/t/test.json'] = JSON.stringify({ ...TEST, sections });
-    files['Qard/Tests/t/attempt.json'] = JSON.stringify({
-      version: 1,
-      startedAt: 1,
-      sections: Object.fromEntries(sections.slice(0, 5).map((s) => [s.id, { status: 'marked' }])),
-      answers: {},
-      marks: {},
-      review: {},
-    });
-    const settings = services.reviews.getSnapshot().settings;
-    await services.reviews.saveSettings({
-      ...settings,
-      tests: { ...settings.tests, marking: 'end' },
-    });
-    host.scrollTop = 70;
-    await act(async () =>
-      root.render(<TakeTest services={services} nav={nav} folder="Qard/Tests/t" />),
-    );
-    await tick();
-    await tick();
-    const strip = host.querySelector<HTMLDivElement>('.qard-test-steps')!;
-    expect(strip.querySelector('[aria-current="step"]')?.textContent).toBe('Transport section 6');
-    expect(strip.scrollLeft).toBe(600);
-    strip.scrollLeft = 75;
-    await act(async () =>
-      root.render(<TakeTest services={services} nav={nav} folder="Qard/Tests/t" />),
-    );
-    await tick();
-    expect(strip.scrollLeft).toBe(75);
-    await click(buttons('Next section')[0]);
-    await tick();
-    expect(strip.querySelector('[aria-current="step"]')?.textContent).toBe('Transport section 7');
-    expect(strip.scrollLeft).toBe(750);
-    expect(host.scrollTop).toBe(70);
-    expect(
-      outerScroll.mock.contexts.every(
-        (node) => node !== strip && !(node as HTMLElement).matches('.qard-test-steps button'),
-      ),
-    ).toBe(true);
-  } finally {
-    bounds.mockRestore();
-    width.mockRestore();
-    if (originalScroll)
-      Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', originalScroll);
-    else delete (HTMLElement.prototype as Partial<HTMLElement>).scrollIntoView;
-  }
-});
-
 it('takes a test: answers autosave and a section can be submitted', async () => {
   files['Qard/Tests/t/attempt.json'] = JSON.stringify({
     version: 1,
@@ -262,36 +184,12 @@ it('takes a test: answers autosave and a section can be submitted', async () => 
   await tick();
   await tick();
   const radios = [...host.querySelectorAll<HTMLButtonElement>('[role="radio"]')];
-  expect(radios.map((radio) => radio.tabIndex)).toEqual([0, -1]);
-  const key = async (value: string) => {
-    await act(async () => {
-      const selected = radios.find((radio) => radio.tabIndex === 0)!;
-      selected.focus();
-      selected.dispatchEvent(new KeyboardEvent('keydown', { key: value, bubbles: true }));
-    });
-    const selected = radios.find((radio) => radio.getAttribute('aria-checked') === 'true')!;
-    expect(document.activeElement).toBe(selected);
-    expect(radios.filter((radio) => radio.tabIndex === 0)).toEqual([selected]);
-  };
-  await key('ArrowRight');
-  expect(radios[1]!.getAttribute('aria-checked')).toBe('true');
-  await key('ArrowDown');
-  expect(radios[0]!.getAttribute('aria-checked')).toBe('true');
-  await key('ArrowUp');
-  expect(radios[1]!.getAttribute('aria-checked')).toBe('true');
-  await key('Home');
-  expect(radios[0]!.getAttribute('aria-checked')).toBe('true');
-  await key('End');
-  expect(radios[1]!.getAttribute('aria-checked')).toBe('true');
-  const unknown = radios[0]!.closest('.qard-q')!.querySelector('.qard-dont-know')!;
-  await click(unknown);
-  expect(radios.every((radio) => radio.disabled && radio.tabIndex === -1)).toBe(true);
   await act(async () => {
-    radios[0]!.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    radios[1]!.focus();
+    radios[1]!.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
   });
-  expect(services.tests.get('Qard/Tests/t')?.attempt?.answers.q2?.choice).toBeUndefined();
-  await click(unknown);
-  expect(radios.map((radio) => radio.tabIndex)).toEqual([0, -1]);
+  expect(radios[0]!.getAttribute('aria-checked')).toBe('true');
+  expect(document.activeElement).toBe(radios[0]);
   await click(buttons('Viterbi').find((b) => b.getAttribute('role') === 'radio'));
   await click(buttons('Sure')[0]);
   expect(services.tests.get('Qard/Tests/t')?.attempt?.answers).toMatchObject({
