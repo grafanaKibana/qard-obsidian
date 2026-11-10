@@ -25,8 +25,8 @@ export function SourceUpdatesRow({
             ? 'Check source tracking'
             : `${state.changes.length} ${state.changes.length === 1 ? 'card may' : 'cards may'} need updating`}
         </strong>
-        <span className="qard-muted qard-resume-context">Review changes</span>
       </span>
+      <span className="qard-muted">Review changes</span>
       <ChevronRight size={16} />
     </button>
   );

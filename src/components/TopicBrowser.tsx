@@ -155,7 +155,7 @@ export function TopicBrowser({
           </span>
         </div>
       </div>
-      {resume}
+      <div className="qard-row-stack">{resume}</div>
       <div className="qard-library-toolbar">
         <span>Topics</span>
         {management && (

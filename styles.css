@@ -4030,7 +4030,7 @@ body.qard-focus-active .status-bar {
   min-height: var(--qard-row-height);
   padding: var(--qard-row-padding);
   gap: var(--qard-row-gap);
-  margin-bottom: var(--qard-gap-actions);
+  margin: 0;
 }
 
 .qard-app :is(button.qard-resume, .qard-summary-row):hover {
@@ -4048,6 +4048,7 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-app .qard-summary-row > button:is(.qard-resume, .qard-test-row) {
+  position: static;
   align-self: stretch;
   min-height: 0;
   margin: 0;
@@ -4057,8 +4058,36 @@ body.qard-focus-active .status-bar {
   background: transparent;
 }
 
-.qard-deck-list > .qard-summary-row {
-  margin-bottom: 0;
+.qard-row-stack {
+  display: grid;
+  gap: var(--qard-gap-actions);
+  margin-bottom: var(--qard-gap-actions);
+}
+
+.qard-row-stack:empty,
+.qard-row-stack > :empty {
+  display: none;
+}
+
+.qard-deletable-row.qard-summary-row {
+  position: relative;
+}
+
+.qard-app .qard-summary-row > button:is(.qard-resume, .qard-test-row)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.qard-app .qard-summary-row > .qard-delete-item {
+  position: relative;
+  z-index: 1;
+}
+
+.qard-summary-row > svg:last-child {
+  flex: 0 0 auto;
+  pointer-events: none;
+  color: var(--qard-muted);
 }
 
 .qard-app .qard-summary-row > .qard-delete-item > button {
@@ -4072,8 +4101,7 @@ body.qard-focus-active .status-bar {
   background: color-mix(in srgb, var(--qard-row-accent) 16%, var(--qard-bg));
 }
 
-.qard-summary-row .qard-test-row > svg:last-child,
-.qard-summary-row.qard-test-row > svg:last-child {
+.qard-summary-row > svg:last-child {
   width: var(--qard-row-action-size);
   height: var(--qard-row-action-size);
   padding: calc((var(--qard-row-action-size) - 16px) / 2);
@@ -4126,8 +4154,15 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-app .qard-resume > .qard-muted {
-  font-size: inherit;
-  line-height: inherit;
+  flex: 0 0 auto;
+  max-width: 40%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--qard-font-meta);
+  font-weight: var(--qard-weight-normal);
+  line-height: 1.5;
+  text-align: right;
 }
 
 /* Learn: today, courses, checks and lessons. State colours reuse the marking palette. */
@@ -7341,8 +7376,8 @@ div.qard-ask-q {
 .qard-saved-sessions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 28px;
+  gap: var(--qard-gap-actions);
+  margin: 0;
   container-type: inline-size;
 }
 
@@ -7428,7 +7463,7 @@ div.qard-ask-q {
 
 @container qard-workspace (max-width: 640px) {
   .qard-tabs {
-    justify-content: space-between;
+    justify-content: space-around;
     gap: var(--qard-gap-actions);
   }
 

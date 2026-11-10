@@ -173,7 +173,7 @@ export function DeckBrowser({
               {decks.reduce((count, deck) => count + deck.cards.length, 0).toLocaleString()} cards
             </p>
           </div>
-          {resume}
+          <div className="qard-row-stack">{resume}</div>
           <div className="qard-library-toolbar">
             <span>{search || repairFilter?.active ? 'Matching decks' : 'All decks'}</span>
             <label className="qard-search qard-library-search">

@@ -54,8 +54,8 @@ export function ResumeFlashcards({
       <span className="qard-resume-copy">
         <strong className="qard-resume-title">{title}</strong>
         <span className="qard-muted qard-resume-label">{label}</span>
-        <span className="qard-muted qard-resume-context">{status}</span>
       </span>
+      <span className="qard-muted">{status}</span>
       <ChevronRight size={16} />
     </button>
   );

@@ -93,97 +93,99 @@ export function LearnBrowser({
           Loading courses…
         </p>
       )}
-      {pending?.mapping.map((f) => (
-        <div key={f} className="qard-resume is-static">
-          <Waiting text={`Mapping ${f.split('/').pop()}…`}>
-            <AgentLabel services={services} role="writer" />
-          </Waiting>
-          <DeleteLearnItem services={services} kind="mapping" path={f} />
-        </div>
-      ))}
-      {pending?.failed.map((f) => (
-        <div key={f.kind + f.target} className="qard-error" role="alert">
-          <span>
-            {f.kind === 'map' ? 'Mapping' : 'Updating'}{' '}
-            {f.target.split('/').pop()!.replace(/\.md$/, '')} failed: {f.error}
-          </span>
+      <div className="qard-row-stack">
+        {pending?.mapping.map((f) => (
+          <div key={f} className="qard-resume is-static">
+            <Waiting text={`Mapping ${f.split('/').pop()}…`}>
+              <AgentLabel services={services} role="writer" />
+            </Waiting>
+            <DeleteLearnItem services={services} kind="mapping" path={f} />
+          </div>
+        ))}
+        {pending?.failed.map((f) => (
+          <div key={f.kind + f.target} className="qard-error" role="alert">
+            <span>
+              {f.kind === 'map' ? 'Mapping' : 'Updating'}{' '}
+              {f.target.split('/').pop()!.replace(/\.md$/, '')} failed: {f.error}
+            </span>
+            <button
+              className="qard-text-button"
+              onClick={() =>
+                void (f.kind === 'map'
+                  ? services.learn.mapCourse(f.target, f.request)
+                  : services.learn.updateCourse(f.target, f.request))
+              }
+            >
+              Try again
+            </button>
+            <button
+              className="qard-text-button"
+              onClick={() => void services.learn.dismissFailure(f.kind, f.target)}
+            >
+              Dismiss
+            </button>
+            {f.kind === 'map' && (
+              <DeleteLearnItem services={services} kind="mapping" path={f.target} />
+            )}
+          </div>
+        ))}
+        {pending?.proposals.map((p) => (
+          <div key={p.folder} className="qard-deletable-row qard-summary-row qard-row-update">
+            <button className="qard-resume" onClick={() => nav.mapCourse(p.folder)}>
+              <span className="qard-resume-copy">
+                <span className="qard-muted qard-resume-label">Ready to review</span>
+                <strong className="qard-resume-title">
+                  {p.course} · {plural(p.objectives.length, 'objective')}
+                </strong>
+              </span>
+            </button>
+            <DeleteLearnItem services={services} kind="mapping" path={p.folder} />
+            <ChevronRight size={16} aria-hidden="true" />
+          </div>
+        ))}
+        {pending?.updates.map((u) => (
           <button
-            className="qard-text-button"
-            onClick={() =>
-              void (f.kind === 'map'
-                ? services.learn.mapCourse(f.target, f.request)
-                : services.learn.updateCourse(f.target, f.request))
-            }
+            key={u.mastery}
+            className="qard-resume qard-row-update"
+            onClick={() => nav.course(u.mastery)}
           >
-            Try again
-          </button>
-          <button
-            className="qard-text-button"
-            onClick={() => void services.learn.dismissFailure(f.kind, f.target)}
-          >
-            Dismiss
-          </button>
-          {f.kind === 'map' && (
-            <DeleteLearnItem services={services} kind="mapping" path={f.target} />
-          )}
-        </div>
-      ))}
-      {pending?.proposals.map((p) => (
-        <div key={p.folder} className="qard-deletable-row qard-summary-row qard-row-update">
-          <button className="qard-resume" onClick={() => nav.mapCourse(p.folder)}>
             <span className="qard-resume-copy">
-              <span className="qard-muted qard-resume-label">Ready to review</span>
-              <strong className="qard-resume-title">
-                {p.course} · {plural(p.objectives.length, 'objective')}
-              </strong>
+              <span className="qard-muted qard-resume-label">Update ready</span>
+              <strong className="qard-resume-title">{u.course}</strong>
             </span>
             <ChevronRight size={16} />
           </button>
-          <DeleteLearnItem services={services} kind="mapping" path={p.folder} />
+        ))}
+        {open.map((l) => (
+          <div key={l.path} className="qard-deletable-row qard-summary-row qard-row-lesson">
+            <button className="qard-resume" onClick={() => nav.lesson(l.path)}>
+              <ResumeLessonCopy lesson={l} services={services} />
+            </button>
+            <DeleteLearnItem services={services} kind="lesson" path={l.path} />
+            <ChevronRight size={16} aria-hidden="true" />
+          </div>
+        ))}
+        <div className="qard-deck-list">
+          {courses?.map((c) => {
+            const mastered = c.objectives.filter((o) => o.state === 'mastered').length,
+              due = c.objectives.filter((o) => o.state !== 'new' && o.due && o.due <= day).length;
+            return (
+              <div key={c.path} className="qard-deletable-row qard-summary-row">
+                <button className="qard-deck qard-test-row" onClick={() => nav.course(c.path)}>
+                  <span className="qard-deck-name">
+                    <strong>{c.course}</strong>
+                    <small>
+                      {mastered} of {plural(c.objectives.length, 'objective')} mastered
+                    </small>
+                  </span>
+                  <span className="qard-test-status">{due ? `${due} due` : ''}</span>
+                </button>
+                <DeleteLearnItem services={services} kind="course" path={c.path} />
+                <ChevronRight size={16} aria-hidden="true" />
+              </div>
+            );
+          })}
         </div>
-      ))}
-      {pending?.updates.map((u) => (
-        <button
-          key={u.mastery}
-          className="qard-resume qard-row-update"
-          onClick={() => nav.course(u.mastery)}
-        >
-          <span className="qard-resume-copy">
-            <span className="qard-muted qard-resume-label">Update ready</span>
-            <strong className="qard-resume-title">{u.course}</strong>
-          </span>
-          <ChevronRight size={16} />
-        </button>
-      ))}
-      {open.map((l) => (
-        <div key={l.path} className="qard-deletable-row qard-summary-row qard-row-lesson">
-          <button className="qard-resume" onClick={() => nav.lesson(l.path)}>
-            <ResumeLessonCopy lesson={l} services={services} />
-            <ChevronRight size={16} />
-          </button>
-          <DeleteLearnItem services={services} kind="lesson" path={l.path} />
-        </div>
-      ))}
-      <div className="qard-deck-list">
-        {courses?.map((c) => {
-          const mastered = c.objectives.filter((o) => o.state === 'mastered').length,
-            due = c.objectives.filter((o) => o.state !== 'new' && o.due && o.due <= day).length;
-          return (
-            <div key={c.path} className="qard-deletable-row qard-summary-row">
-              <button className="qard-deck qard-test-row" onClick={() => nav.course(c.path)}>
-                <span className="qard-deck-name">
-                  <strong>{c.course}</strong>
-                  <small>
-                    {mastered} of {plural(c.objectives.length, 'objective')} mastered
-                  </small>
-                </span>
-                <span className="qard-test-status">{due ? `${due} due` : ''}</span>
-                <ChevronRight size={17} />
-              </button>
-              <DeleteLearnItem services={services} kind="course" path={c.path} />
-            </div>
-          );
-        })}
       </div>
       {courses && !courses.length && (
         <div className="qard-empty">

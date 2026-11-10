@@ -53,8 +53,8 @@ export function ResumeTest({ services, nav }: { services: QardServices; nav: Tes
         <span className="qard-muted qard-resume-label">
           {test.status === 'ready' ? 'Start' : 'Continue'}
         </span>
-        <span className="qard-muted qard-resume-context">{STATUS[test.status]}</span>
       </span>
+      <span className="qard-muted">{STATUS[test.status]}</span>
       <ChevronRight size={16} />
     </button>
   );
