@@ -1,10 +1,10 @@
 {
   "before": "70056821914f0dae910b52a20f1fa3329b04d0ac",
-  "after": "e3e35267e8182a570be8a212c2af2e759252b060",
+  "after": "52ce8c5c7b39957377403405aa0c1aded1ff7507",
   "comparisons": 50,
   "deviceScaleFactor": 2,
   "clock": "2026-11-09T12:00Z for browser fixtures; native identical live renderer/settings",
-  "capture": "Upstream main to latest PR #17. Sixteen refreshed browser pairs cover the study card, completed session, active questions, task status and running tasks. The other 34 comparisons retain their prior captures. No intermediate PR revisions are shown.",
+  "capture": "Upstream main to latest PR #17. Three refreshed pairs show the wider prose in the lesson, lesson summary, and Learn library. The other 47 comparisons retain prior captures.",
   "maximumExamplesPerGroup": 3,
   "scenes": [
     {
@@ -252,10 +252,12 @@
     {
       "name": "lesson-step-desktop",
       "screen": "lesson",
+      "variant": "wide-prose",
       "width": 1100,
       "theme": "dark",
       "ask": true,
-      "bottom": true
+      "crop": ".qard-lesson",
+      "height": 1120
     },
     {
       "name": "lesson-check-first-phone",
@@ -346,7 +348,8 @@
       "screen": "lesson",
       "variant": "completed",
       "width": 1100,
-      "theme": "dark"
+      "theme": "dark",
+      "height": 1120
     },
     {
       "name": "mcq-dark",
@@ -374,7 +377,7 @@
   "hashes": {
     "after-builder-phone.png": "2f206ab5b85ebe530a15284b5d90a7477c25cdd9ebfc66319761a91d212f70df",
     "after-checking-phone.png": "57a97420b38eaf8dc67becc9830e16eb6e644468ece7fa0e17d28ae1858da0c7",
-    "after-completed-desktop.png": "50470e86631175ed5bfd9da4d000f3504f42d006512c79ac33038ad37a29020c",
+    "after-completed-desktop.png": "2d8ba3ac552a39426ed2ae7c45175c2fdd1fd45fa17f8e26f65e308b500cb763",
     "after-completed-phone.png": "c10ad5b19683520ea0bad17353910438569fc4443997bc5abcac79ad656cfc90",
     "after-create-boundary.png": "38f01b1d84511f907bfe99a9bd907a5b86033ab40f8034cb25202e3a7b4fabfe",
     "after-decks-phone.png": "0316fea3cf646ec119e6244f087b19cfdff8db27cf6eb1bf9f8ac8ba38306205",
@@ -388,7 +391,7 @@
     "after-lesson-check-first-phone.png": "38a75766c5ff0e84918e798b8dd304db808b685f11767a5b085eb6dbf7221bbd",
     "after-lesson-plan-phone.png": "b59479f600080cd78f2391abd5cb78ccc044c827a6731a746bdc9367c800b452",
     "after-lesson-resume-phone.png": "d7b2d3e1fb0a4ba1de4be36526937d9ff105bcfe511350245f03af42eeefc32a",
-    "after-lesson-step-desktop.png": "b439a29d88215d7c2b3f06e289c34c4e179492e2e0b2bc2007e83f4f73ce67bf",
+    "after-lesson-step-desktop.png": "7e94f7fd1b5bf08895576ed56fdb94bf3a7faf3020f1bb23b0693f83b7eb1868",
     "after-lesson-step-phone.png": "63ec94e0ade839125d61f5a4423ec2b37c76254315fba91af6ea011ac1b5fadd",
     "after-library-interactions-desktop.png": "a1275752f9326377f850ede9199bd6448c705598cea0e3be4c77457e23526759",
     "after-library-interactions-phone.png": "d622259a725e16c2f2fc53e657aec421f0d8a3a08800678886482a29a85c9e32",
@@ -424,7 +427,7 @@
     "after-wrapping-desktop.png": "c5185107fc36bf16e54be2e07a51412950f251ddf34d81b1d0f0f0b68b17ae3a",
     "before-builder-phone.png": "e63b753c0d62615f08a779ef4fa55e7efacbbf8ba2ec14bbeb9d0d33321a5297",
     "before-checking-phone.png": "15682b57b6d01b6f4d054ea51e1313a4682758b000ee12b97c48d5740f529e18",
-    "before-completed-desktop.png": "6261531fb92262cbcac6d528aff6c7b4597a3a351663118045393c64206f7d25",
+    "before-completed-desktop.png": "e379f644ae132c477e617277a2594a4a0d889a71bf32df42d8d7f3fe2c206443",
     "before-completed-phone.png": "561eed044138a309f56ee23632aebeab47b6802dbd564be29e740801301d4096",
     "before-create-boundary.png": "251896e5e6dec9bb403b1fef8baf029068f48e8e80a7d94ad4353f7fd206da61",
     "before-decks-phone.png": "623878cc2f0d1915877c7064c3d7ecad011e965c9f1675d7766c199a64b285e4",
@@ -433,12 +436,12 @@
     "before-figure-redraw-phone.png": "0e89d0e5222fbac5a72a7583f28ed2c56311ed11de74cd885e82678fb5367efc",
     "before-figure-wait-phone.png": "a5206511dbecf8ec33c88eb094b009d46e643571f8f5943986d5c07a0942f36c",
     "before-group-menu-phone.png": "1e82f7d5858ea0875a004084eef52661d893ea8a890820583f197f34edcb1fbb",
-    "before-learn-desktop.png": "6128c5951657db57daba1a12796ea8e47324ee67b3a00c4c01e74ff77615f9af",
+    "before-learn-desktop.png": "ae2ac55a3d63da82766558489aa27d377cf5771d103edc10702b7046cb9910ea",
     "before-learn-phone.png": "30d6a653f60ed0b6440df79cf54aea9752650ed7b9ba2048ba7f54ccbfe5c07e",
     "before-lesson-check-first-phone.png": "0244034eff1f0b987db3a768758715683e11ff41654832a48cde441456bb2b10",
     "before-lesson-plan-phone.png": "4d6e6526f58aa5e1622d46e84a640c6b64937934e7306289221e38929a0312f9",
     "before-lesson-resume-phone.png": "e1e4b894b536cd58fe3ef59c3dc9a27aeb42e37ebf45e25186784b363fe3f464",
-    "before-lesson-step-desktop.png": "f0090762bc596fd37d5a3959f1e1bc1d1cffde45d8927b33f469f35f29bb7f93",
+    "before-lesson-step-desktop.png": "5290ea4a57cb1326989010e944f9782d2c5f8f2dccc98d0ab7cd04588f205f65",
     "before-lesson-step-phone.png": "38cd607e3348c608065840477628bedd702edcf49fa960b6d4f9921c5fe00f26",
     "before-library-interactions-desktop.png": "d36a4ed30b9cddf93aae9d811d5732995642afb02e57c39264bcbfa3c5f6568d",
     "before-library-interactions-phone.png": "d56d4f5be03719eaa01bcc4a68d4d4944e5d2eb8263d90eb843d18f2ec884d21",

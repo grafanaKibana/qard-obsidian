@@ -1,3 +1,15 @@
+# Content width verification
+
+Latest source `52ce8c5c7b39957377403405aa0c1aded1ff7507`. Screenshot baseline is upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
+
+- Removed the 72ch cap that still narrowed Markdown paragraphs, lists and quotes in lessons, lesson plans, lesson summaries, and practice-test goals while code blocks used the full width. Removed the separate 48ch cap on the Learn and Practice tests library descriptions.
+- Isolated Obsidian reproduced the issue at `e3e3526` with a 725.6px paragraph beside a 1340px code block. The corrected build renders paragraphs, lists, quotes and code blocks at 1340px using the same fixture and native Markdown renderer.
+- All 84 browser cases passed across 320–1440px panes and both themes, including a narrow pane in a wide window. Cases cover lesson steps, plans, summaries, practice-test goals, study cards, previews and library descriptions. Width measurements account for block indentation and check for horizontal page overflow.
+- Full npm run check passed with 791 tests in 96 suites, plus formatting, typecheck, lint, CSS lint, build and release checks. Layout and typography scans returned no findings.
+- The lesson, lesson summary, and Learn screenshots were refreshed against main. The gallery remains 50 pairs.
+
+## Prior verification at `e3e3526`
+
 # Study results, questions and task controls
 
 Latest source `e3e35267e8182a570be8a212c2af2e759252b060`. Baseline is upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
