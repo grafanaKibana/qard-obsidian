@@ -2306,7 +2306,14 @@
 }
 
 .qard-summary .qard-actions {
-  justify-content: center;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+@container qard-workspace (min-width: 641px) {
+  .qard-summary .qard-actions > button:last-child {
+    margin-inline-start: auto;
+  }
 }
 
 .qard-difficulty {
