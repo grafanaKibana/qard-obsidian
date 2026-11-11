@@ -1,5 +1,20 @@
 # Session summary refinement verification
 
+Latest source `cbd05c7adb0e8df23dd3c112c97b7a9ad395f0ba`. Screenshot baseline is upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
+
+- Axis and arrowhead strokes use the same border color and non-scaling 1px width as element separators. Direction labels use the plot metadata size and say Harder and Easier.
+- Skipped is now in the ratings row. Skipped is first and includes its percentage. All five cells share the same denominator (rating events plus skips), with vertical separators only between cells. Plot frequencies and median remain based on rated reviews. Direction labels are 4px closer to the plot.
+- Review totals including repeats sit beside the peak count above the plot. The row measures its actual available width and switches to an info icon with the full message when the text cannot fit, then restores the text when space returns.
+- Compact summary stats now pair each count and label inline, reduce the type size and distribute both pairs across one row. On compact panes, review buttons fill the first row and Done fills the second row. Action heights stretch consistently. Skipped-only and Cram sessions retain a valid count without a false rating plot.
+- All 24 browser cases passed across 320, 390, 640, 641, 768, 1100 and 1440px widths, plus a narrow pane in a wide window, in both themes. They verify stroke parity, typography, spacing, skipped data, mobile action rows, page overflow and text-to-icon resize recovery. Skipped-only and Cram states are included.
+- Full npm run check passed with 767 tests in 95 suites. Existing skipped-session assertions were updated. Formatting, typecheck, source lint, CSS lint, tests, build and release verification all passed. No new test cases were added.
+- The existing two summary comparisons were refreshed. Gallery total remains 50 pairs.
+- The isolated test plugin and protected-file hashes are checked before completion.
+
+## Prior verification at `4ea1e1e`
+
+# Session summary refinement verification
+
 Latest source `4ea1e1e5b4d6d704c7f3521abac34359c2b0b3d7`. Screenshot baseline is upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
 
 - Axis and arrowhead strokes use the same border color and non-scaling 1px width as element separators. Direction labels use the plot metadata size and say Harder and Easier.
