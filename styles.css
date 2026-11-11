@@ -1418,6 +1418,18 @@
   padding: 5px 0;
 }
 
+.qard-topic-heading:hover {
+  background: var(--qard-soft);
+}
+
+.qard-app .qard-topic-heading > button:first-of-type:hover {
+  background: transparent;
+}
+
+.qard-app .qard-topic-heading .qard-icon-button:hover {
+  background: var(--qard-control-hover);
+}
+
 .qard-topic-heading > button:first-of-type {
   flex: 1;
   border: 0;
@@ -8180,7 +8192,6 @@ div.qard-ask-q {
 }
 
 .qard-library-toolbar {
-  padding-inline: calc(var(--qard-space-4) + 1px);
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -8201,7 +8212,6 @@ div.qard-ask-q {
 
 .qard-library-search {
   flex: 1 1 200px;
-  max-width: 320px;
   margin-inline-start: auto;
 }
 
@@ -8455,10 +8465,6 @@ div.qard-ask-q {
     width: auto;
     justify-content: center;
     padding-inline: var(--qard-space-2);
-  }
-
-  .qard-library-search {
-    max-width: none;
   }
 
   .qard-deck-detail .qard-topic-heading > button:first-of-type {
