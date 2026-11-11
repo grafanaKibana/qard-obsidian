@@ -1,3 +1,17 @@
+# Session outcome alignment and course padding verification
+
+Latest source `0d823c2735d82c4c04a22a05d8248d218deba12a`. Screenshot baseline remains upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
+
+- Plot samples and summary cells use five equal-width columns in the same order: Skipped, Again, Hard, Good, Easy. Every point is centered above its label. The curve retains full-width edges.
+- Skipped has its own muted point and participates in the plot scale. Percentages retain the shared outcome denominator. Median calculation still uses rated answers only and is positioned in the shifted rating columns. Direction labels describe the rated region.
+- Skipped-only and unrated Cram outcomes show their real skipped count and zero rated counts without inventing a median. Empty sessions still omit the chart.
+- Course rows restore the shared horizontal row inset. The flush-padding override now applies only to other Learn summary rows. Neutral course styling and Today alignment remain intact.
+- All 40 browser cases passed across 320, 390, 640, 641, 768, 1100 and 1440px panes, plus a narrow pane in a wide window, in both themes. They verify point/label alignment, five category counts, peak scale, full-width path, median placement/absence, repeat-tooltip resize recovery, action layout and overflow, course padding and neutral styling, and preserved lesson alignment.
+- Full check passed with 767 tests in 95 suites, formatting, typecheck, source lint, CSS lint, production build and release verification. Existing chart/skipped-session cases now cover the fifth point and skipped-only plot; no test cases were added.
+- Four existing main-to-latest pairs were refreshed; gallery remains 52 pairs. The isolated Obsidian build was refreshed and current working plugin/global Obsidian files were preserved using before/after hashes.
+
+## Prior verification
+
 # Learning rows and objective metadata verification
 
 Latest source `f6372bb5c11e89455a18394b9c84fd47c19ce284`. Screenshot baseline remains upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
