@@ -1,3 +1,17 @@
+# Lesson questions, suggestions and pending operations verification
+
+Latest source `bb86bda99c6ba6562fa9de10451180437ef1098f`. Screenshot baseline remains upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
+
+- Question headers restore the original label-left / maximum-marks-right structure for lesson checks, diagnostics, retention checks and practice tests. Answer hints are removed. Mark values and scoring data are unchanged.
+- Suggested lesson/test cards put destination metadata above the question. Shared grid rows give text all available width. At 800px and narrower actions move below the answer; above the breakpoint they are centered vertically beside the body. Spacing uses existing design tokens and separators remain only between cards.
+- Pending AI cancellation uses the same filled 14px square and shared stop-button styling across JobControls, answer generation, source-update suggestions/batches and card improvement. RunningJobs already uses that square. Accessible names/tooltips and cancellation callbacks are retained. Form/dialog dismissal is unchanged.
+- All 54 browser cases passed across 320, 390, 800, 801, 1100 and 1440px viewports/panes, in both themes. Checks cover restored marks and alignment, suggestion metadata order and action placement on both sides of the breakpoint, overflow and action content fit, and square-only stops/red hover for checking, wrapping, retry, waiting and drawing.
+- Full check passed with 767 tests in 95 suites, formatting, typecheck, source lint, CSS lint, build and release verification. Existing mark-header/recap assertions were extended and text-based Cancel selectors updated; no cases or test files were added.
+- Thirteen existing main-to-latest pairs are refreshed. Completed suggestion captures focus on the changed section; gallery remains 52 pairs.
+- The isolated Obsidian build was refreshed and current working plugin/global Obsidian files were preserved using before/after hashes.
+
+## Prior verification
+
 # Full-width search and topic hover verification
 
 Latest source `36c2aef14ba91a3efb2236a462d22c144f53d73c`. Screenshot baseline remains upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
