@@ -27,7 +27,7 @@ async function render(ratings: Rating[], skipped = 0) {
 }
 
 it('plots actual rating frequencies and percentages with an accessible median', async () => {
-  await render([1, 2, 3, 3, 3, 4]);
+  await render([1, 2, 3, 3, 3, 4], 2);
   expect(host.querySelector('svg')?.getAttribute('aria-label')).toBe(
     '6 rated cards. Again: 1, Hard: 1, Good: 3, Easy: 1. Median: Good.',
   );
@@ -37,7 +37,8 @@ it('plots actual rating frequencies and percentages with an accessible median', 
   expect(host.querySelector('.qard-difficulty-marker')?.getAttribute('d')).toBe('M 320 28 V 148');
   expect(
     [...host.querySelectorAll('.qard-difficulty-ratings small')].map((p) => p.textContent),
-  ).toEqual(['17%', '17%', '50%', '17%']);
+  ).toEqual(['25%', '13%', '13%', '38%', '13%']);
+  expect(host.querySelector('.qard-difficulty-ratings > div > span')?.textContent).toBe('Skipped');
 });
 
 it('places an even median between the two middle ratings, including a split distribution', async () => {
@@ -63,5 +64,5 @@ it('handles a single rating and omits the chart when there are no rated cards', 
   expect(host.querySelector('figure')).toBeNull();
   await render([], 3);
   expect(host.querySelector('svg')).toBeNull();
-  expect(host.querySelector('.qard-difficulty-ratings')?.textContent).toBe('Skipped3');
+  expect(host.querySelector('.qard-difficulty-ratings')?.textContent).toBe('Skipped3 100%');
 });

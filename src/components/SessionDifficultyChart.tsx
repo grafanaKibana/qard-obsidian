@@ -68,6 +68,7 @@ export function SessionDifficultyChart({
     return null;
   }
   const counts = labels.map((_, index) => results.filter((r) => r.rating === index + 1).length);
+  const total = results.length + skipped;
   const sorted = results.map((r) => r.rating).sort((a, b) => a - b);
   const lower = sorted[Math.floor((sorted.length - 1) / 2)] ?? 1;
   const upper = sorted[Math.floor(sorted.length / 2)] ?? 1;
@@ -106,7 +107,7 @@ export function SessionDifficultyChart({
             peak={peak}
             repeatMessage={
               results.length > new Set(results.map((result) => result.cardId)).size
-                ? `${results.length} reviews, including learning repeats`
+                ? `${results.length} reviews, including repeats`
                 : undefined
             }
           />
@@ -164,20 +165,21 @@ export function SessionDifficultyChart({
         </>
       )}
       <div className="qard-summary-ratings qard-difficulty-ratings">
+        <div title="Skipped cards are not counted as reviews">
+          <span>Skipped</span>
+          <strong>
+            {skipped} <small>{Math.round((skipped / total) * 100)}%</small>
+          </strong>
+        </div>
         {results.length > 0 &&
           labels.map((label, index) => (
             <div key={label}>
               <span>{label}</span>
               <strong>
-                {counts[index]}{' '}
-                <small>{Math.round((counts[index]! / results.length) * 100)}%</small>
+                {counts[index]} <small>{Math.round((counts[index]! / total) * 100)}%</small>
               </strong>
             </div>
           ))}
-        <div title="Skipped cards are not counted as reviews">
-          <span>Skipped</span>
-          <strong>{skipped}</strong>
-        </div>
       </div>
     </figure>
   );

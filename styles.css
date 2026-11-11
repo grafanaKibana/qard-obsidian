@@ -2426,9 +2426,14 @@
 }
 
 .qard-difficulty-ratings > div {
+  flex: 1;
   min-width: 0;
   align-items: center;
   padding-inline: var(--qard-gap-actions);
+}
+
+.qard-difficulty-ratings > div + div {
+  border-inline-start: 1px solid var(--qard-border);
 }
 
 .qard-difficulty-ratings strong {
@@ -2450,17 +2455,30 @@
   display: flex;
   justify-content: space-between;
   gap: var(--qard-gap-actions);
+  margin-top: calc(-1 * var(--qard-space-1));
   color: var(--qard-muted);
   font-size: calc(var(--qard-font-meta) * 0.875);
 }
 
 @container qard-workspace (max-width: 640px) {
   .qard-summary .qard-summary-stats {
+    width: 100%;
+    justify-content: space-between;
     gap: var(--qard-gap-fields);
   }
 
+  .qard-summary-stats > div {
+    flex-direction: row;
+    align-items: baseline;
+    gap: var(--qard-space-1);
+  }
+
   .qard-summary-stats strong {
-    font-size: calc(var(--qard-font-body) * 1.2);
+    font-size: var(--qard-font-body);
+  }
+
+  .qard-summary-stats span {
+    font-size: calc(var(--qard-font-meta) * 0.875);
   }
 
   .qard-summary .qard-actions {
