@@ -174,8 +174,16 @@ export function DeckBrowser({
             </p>
           </div>
           <div className="qard-row-stack">{resume}</div>
-          <div className="qard-library-toolbar">
-            <span>{search || repairFilter?.active ? 'Matching decks' : 'All decks'}</span>
+          <div className="qard-library-filters">
+            {repairFilter && (repairFilter.count > 0 || repairFilter.active) && (
+              <button
+                className="qard-repair-filter"
+                aria-pressed={repairFilter.active}
+                onClick={repairFilter.toggle}
+              >
+                Needs fixing · {repairFilter.count}
+              </button>
+            )}
             <label className="qard-search qard-library-search">
               <Search size={17} />
               <input
@@ -187,15 +195,6 @@ export function DeckBrowser({
               />
             </label>
           </div>
-          {repairFilter && (repairFilter.count > 0 || repairFilter.active) && (
-            <button
-              className="qard-repair-filter"
-              aria-pressed={repairFilter.active}
-              onClick={repairFilter.toggle}
-            >
-              Needs fixing · {repairFilter.count}
-            </button>
-          )}
           {loading && (
             <p className="qard-muted" role="status">
               Loading cards…

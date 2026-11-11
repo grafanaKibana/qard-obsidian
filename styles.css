@@ -1217,13 +1217,13 @@
 .qard-search {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--qard-gap-actions);
+  min-width: 0;
   color: var(--qard-muted);
   border: 1px solid var(--qard-border);
   border-radius: var(--qard-control-radius);
-  background: var(--qard-soft);
-  margin-bottom: 18px;
-  padding: 0 12px;
+  background: var(--qard-bg);
+  padding: 0 var(--qard-space-3);
 }
 
 .qard-app .qard-search input[type='search'] {
@@ -1232,7 +1232,6 @@
   background: transparent;
   padding: 6px 0;
   border-radius: 0;
-  outline-offset: 4px;
 }
 
 .qard-deck-list {
@@ -7991,10 +7990,6 @@ div.qard-ask-q {
   padding: var(--qard-space-6) var(--qard-workspace-gutter) var(--qard-space-12);
 }
 
-.qard-app .qard-repair-filter {
-  margin-block: 8px;
-}
-
 .qard-app .qard-improve-card {
   margin-top: 16px;
   text-align: start;
@@ -8187,6 +8182,7 @@ div.qard-ask-q {
 .qard-library-toolbar {
   padding-inline: calc(var(--qard-space-4) + 1px);
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   gap: 16px;
@@ -8195,20 +8191,18 @@ div.qard-ask-q {
   font-size: var(--qard-font-meta);
 }
 
-.qard-app .qard-library-search {
-  min-width: 0;
-  gap: 8px;
-  padding: 0;
-  margin: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
+.qard-library-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--qard-gap-actions);
+  margin-bottom: var(--qard-gap-actions);
 }
 
-.qard-app .qard-library-search input[type='search'] {
-  width: 158px;
-  min-width: 0;
-  font-size: var(--qard-font-control);
+.qard-library-search {
+  flex: 1 1 200px;
+  max-width: 320px;
+  margin-inline-start: auto;
 }
 
 .qard-app .qard-library-search input[type='search']:focus {
@@ -8463,9 +8457,8 @@ div.qard-ask-q {
     padding-inline: var(--qard-space-2);
   }
 
-  .qard-app .qard-library-search input[type='search'] {
-    width: 140px;
-    font-size: var(--qard-font-control);
+  .qard-library-search {
+    max-width: none;
   }
 
   .qard-deck-detail .qard-topic-heading > button:first-of-type {
