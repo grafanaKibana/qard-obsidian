@@ -1,10 +1,10 @@
 {
   "before": "70056821914f0dae910b52a20f1fa3329b04d0ac",
-  "after": "52ce8c5c7b39957377403405aa0c1aded1ff7507",
+  "after": "9b11b132d5b3d93ea3bde05bece418f96e0d2c20",
   "comparisons": 50,
   "deviceScaleFactor": 2,
   "clock": "2026-11-09T12:00Z for browser fixtures; native identical live renderer/settings",
-  "capture": "Upstream main to latest PR #17. Three refreshed pairs show the wider prose in the lesson, lesson summary, and Learn library. The other 47 comparisons retain prior captures.",
+  "capture": "Upstream main to latest PR #17. The two completed-session comparisons are freshly captured in mobile light and desktop dark. The other 48 comparisons retain their prior captures.",
   "maximumExamplesPerGroup": 3,
   "scenes": [
     {
@@ -411,8 +411,8 @@
     "after-probe-phone.png": "cfa16494148e99c4e0ed919136604c4d7a34c12ef53f8223396430fb2b19d9e4",
     "after-reading-phone.png": "bbe484e130e2ad8edc13d9c9e9b434865128966aa41c3bd307e3d93f3e4b67b0",
     "after-repair-phone.png": "130c7c2ecc150ab31cd196a76088ed05008b6e36fdae85419b7e5c96f1f4a395",
-    "after-session-summary-desktop.png": "5caf5a7fd83876deb33de4a3c6b26031d87df53c008293d30bd8f505159a2167",
-    "after-session-summary-phone.png": "6024a836cf345be0229cb9ffca86e3696238404e520fcf12d1cff0b1fdba570c",
+    "after-session-summary-desktop.png": "20b53873365ab7e3a9187e55b9d387950da79df891553be5ee509e75fc1ccb3d",
+    "after-session-summary-phone.png": "819442d0eebd5ead9c17bde9bfa38c4518c10d3b5a89753aec11fb3cf4f9d5ea",
     "after-statistics-phone.png": "da7cb51b2500cfbed4836e78be3ec80c5714f3254a02e08b4bac24f51f1c40de",
     "after-study-desktop.png": "8041922d0ea1f5bedd9f9b3ba73923c4b604e88a589ffbfb7137397f3e5c549a",
     "after-tasks.png": "d065b705ed591abecff065200e2afd7696963cb2929f55593bf724adb3b3a2ad",

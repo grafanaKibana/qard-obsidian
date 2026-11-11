@@ -1,3 +1,18 @@
+# Session summary verification
+
+Latest source `9b11b132d5b3d93ea3bde05bece418f96e0d2c20`. Baseline is upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
+
+- The curve and filled region now span the full 480-unit plot width. The median uses the same updated coordinates.
+- Both arrowheads attach to the horizontal plot axis. Direction labels follow the plot and have a separator below them.
+- Rating cells distribute with space-between, equal horizontal insets and centered content. Percentages align vertically with counts, and the rating row ends with a separator.
+- Summary metrics stay on one line and use a smaller font at compact widths.
+- All 32 browser layout cases passed across 320, 390, 640, 641, 768, 1100 and 1440px widths, plus a narrow pane in a wide window. Both themes were checked with regular and larger metric text. Checks cover curve/fill bounds, axis markers, row order, separators, cell alignment, nowrap statistics and page overflow.
+- Full npm run check passed with 767 tests in 95 suites. The existing median-coordinate tests were adjusted. Formatting, TypeScript, lint, CSS lint, build and release checks passed. No test cases were added.
+- Two refreshed main-to-latest screenshots replace the existing mobile and desktop summary examples. The gallery remains 50 pairs.
+- The isolated test plugin installation and protected-file hashes are verified before completion.
+
+## Prior verification at `52ce8c5`
+
 # Content width verification
 
 Latest source `52ce8c5c7b39957377403405aa0c1aded1ff7507`. Screenshot baseline is upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
