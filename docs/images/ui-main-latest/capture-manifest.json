@@ -1,7 +1,7 @@
 {
   "before": "70056821914f0dae910b52a20f1fa3329b04d0ac",
   "after": "f303c63d9e66a45a072d133d84a8c0de35c31457",
-  "comparisons": 50,
+  "comparisons": 52,
   "deviceScaleFactor": 2,
   "clock": "2026-11-09T12:00Z for browser fixtures; native identical live renderer/settings",
   "capture": "Upstream main to latest PR #17. Six existing deck-library comparisons are refreshed, and two deck-detail topic-search comparisons are added. Other comparisons retain their prior captures.",
@@ -372,6 +372,22 @@
       "width": 1440,
       "theme": "dark",
       "crop": ".qard-summary"
+    },
+    {
+      "name": "topics-phone",
+      "screen": "app",
+      "width": 390,
+      "touch": true,
+      "deck": true,
+      "crop": ".qard-deck-detail"
+    },
+    {
+      "name": "topics-desktop",
+      "screen": "app",
+      "width": 1100,
+      "theme": "dark",
+      "deck": true,
+      "crop": ".qard-deck-detail"
     }
   ],
   "hashes": {
