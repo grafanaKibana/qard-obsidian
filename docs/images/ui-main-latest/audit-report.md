@@ -1,3 +1,17 @@
+# Full-width search and topic hover verification
+
+Latest source `36c2aef14ba91a3efb2236a462d22c144f53d73c`. Screenshot baseline remains upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
+
+- Removed the library search maximum width and its redundant compact override. Search uses all remaining width beside filters and topic controls, and fills wrapped rows.
+- Removed inline padding from the topic library toolbar so text and search align with the content edges.
+- Topic-heading hover uses the same shared soft surface as deck rows across the entire row. The main disclosure button stays transparent over it; individual icon controls retain the stronger shared control-hover surface.
+- All 32 browser cases passed across 320–1440px panes in both themes, including a narrow desktop pane. They verify available-width fill with and without a repair filter, zero toolbar side padding, full row hover, individual action hover, filtering, typography, control styling and overflow.
+- CSS formatting, CSS lint, production build and release verification passed. No runtime code or test cases changed; the preceding full suite passed 767 tests.
+- Eight existing main-to-latest pairs were refreshed without adding examples. Gallery remains 52 pairs.
+- The isolated Obsidian build was refreshed; current working plugin files and global Obsidian files were preserved using before/after hashes.
+
+## Prior verification
+
 # Deck and topic search verification
 
 Latest source `f303c63d9e66a45a072d133d84a8c0de35c31457`. Screenshot baseline remains upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
