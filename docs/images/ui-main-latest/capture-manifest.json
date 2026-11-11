@@ -1,6 +1,6 @@
 {
   "before": "70056821914f0dae910b52a20f1fa3329b04d0ac",
-  "after": "cbd05c7adb0e8df23dd3c112c97b7a9ad395f0ba",
+  "after": "617d68c06d15b69abf2b01cda5512950aa698b66",
   "comparisons": 50,
   "deviceScaleFactor": 2,
   "clock": "2026-11-09T12:00Z for browser fixtures; native identical live renderer/settings",
@@ -411,7 +411,7 @@
     "after-probe-phone.png": "cfa16494148e99c4e0ed919136604c4d7a34c12ef53f8223396430fb2b19d9e4",
     "after-reading-phone.png": "bbe484e130e2ad8edc13d9c9e9b434865128966aa41c3bd307e3d93f3e4b67b0",
     "after-repair-phone.png": "130c7c2ecc150ab31cd196a76088ed05008b6e36fdae85419b7e5c96f1f4a395",
-    "after-session-summary-desktop.png": "5e220d5f88fccf158771b5af05d1663adcb99f5da6d01404a68041d64d522c16",
+    "after-session-summary-desktop.png": "62d09bcdfca70b1140a1530b380e823d67d39231d0b2308e3c761e3d0ab290cb",
     "after-session-summary-phone.png": "e25246a76d5d890f46d2a59e542fdf0cc1673cfb1dc3ab853d5a1d8ddc53a1b0",
     "after-statistics-phone.png": "da7cb51b2500cfbed4836e78be3ec80c5714f3254a02e08b4bac24f51f1c40de",
     "after-study-desktop.png": "8041922d0ea1f5bedd9f9b3ba73923c4b604e88a589ffbfb7137397f3e5c549a",

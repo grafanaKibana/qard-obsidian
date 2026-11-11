@@ -1,3 +1,15 @@
+# Summary action alignment verification
+
+Latest source `617d68c06d15b69abf2b01cda5512950aa698b66`. Screenshot baseline remains upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
+
+- Full-width single-row actions place the review controls at the start and Done at the end, using the existing action gap.
+- Compact panes retain the existing full-width two-row action grid.
+- All 24 browser cases passed across 320–1440px panes in both themes, including the narrow pane in a wide window, skipped-only and Cram states.
+- CSS formatting, CSS lint, production build and release verification passed. Runtime code and the 767-test suite from the preceding revision are unchanged.
+- Both existing session-summary pairs were refreshed. The gallery retains 50 pairs. The isolated Obsidian build was refreshed and protected build hashes still match.
+
+## Prior verification
+
 # Session summary refinement verification
 
 Latest source `cbd05c7adb0e8df23dd3c112c97b7a9ad395f0ba`. Screenshot baseline is upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
