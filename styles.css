@@ -2431,20 +2431,23 @@
   vector-effect: non-scaling-stroke;
 }
 
+.qard-difficulty-point.is-skipped {
+  stroke: var(--qard-muted);
+}
+
 .qard-difficulty-median-point {
   fill: var(--qard-muted);
 }
 
 .qard-difficulty .qard-difficulty-ratings {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0;
   margin-top: var(--qard-gap-sections);
   text-align: center;
 }
 
 .qard-difficulty-ratings > div {
-  flex: 1;
   min-width: 0;
   align-items: center;
   padding-inline: var(--qard-gap-actions);
@@ -2474,6 +2477,7 @@
   justify-content: space-between;
   gap: var(--qard-gap-actions);
   margin-top: calc(-1 * var(--qard-space-1));
+  padding-inline-start: 20%;
   color: var(--qard-muted);
   font-size: calc(var(--qard-font-meta) * 0.875);
 }
@@ -4194,7 +4198,7 @@ body.qard-focus-active .status-bar {
   background: color-mix(in srgb, var(--qard-row-accent) 10%, var(--qard-bg));
 }
 
-.qard-app .qard-learn-rows .qard-summary-row {
+.qard-app .qard-learn-rows .qard-summary-row:not(.qard-row-course) {
   padding-inline: 0;
 }
 

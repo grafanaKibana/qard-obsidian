@@ -352,8 +352,11 @@ it('skip reports no review, leaves the schedule unchanged and offers skipped car
   await key('s');
   expect(host.textContent).toContain('Session complete');
   expect(host.textContent).toContain('0 / 1');
-  expect(host.querySelector('.qard-difficulty-ratings')?.textContent).toBe('Skipped1 100%');
-  expect(host.querySelector('.qard-difficulty-plot')).toBeNull();
+  expect(host.querySelector('.qard-difficulty-ratings > div')?.textContent).toBe('Skipped1 100%');
+  expect(host.querySelector('.qard-difficulty-plot')?.getAttribute('aria-label')).toContain(
+    'Skipped: 1',
+  );
+  expect(host.querySelector('.qard-difficulty-marker')).toBeNull();
   expect(services.reviews.getSnapshot()).toBe(before);
   await act(async () =>
     [...host.querySelectorAll('button')].find((b) => b.textContent === 'Review skipped')!.click(),
