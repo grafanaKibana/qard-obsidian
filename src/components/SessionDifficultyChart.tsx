@@ -1,11 +1,10 @@
 import { useId } from 'react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
 import type { SessionResult } from '../review/session';
 
 const labels = ['Again', 'Hard', 'Good', 'Easy'] as const;
 const baseline = 148;
 const top = 28;
-const xFor = (index: number) => 60 + index * 120;
+const xFor = (index: number) => index * 160;
 
 /** A smoothed frequency curve over the four ordered recall ratings. */
 export function SessionDifficultyChart({ results }: { results: SessionResult[] }) {
@@ -56,10 +55,27 @@ export function SessionDifficultyChart({ results }: { results: SessionResult[] }
             <stop offset="0%" stopColor="currentColor" stopOpacity="0.16" />
             <stop offset="100%" stopColor="currentColor" stopOpacity="0.02" />
           </linearGradient>
+          <marker
+            id={`${id}-arrow`}
+            markerWidth="6"
+            markerHeight="12"
+            viewBox="0 -1 6 12"
+            refX="5"
+            refY="5"
+            orient="auto-start-reverse"
+            markerUnits="strokeWidth"
+          >
+            <path className="qard-difficulty-axis-tip" d="M 0 0 L 5 5 L 0 10" />
+          </marker>
         </defs>
         <path className="qard-difficulty-grid" d={`M 0 ${top} H 480`} />
-        <path d={`${line} L 420 ${baseline} L 60 ${baseline} Z`} fill={`url(#${id}-fill)`} />
-        <path className="qard-difficulty-axis" d={`M 0 ${baseline} H 480`} />
+        <path d={`${line} L 480 ${baseline} L 0 ${baseline} Z`} fill={`url(#${id}-fill)`} />
+        <path
+          className="qard-difficulty-axis"
+          d={`M 0 ${baseline} H 480`}
+          markerStart={`url(#${id}-arrow)`}
+          markerEnd={`url(#${id}-arrow)`}
+        />
         <path className="qard-difficulty-marker" d={`M ${medianX} ${top} V ${baseline}`}>
           <title>Median: {median}</title>
         </path>
@@ -75,6 +91,10 @@ export function SessionDifficultyChart({ results }: { results: SessionResult[] }
         ))}
         <circle className="qard-difficulty-median-point" cx={medianX} cy={baseline} r="3" />
       </svg>
+      <div className="qard-difficulty-direction" aria-hidden="true">
+        <span>More difficult</span>
+        <span>Easier</span>
+      </div>
       <div className="qard-summary-ratings qard-difficulty-ratings">
         {labels.map((label, index) => (
           <div key={label}>
@@ -84,16 +104,6 @@ export function SessionDifficultyChart({ results }: { results: SessionResult[] }
             </strong>
           </div>
         ))}
-      </div>
-      <div className="qard-difficulty-direction" aria-hidden="true">
-        <span>
-          <ArrowLeft size={14} />
-          More difficult
-        </span>
-        <span>
-          Easier
-          <ArrowRight size={14} />
-        </span>
       </div>
     </figure>
   );

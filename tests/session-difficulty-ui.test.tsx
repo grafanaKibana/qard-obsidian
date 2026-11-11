@@ -33,7 +33,7 @@ it('plots actual rating frequencies and percentages with an accessible median', 
   expect(
     [...host.querySelectorAll('.qard-difficulty-point')].map((p) => Number(p.getAttribute('cy'))),
   ).toEqual([108, 108, 28, 108]);
-  expect(host.querySelector('.qard-difficulty-marker')?.getAttribute('d')).toBe('M 300 28 V 148');
+  expect(host.querySelector('.qard-difficulty-marker')?.getAttribute('d')).toBe('M 320 28 V 148');
   expect(
     [...host.querySelectorAll('.qard-difficulty-ratings small')].map((p) => p.textContent),
   ).toEqual(['17%', '17%', '50%', '17%']);
@@ -54,7 +54,7 @@ it('handles a single rating and omits the chart when there are no rated cards', 
   await render([4]);
   expect(host.querySelector('svg')?.getAttribute('aria-label')).toContain('1 rated card.');
   expect(host.querySelector('.qard-difficulty-scale')?.textContent).toBe('1 card');
-  expect(host.querySelector('.qard-difficulty-marker')?.getAttribute('d')).toBe('M 420 28 V 148');
+  expect(host.querySelector('.qard-difficulty-marker')?.getAttribute('d')).toBe('M 480 28 V 148');
   expect(host.querySelector('.qard-difficulty-line')?.getAttribute('d')).not.toMatch(
     /NaN|Infinity/,
   );
