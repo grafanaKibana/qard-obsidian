@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { X } from 'lucide-react';
+import { Square } from 'lucide-react';
 import type { QardServices } from '../../views/services';
 import { overdue, roleOf } from '../../jobs/job-clock';
 import { useTick } from './RunningJobs';
@@ -57,12 +57,12 @@ export function JobControls({
       )}
       <button
         type="button"
-        className={compact ? 'qard-icon-button' : stuck ? 'qard-primary' : 'qard-text-button'}
-        aria-label={compact ? 'Cancel' : undefined}
-        title={compact ? 'Cancel' : undefined}
+        className="qard-icon-button qard-jobs-cancel"
+        aria-label="Cancel"
+        title="Cancel"
         onClick={cancel}
       >
-        {compact ? <X size={16} aria-hidden="true" /> : 'Cancel'}
+        <Square size={14} fill="currentColor" strokeWidth={0} aria-hidden="true" />
       </button>
     </div>
   );

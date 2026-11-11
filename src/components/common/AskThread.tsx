@@ -1,6 +1,6 @@
 import type { SourceSnapshot } from '../../cards/source-sync-types';
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
-import { ChevronRight, Copy, Check as CheckIcon } from 'lucide-react';
+import { ChevronRight, Copy, Check as CheckIcon, Square } from 'lucide-react';
 import type { QardServices } from '../../views/services';
 import type { AgentRole } from '../../agents/runner';
 import { Markdown } from '../Markdown';
@@ -220,8 +220,13 @@ export function AskThread({
                       <AgentLabel services={services} role={role} />
                     </Waiting>
                     {cancel && (
-                      <button className="qard-text-button" onClick={cancel}>
-                        Cancel
+                      <button
+                        className="qard-icon-button qard-jobs-cancel"
+                        aria-label="Cancel answer"
+                        title="Cancel answer"
+                        onClick={cancel}
+                      >
+                        <Square size={14} fill="currentColor" strokeWidth={0} aria-hidden="true" />
                       </button>
                     )}
                   </div>

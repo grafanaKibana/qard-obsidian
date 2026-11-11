@@ -23,7 +23,8 @@ it('offers Cancel, warns when a job is stuck, and restarts one that was lost', a
     });
   await show({ kind: 'probe', startedAt: Date.now() - 10_000 });
   expect(host.querySelector('.is-stuck')).toBeNull();
-  expect(host.textContent).toBe('Cancel');
+  expect(host.querySelector('button')?.getAttribute('aria-label')).toBe('Cancel');
+  expect(host.querySelector('button .lucide-square')).not.toBeNull();
   await show({ kind: 'probe', startedAt: Date.now() - 4.5 * 60_000 });
   expect(host.textContent).toContain('This has taken 4 min, much longer than usual');
   await act(async () => {

@@ -290,7 +290,6 @@ function LessonProbe({
           locked={false}
           path={lesson.notes[0] ?? path}
           label={`Question ${i + 1}`}
-          showMarks={false}
           onChange={(patch) => services.learn.answerProbe(path, q.id, patch)}
         />
       ))}
@@ -823,13 +822,13 @@ function LessonClose({
                 className={'qard-suggestion' + (state === 'skipped' ? ' is-skipped' : '')}
               >
                 <div className="qard-suggestion-body">
+                  <small className="qard-muted">
+                    {target.deck} › {target.topic}
+                  </small>
                   <strong>
                     <Markdown text={c.front} path={where} services={services} />
                   </strong>
                   <Markdown text={c.back} path={where} services={services} />
-                  <small className="qard-muted">
-                    {target.deck} › {target.topic}
-                  </small>
                 </div>
                 <div className="qard-suggestion-actions">
                   {!state ? (

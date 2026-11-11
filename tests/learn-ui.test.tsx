@@ -191,6 +191,9 @@ it('a check: answer, "I don\'t know" disables the input, submit marks and moves 
   await tick();
   await tick();
   const submit = () => buttons('Submit')[0]!;
+  expect(
+    [...host.querySelectorAll('.qard-q-meta > span:last-child')].map((el) => el.textContent),
+  ).toEqual(['1 mark', '2 marks']);
   expect(submit().disabled).toBe(true);
   await click(buttons('K+KV').find((b) => b.getAttribute('role') === 'radio'));
   await click(buttons("I don't know")[1]);
@@ -332,6 +335,7 @@ it('recap cards use the selected source note fixed topic without changing the sh
   expect(host.querySelector('.qard-suggestion small')?.textContent).toBe(
     'Programming › NET/Generics',
   );
+  expect(host.querySelector('.qard-suggestion-body')?.firstElementChild?.tagName).toBe('SMALL');
   await click(buttons('Add')[0]);
   expect(create).toHaveBeenCalledWith(
     expect.objectContaining({

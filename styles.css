@@ -3620,10 +3620,11 @@ body.qard-focus-active .status-bar {
 }
 
 .qard-suggestion {
-  display: flex;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 18px 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--qard-gap-fields) var(--qard-gap-sections);
+  padding: var(--qard-inset-compact) 0;
 }
 
 .qard-suggestion + .qard-suggestion {
@@ -3637,8 +3638,12 @@ body.qard-focus-active .status-bar {
 .qard-suggestion-body {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--qard-gap-actions);
   min-width: 0;
+}
+
+.qard-suggestion-body > small {
+  font-size: var(--qard-font-meta);
 }
 
 .qard-suggestion-body .qard-markdown {
@@ -3654,9 +3659,19 @@ body.qard-focus-active .status-bar {
 
 .qard-suggestion-actions {
   display: flex;
-  align-items: flex-start;
-  gap: 6px;
+  align-items: center;
+  gap: var(--qard-gap-actions);
   flex-shrink: 0;
+}
+
+@container qard-workspace (max-width: 800px) {
+  .qard-suggestion {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .qard-suggestion-actions {
+    justify-self: end;
+  }
 }
 
 .qard-profile-line {
