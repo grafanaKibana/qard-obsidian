@@ -1,3 +1,18 @@
+# Session summary refinement verification
+
+Latest source `4ea1e1e5b4d6d704c7f3521abac34359c2b0b3d7`. Screenshot baseline is upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
+
+- Axis and arrowhead strokes use the same border color and non-scaling 1px width as element separators. Direction labels use the plot metadata size and say Harder and Easier.
+- Skipped is now in the ratings row. It has no rating percentage because skipped cards are excluded from rated-review frequencies. The row has a larger gap from the plot and no surrounding separators.
+- Review totals including repeats sit beside the peak count above the plot. The row measures its actual available width and switches to an info icon with the full message when the text cannot fit, then restores the text when space returns.
+- On compact panes, review buttons fill the first row and Done fills the second row. Action heights stretch consistently. Skipped-only and Cram sessions retain a valid count without a false rating plot.
+- All 24 browser cases passed across 320, 390, 640, 641, 768, 1100 and 1440px widths, plus a narrow pane in a wide window, in both themes. They verify stroke parity, typography, spacing, skipped data, mobile action rows, page overflow and text-to-icon resize recovery. Skipped-only and Cram states are included.
+- Full npm run check passed with 767 tests in 95 suites. Existing skipped-session assertions were updated. The final CSS alignment correction passed formatting, CSS lint and the complete browser confirmation. No new test cases were added.
+- The existing two summary comparisons were refreshed. Gallery total remains 50 pairs.
+- The isolated test plugin and protected-file hashes are checked before completion.
+
+## Prior verification at `9b11b13`
+
 # Session summary verification
 
 Latest source `9b11b132d5b3d93ea3bde05bece418f96e0d2c20`. Baseline is upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.

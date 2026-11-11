@@ -1,13 +1,13 @@
 {
-  "source_head": "9b11b132d5b3d93ea3bde05bece418f96e0d2c20",
+  "source_head": "4ea1e1e5b4d6d704c7f3521abac34359c2b0b3d7",
   "upstream_pr": "https://github.com/kylianmarceau/qard-obsidian/pull/17",
   "code_review": {
-    "commit_sha": "9b11b132d5b3d93ea3bde05bece418f96e0d2c20",
+    "commit_sha": "4ea1e1e5b4d6d704c7f3521abac34359c2b0b3d7",
     "has_any_findings": true,
     "has_unresolved_findings": true,
     "status": "failed"
   },
-  "summary_updated_at": "2026-11-11T18:36:06Z",
+  "summary_updated_at": "2026-11-11T18:53:13Z",
   "review_note": "The hosted review service reported its usage limit. GitHub lists no unresolved review threads.",
   "threads": [
     {
