@@ -2,7 +2,7 @@ import { plural } from '../common/labels';
 import { UpdateCourse } from './UpdateCourse';
 import { teach } from './lesson-navigation';
 import { useEffect, useId, useState } from 'react';
-import { ChevronRight, FileText, List, Network } from 'lucide-react';
+import { ChevronRight, FileText, Info, List, Network } from 'lucide-react';
 import type { QardServices } from '../../views/services';
 import type { Mastery, Objective } from '../../learn/mastery';
 import { CourseMap } from './CourseMap';
@@ -11,7 +11,7 @@ import { InlineMarkdown } from '../Markdown';
 import { NEEDS_LESSON, isoDay } from '../../learn/mastery';
 import type { LessonSummary } from '../../learn/learn-types';
 import { Waiting } from '../common/FeedbackStatus';
-import { STATE_LABEL, StateChip, relativeDay } from './learning-status';
+import { StateChip, relativeDay } from './learning-status';
 import { useLearn } from './useLearn';
 import { type LearnNav } from '../../views/navigation';
 import { StudyTimeLine } from '../usage/StudyTimeView';
@@ -136,7 +136,6 @@ export function CourseView({
       return next;
     });
   const objectives = course.objectives.filter((o) => !filter.size || filter.has(o.state));
-  const presentStates = [...new Set(objectives.map((o) => o.state))];
   const selector = (
     <div className="qard-segmented qard-course-view" role="tablist" aria-label="Course view">
       {(['map', 'list'] as const).map((mode, index) => (
@@ -254,25 +253,22 @@ export function CourseView({
             {objectives.map((o) => (
               <div key={o.id} className="qard-objective">
                 <div className="qard-objective-meta">
-                  <small className="qard-muted qard-objective-evidence">
-                    {o.evidence.at(-1) ?? 'No evidence yet'}
-                  </small>
-                  {o.due && !['new', 'planned'].includes(o.state) && (
-                    <span className="qard-muted qard-objective-due">
-                      {relativeDay(o.due, day).replace(/^./, (first) => first.toUpperCase())}
+                  <StateChip state={o.state} />
+                  <span className="qard-muted qard-objective-due">
+                    {o.due &&
+                      !['new', 'planned'].includes(o.state) &&
+                      relativeDay(o.due, day).replace(/^./, (first) => first.toUpperCase())}
+                    <span
+                      className="qard-section-info qard-objective-evidence"
+                      title={o.evidence.at(-1) ?? 'No evidence yet'}
+                      aria-label={o.evidence.at(-1) ?? 'No evidence yet'}
+                    >
+                      <Info size={14} aria-hidden="true" />
                     </span>
-                  )}
+                  </span>
                 </div>
                 <div className="qard-objective-main">
                   <strong className="qard-objective-title">
-                    <span className="qard-objective-status">
-                      <span className="qard-objective-status-size" aria-hidden="true">
-                        {presentStates.map((state) => (
-                          <span key={state}>{STATE_LABEL[state]}</span>
-                        ))}
-                      </span>
-                      <StateChip state={o.state} />
-                    </span>
                     <span className="qard-objective-title-text">
                       <InlineMarkdown text={o.title} path={path} services={services} />
                     </span>

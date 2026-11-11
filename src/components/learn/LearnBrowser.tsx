@@ -93,7 +93,7 @@ export function LearnBrowser({
           Loading courses…
         </p>
       )}
-      <div className="qard-row-stack">
+      <div className="qard-row-stack qard-learn-rows">
         {pending?.mapping.map((f) => (
           <div key={f} className="qard-resume is-static">
             <Waiting text={`Mapping ${f.split('/').pop()}…`}>
@@ -170,7 +170,7 @@ export function LearnBrowser({
             const mastered = c.objectives.filter((o) => o.state === 'mastered').length,
               due = c.objectives.filter((o) => o.state !== 'new' && o.due && o.due <= day).length;
             return (
-              <div key={c.path} className="qard-deletable-row qard-summary-row">
+              <div key={c.path} className="qard-deletable-row qard-summary-row qard-row-course">
                 <button className="qard-deck qard-test-row" onClick={() => nav.course(c.path)}>
                   <span className="qard-deck-name">
                     <strong>{c.course}</strong>
