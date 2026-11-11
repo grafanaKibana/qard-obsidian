@@ -1,3 +1,16 @@
+# Deck and topic search verification
+
+Latest source `f303c63d9e66a45a072d133d84a8c0de35c31457`. Screenshot baseline remains upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
+
+- Deck search and Needs fixing share one wrapping filter row. The redundant deck toolbar, All/Matching decks label, underline and filter margins are removed. Search stays at the trailing edge and fills its wrapped row in compact panes.
+- Deck and topic search use the existing shared qard-search border, control radius, input typography, control height and 12px horizontal inset. Library-specific borderless, fixed-input-width and radius overrides are removed. Topic controls wrap naturally with the same field treatment.
+- All 32 browser cases passed across 320, 390, 600, 601, 768, 1100 and 1440px panes, plus a narrow desktop pane, in both themes. Checks cover padding, border/radius/type parity, input focus styling, wrapping and overflow, deck/topic text filtering, repair filtering combined with text, and clearing/restoring results.
+- Full check passed: 767 tests in 95 suites, formatting, typecheck, source lint, CSS lint, production build and release verification. No test cases were added. The final unused filter-margin deletion also passed formatting and CSS lint.
+- Six existing comparison pairs are refreshed and two relevant topic-search pairs added, for 52 pairs total. Captions remain outside images and all tables retain at most three examples.
+- The isolated Obsidian build was refreshed. Current working plugin and Obsidian files were hashed before and after the isolated installation and preserved.
+
+## Prior verification
+
 # Summary action alignment verification
 
 Latest source `617d68c06d15b69abf2b01cda5512950aa698b66`. Screenshot baseline remains upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
