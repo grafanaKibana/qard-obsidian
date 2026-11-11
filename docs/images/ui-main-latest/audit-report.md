@@ -1,3 +1,18 @@
+# Learning rows and objective metadata verification
+
+Latest source `f6372bb5c11e89455a18394b9c84fd47c19ce284`. Screenshot baseline remains upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
+
+- Wrapped suggestion actions use two equal grid tracks across the full row at 800px and below; single-action states span both tracks. Desktop actions retain their centered placement beside the question/answer body.
+- Today flat rows and Learn summary rows remove horizontal padding so content aligns with headings. Nested topic structure and activity rows outside Learn retain their established layout.
+- Learn course rows return to transparent resting surfaces and neutral borders/colors. Their neutral hover remains visible; lesson/update category colors remain intact.
+- Objective metadata starts with the status pill; date and a neutral info icon sit at the trailing edge. The icon title/label preserves the exact latest evidence message or No evidence yet. Full-width titles no longer contain a pill or hidden status-sizing scaffold. Due-date and filtering semantics are unchanged.
+- All 56 browser cases passed across 320, 390, 640, 800, 801 and 1100px panes, plus a narrow pane in a 1440px window, in both themes. They check equal/full-width suggestion actions, desktop vertical centering, row/heading alignment, neutral course surfaces, evidence tooltips and title width, and overflow.
+- Full check passed with 767 tests in 95 suites, formatting, typecheck, source lint, CSS lint, production build and release verification. The final CSS corrections passed formatting, CSS lint, build/release checks and complete browser confirmation. No test cases were added.
+- Eight existing main-to-latest comparison pairs are refreshed; gallery remains 52 pairs.
+- The isolated Obsidian build was refreshed and current working plugin/global Obsidian files were preserved using before/after hashes.
+
+## Prior verification
+
 # Lesson questions, suggestions and pending operations verification
 
 Latest source `bb86bda99c6ba6562fa9de10451180437ef1098f`. Screenshot baseline remains upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
