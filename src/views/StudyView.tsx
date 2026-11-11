@@ -677,26 +677,17 @@ export function StudyView({
             </div>
           </div>
         </header>
-        {!cram && <SessionDifficultyChart results={results} />}
+        <SessionDifficultyChart results={cram ? [] : results} skipped={skipped.length} />
         {!!repairCount && (
           <p className="qard-muted">
             {repairCount} {repairCount === 1 ? 'card needs' : 'cards need'} attention. Find them
             with the Needs fixing filter in your library.
           </p>
         )}
-        {!cram && results.length > new Set(results.map((r) => r.cardId)).size && (
-          <p className="qard-muted">{results.length} reviews, including learning repeats</p>
-        )}
         {!!deferred.length && (
           <p className="qard-muted">
             {deferred.length} related {deferred.length === 1 ? 'card deferred' : 'cards deferred'}{' '}
             until tomorrow · available in cram
-          </p>
-        )}
-        {!!skipped.length && (
-          <p className="qard-muted">
-            {skipped.length} {skipped.length === 1 ? 'card skipped' : 'cards skipped'} · not counted
-            as reviews
           </p>
         )}
         <div className="qard-actions">

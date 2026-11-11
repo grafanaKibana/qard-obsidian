@@ -15,11 +15,12 @@ afterEach(async () => {
   await act(async () => root.unmount());
   host.remove();
 });
-async function render(ratings: Rating[]) {
+async function render(ratings: Rating[], skipped = 0) {
   await act(async () =>
     root.render(
       <SessionDifficultyChart
         results={ratings.map((rating, i) => ({ cardId: String(i), rating }))}
+        skipped={skipped}
       />,
     ),
   );
@@ -60,4 +61,7 @@ it('handles a single rating and omits the chart when there are no rated cards', 
   );
   await render([]);
   expect(host.querySelector('figure')).toBeNull();
+  await render([], 3);
+  expect(host.querySelector('svg')).toBeNull();
+  expect(host.querySelector('.qard-difficulty-ratings')?.textContent).toBe('Skipped3');
 });

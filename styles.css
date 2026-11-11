@@ -2343,21 +2343,50 @@
   stroke-dasharray: 3 5;
 }
 
-.qard-difficulty-axis,
 .qard-difficulty-axis-tip {
-  stroke: var(--qard-muted);
-}
-
-.qard-difficulty-axis-tip {
+  stroke: var(--qard-border);
+  vector-effect: non-scaling-stroke;
   fill: none;
   stroke-width: 1px;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-.qard-difficulty-scale {
+.qard-difficulty-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--qard-gap-actions);
+  min-width: 0;
   color: var(--qard-muted);
-  font-size: var(--qard-font-meta);
+  font-size: calc(var(--qard-font-meta) * 0.875);
+}
+
+.qard-difficulty-scale {
+  flex-shrink: 0;
+}
+
+.qard-difficulty-reviews {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  margin-left: auto;
+}
+
+.qard-difficulty-review-text {
+  display: block;
+  white-space: nowrap;
+}
+
+.qard-difficulty-reviews.is-compact {
+  overflow: hidden;
+  cursor: help;
+}
+
+.qard-difficulty-reviews.is-compact .qard-difficulty-review-text {
+  position: absolute;
+  right: 0;
+  visibility: hidden;
 }
 
 .qard-difficulty-marker {
@@ -2392,8 +2421,7 @@
   display: flex;
   justify-content: space-between;
   gap: 0;
-  padding-bottom: var(--qard-gap-actions);
-  border-bottom: 1px solid var(--qard-border);
+  margin-top: var(--qard-gap-sections);
   text-align: center;
 }
 
@@ -2422,10 +2450,8 @@
   display: flex;
   justify-content: space-between;
   gap: var(--qard-gap-actions);
-  padding-bottom: var(--qard-gap-actions);
-  border-bottom: 1px solid var(--qard-border);
   color: var(--qard-muted);
-  font-size: var(--qard-font-meta);
+  font-size: calc(var(--qard-font-meta) * 0.875);
 }
 
 @container qard-workspace (max-width: 640px) {
@@ -2435,6 +2461,33 @@
 
   .qard-summary-stats strong {
     font-size: calc(var(--qard-font-body) * 1.2);
+  }
+
+  .qard-summary .qard-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    width: 100%;
+    gap: var(--qard-gap-actions);
+  }
+
+  .qard-summary .qard-actions > button {
+    justify-content: center;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .qard-summary .qard-actions > button:last-child,
+  .qard-summary .qard-actions > button:first-child:nth-last-child(2) {
+    grid-column: 1 / -1;
+  }
+
+  .qard-difficulty-ratings > div {
+    padding-inline: var(--qard-space-1);
+  }
+
+  .qard-difficulty-ratings strong {
+    font-size: var(--qard-font-body);
   }
 }
 
