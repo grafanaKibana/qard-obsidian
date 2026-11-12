@@ -1,3 +1,18 @@
+# Shared shadows, resume insets and Recent lessons hover
+
+Latest source `f23227d1a4afd88df0694fe262734ace2441377b`. Baseline remains upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
+
+- Four shared elevation roles replace inherited broad shadows and one-off depth values: selected control, card/callout surface, floating tools/menus, and dialogs. Each has light/dark black-shadow values. Map navigation and controls, pickers, jobs, repair/group menus, selected graph nodes, study faces, plans, wait cards and callouts use the matching role. Focus/mask outlines retain their existing non-elevation behavior.
+- Map tools use the tighter 4px/12px floating level. Study cards and callouts share the subtle 2px/6px surface level. Composite row buttons explicitly suppress their own shadow so only the outer callout casts one.
+- The Learn-only zero-padding override is removed. Resume, course, proposal/update and saved-session callouts share the 16px horizontal inset. Static mapping callouts use the same padding token and leave spacing to their parent stack. Plain Today rows keep their established flush alignment.
+- Recent lesson hover colors the entire composite row, including the gap and delete area. Its main button stays transparent; its delete control retains stronger feedback. Canceling the delete confirmation preserves the row.
+- All 48 browser cases passed in both themes across 320, 390, 640, 768, 1100 and 1440px panes, including a narrow pane in a wide window. They cover all shadow levels, light/dark parity by role, toolbar/control/panel depth, callout insets, no nested button shadows, full-row hover and dialog cancel, study/wait/plan/task surfaces, related library callouts and overflow.
+- CSS formatting, CSS lint, build, release verification and the scoped design scan passed. Runtime code and the preceding 767-test suite are unchanged; no test cases were added.
+- All 50 existing browser-after screenshots are refreshed. The three affected fixture baselines are recaptured on main. The prior native Mermaid and special create-boundary scenes remain retained. Total stays 52 pairs; no screenshot examples were added.
+- The isolated Obsidian build is updated and current working plugin/global Obsidian files are preserved by before/after hashes.
+
+## Prior verification
+
 # Plot direction label correction
 
 Latest source `864416e4ae14ad8d00039c193fde598ab487a220`. Baseline remains upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
