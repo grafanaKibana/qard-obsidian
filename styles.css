@@ -52,7 +52,7 @@
 .qard-statistics .qard-segmented button[aria-pressed='true'] {
   background: var(--qard-bg);
   color: var(--qard-text);
-  box-shadow: var(--qard-shadow-segment);
+  box-shadow: var(--qard-shadow-control);
 }
 
 .qard-stats-performance {
@@ -912,7 +912,10 @@
   --qard-row-action-size: 34px;
   --qard-control-hover: color-mix(in srgb, var(--qard-text) 12%, var(--qard-bg));
   --qard-objective-actions-width: calc(var(--qard-font-control) * 10 + var(--qard-space-8));
-  --qard-shadow-segment: 0 1px 3px color-mix(in srgb, var(--qard-text) 10%, transparent);
+  --qard-shadow-control: 0 1px 3px rgb(0 0 0 / 10%);
+  --qard-shadow-surface: 0 2px 6px rgb(0 0 0 / 8%);
+  --qard-shadow-floating: 0 4px 12px rgb(0 0 0 / 14%);
+  --qard-shadow-overlay: 0 8px 24px rgb(0 0 0 / 18%);
 
   /* UI roles follow Obsidian's type settings; reading and data keep their own scale. */
   --qard-font-page: calc(var(--font-ui-large, 20px) * 1.2);
@@ -942,6 +945,10 @@
 .theme-dark .qard-app {
   --qard-blue: #9aafff;
   --qard-on-blue: #182040;
+  --qard-shadow-control: 0 1px 3px rgb(0 0 0 / 24%);
+  --qard-shadow-surface: 0 2px 6px rgb(0 0 0 / 24%);
+  --qard-shadow-floating: 0 4px 12px rgb(0 0 0 / 32%);
+  --qard-shadow-overlay: 0 8px 24px rgb(0 0 0 / 40%);
 }
 
 /* Embedded layouts follow their pane, including desktop split views. */
@@ -1687,7 +1694,7 @@
 .qard-app .qard-session-type button[aria-pressed='true'] {
   background: var(--qard-bg);
   color: var(--qard-text);
-  box-shadow: var(--qard-shadow-segment);
+  box-shadow: var(--qard-shadow-control);
 }
 
 .qard-app .qard-session-description {
@@ -2117,19 +2124,9 @@
 
   /* One shade off the pane, with a soft shadow, so the card reads as lifted. */
   background: color-mix(in srgb, var(--qard-text) 4.5%, var(--qard-bg));
-  box-shadow:
-    0 1px 0 rgb(255 255 255 / 90%) inset,
-    0 16px 36px -18px rgb(30 35 60 / 28%),
-    0 1px 3px rgb(30 35 60 / 8%);
+  box-shadow: var(--qard-shadow-surface);
   overflow: auto;
   max-height: max(280px, 65vh);
-}
-
-.theme-dark .qard-study-face {
-  box-shadow:
-    0 1px 0 rgb(255 255 255 / 5%) inset,
-    0 18px 40px -18px rgb(0 0 0 / 70%),
-    0 2px 6px rgb(0 0 0 / 25%);
 }
 
 .qard-study-front {
@@ -3181,7 +3178,7 @@ body.qard-focus-active .status-bar {
   border: 1px solid var(--qard-border);
   border-radius: var(--qard-radius-floating);
   background: var(--qard-bg);
-  box-shadow: var(--shadow-s);
+  box-shadow: var(--qard-shadow-floating);
 }
 
 .qard-app .qard-popover input[type='search'] {
@@ -4184,6 +4181,7 @@ body.qard-focus-active .status-bar {
   border-radius: var(--qard-row-radius);
   background: color-mix(in srgb, var(--qard-row-accent) 6%, var(--qard-bg));
   color: var(--qard-text);
+  box-shadow: var(--qard-shadow-surface);
 }
 
 .qard-app :is(button.qard-resume, .qard-summary-row) {
@@ -4195,10 +4193,6 @@ body.qard-focus-active .status-bar {
 
 .qard-app :is(button.qard-resume, .qard-summary-row):hover {
   background: color-mix(in srgb, var(--qard-row-accent) 10%, var(--qard-bg));
-}
-
-.qard-app .qard-learn-rows .qard-summary-row:not(.qard-row-course) {
-  padding-inline: 0;
 }
 
 .qard-app .qard-summary-row.qard-row-course {
@@ -4225,6 +4219,7 @@ body.qard-focus-active .status-bar {
   border: 0;
   border-radius: 0;
   background: transparent;
+  box-shadow: none;
 }
 
 .qard-row-stack {
@@ -4668,6 +4663,18 @@ body.qard-focus-active .status-bar {
   margin-top: 28px;
 }
 
+.qard-learn-recent .qard-doc-item:hover {
+  background: var(--qard-soft);
+}
+
+.qard-app .qard-learn-recent .qard-doc-item > button:hover {
+  background: transparent;
+}
+
+.qard-app .qard-learn-recent .qard-delete-item > button:hover {
+  background: var(--qard-control-hover);
+}
+
 @container qard-workspace (max-width: 640px) {
   .qard-objective {
     grid-template-columns: minmax(0, 1fr);
@@ -4804,7 +4811,7 @@ body.qard-focus-active .status-bar {
 .qard-app .qard-segmented button[aria-selected='true'] {
   background: var(--qard-bg);
   color: var(--qard-text);
-  box-shadow: var(--qard-shadow-segment);
+  box-shadow: var(--qard-shadow-control);
 }
 
 .qard-progress {
@@ -4909,7 +4916,7 @@ body.qard-focus-active .status-bar {
   border: 1px solid var(--qard-border);
   border-radius: var(--qard-radius-floating);
   background: var(--qard-bg);
-  box-shadow: var(--shadow-s);
+  box-shadow: var(--qard-shadow-floating);
 }
 
 .qard-map-body {
@@ -5100,7 +5107,7 @@ body.qard-focus-active .status-bar {
 .qard-map-node.is-selected .qard-map-card {
   stroke: var(--qard-text);
   stroke-width: 2.4;
-  filter: drop-shadow(0 4px 10px rgb(0 0 0 / 14%));
+  filter: drop-shadow(var(--qard-shadow-floating));
 }
 
 .qard-map-node:focus-visible .qard-map-card {
@@ -5157,7 +5164,7 @@ body.qard-focus-active .status-bar {
   border: 1px solid var(--qard-border);
   border-radius: var(--qard-radius-floating);
   background: var(--qard-bg);
-  box-shadow: var(--shadow-s);
+  box-shadow: var(--qard-shadow-floating);
 }
 
 .qard-map-tools.is-right > * {
@@ -5210,6 +5217,7 @@ body.qard-focus-active .status-bar {
   padding: 16px;
   border-radius: 12px;
   background: var(--qard-bg);
+  box-shadow: var(--qard-shadow-surface);
   border: 1px solid var(--qard-border);
   cursor: default;
   user-select: text;
@@ -5526,10 +5534,11 @@ body.qard-focus-active .status-bar {
 .qard-resume.is-static {
   display: flex;
   align-items: center;
-  margin-bottom: var(--qard-gap-actions);
-  padding: var(--qard-space-3) var(--qard-space-4);
+  margin-bottom: 0;
+  padding: var(--qard-row-padding);
   border-radius: var(--qard-radius-floating);
   background: var(--qard-soft);
+  box-shadow: var(--qard-shadow-surface);
 }
 
 .qard-resume.is-static .qard-waiting {
@@ -5698,6 +5707,7 @@ body.qard-focus-active .status-bar {
   border: 1px solid var(--qard-border);
   border-radius: var(--qard-radius-surface);
   background: var(--qard-bg);
+  box-shadow: var(--qard-shadow-surface);
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -6447,7 +6457,7 @@ div.qard-ask-q {
   border: 1px solid var(--qard-border);
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 12px 48px #0005;
+  box-shadow: var(--qard-shadow-overlay);
 }
 
 .qard-delete-dialog h2 {
@@ -6773,7 +6783,7 @@ div.qard-ask-q {
 .qard-app .qard-plans-view button[aria-pressed='true'] {
   background: var(--qard-bg);
   color: var(--qard-text);
-  box-shadow: var(--qard-shadow-segment);
+  box-shadow: var(--qard-shadow-control);
 }
 
 .qard-plans-view button > span {
@@ -6813,6 +6823,7 @@ div.qard-ask-q {
   border: 1px solid var(--qard-border);
   border-radius: var(--qard-radius-surface);
   min-width: 0;
+  box-shadow: var(--qard-shadow-surface);
 }
 
 .qard-exam-plan-head {
@@ -7672,7 +7683,7 @@ div.qard-ask-q {
   background: var(--qard-bg);
   border-color: var(--qard-border);
   color: var(--qard-blue);
-  box-shadow: 0 1px 3px #00000008;
+  box-shadow: var(--qard-shadow-control);
 }
 
 .qard-cloze-editor,
@@ -8010,7 +8021,7 @@ div.qard-ask-q {
   border: 1px solid var(--qard-border);
   border-radius: var(--qard-radius-floating);
   background: var(--qard-bg);
-  box-shadow: var(--shadow-s);
+  box-shadow: var(--qard-shadow-floating);
 }
 
 .qard-app .qard-repair-menu > button {
@@ -9324,7 +9335,7 @@ div.qard-ask-q {
   border: 1px solid var(--qard-border);
   border-radius: var(--qard-radius-floating);
   background: var(--qard-bg);
-  box-shadow: var(--shadow-s);
+  box-shadow: var(--qard-shadow-floating);
 }
 
 .qard-app .qard-deck-group-popover > button,
