@@ -1,30 +1,64 @@
-import { useId, useState } from 'react';
-import { Info, X } from 'lucide-react';
-import { canonicalDeck, deckLineage } from '../decks/deck-index';
+import { useId, useMemo, useState } from 'react';
+import { getIcon, getIconIds } from 'obsidian';
+import { ChevronDown, Info, RotateCcw, Search, X } from 'lucide-react';
+import { canonicalDeck, deckLineage, deckPath } from '../decks/deck-index';
 import { deckLimits, deckRetention, withDeckOptions } from '../decks/deck-options';
-import type { DeckOptions as Options, QardSettings } from '../settings/settings';
+import {
+  readDeckColor,
+  readDeckIcon,
+  type DeckOptions as Options,
+  type QardSettings,
+} from '../settings/settings';
+import { DeckBadge } from './DeckBadge';
 
-/** Target retention and a daily new-card limit for one deck and the decks nested under it. */
+/** Scheduling overrides and independent appearance choices for one deck. */
 export function DeckOptions({
   deck,
+  badgeName,
   settings,
   save,
   close,
 }: {
   deck: string;
+  badgeName?: string;
   settings: QardSettings;
   save: (deckOptions: Record<string, Options>) => Promise<void>;
   close: () => void;
 }) {
-  const id = useId();
   const name = canonicalDeck(deck),
     own = settings.deckOptions[name] ?? {};
   const [target, setTarget] = useState(
-      own.desiredRetention === undefined ? '' : String(Math.round(own.desiredRetention * 100)),
+      own.desiredRetention === undefined ? '' : String(own.desiredRetention * 100),
     ),
+    [targetEdited, setTargetEdited] = useState(false),
     [limit, setLimit] = useState(own.newCardsPerDay ? String(own.newCardsPerDay) : ''),
+    [iconDraft, setIcon] = useState<string>(),
+    [colorDraft, setColor] = useState<string>(),
     [error, setError] = useState(''),
     [busy, setBusy] = useState(false);
+  const icon = iconDraft ?? own.icon ?? '',
+    color = colorDraft ?? own.color ?? '';
+  const id = useId();
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const [visible, setVisible] = useState(80);
+  const icons = useMemo(
+    () => [...new Set(getIconIds().map((id) => id.replace(/^lucide-/, '')))].sort(),
+    [],
+  );
+  const matches = icons.filter((id) => id.toLowerCase().includes(query.trim().toLowerCase()));
+  const badge = badgeName ?? deckPath(name).at(-1) ?? name;
+  const availableIcons = useMemo(() => new Set(icons), [icons]);
+  const iconId = icon.trim();
+  const unavailable = useMemo(
+    () =>
+      !!iconId &&
+      !availableIcons.has(iconId) &&
+      !availableIcons.has(`lucide-${iconId}`) &&
+      // Legacy aliases accepted by getIcon are not all listed in getIconIds.
+      !getIcon(iconId),
+    [availableIcons, iconId],
+  );
   // What applies when this deck sets nothing of its own.
   const parent = deckLineage(name)[1];
   const inherited = deckRetention(settings, parent);
@@ -43,13 +77,28 @@ export function DeckOptions({
       setError('Choose a whole number of new cards from 1 to 10,000, or leave it empty.');
       return;
     }
+    if (icon.trim() && (!readDeckIcon(icon) || (unavailable && icon.trim() !== own.icon))) {
+      setError('Choose an available icon name, or leave it empty for an automatic icon.');
+      return;
+    }
+    if (color.trim() && !readDeckColor(color)) {
+      setError('Enter a six-digit hex color such as #729b88, or leave it empty.');
+      return;
+    }
+    const desiredRetention = targetEdited
+      ? retention === undefined
+        ? undefined
+        : retention / 100
+      : own.desiredRetention;
     setBusy(true);
     setError('');
     try {
       await save(
         withDeckOptions(settings.deckOptions, name, {
-          ...(retention !== undefined ? { desiredRetention: retention / 100 } : {}),
+          ...(desiredRetention !== undefined ? { desiredRetention } : {}),
           ...(perDay !== undefined ? { newCardsPerDay: perDay } : {}),
+          ...(icon.trim() ? { icon: icon.trim() } : {}),
+          ...(color.trim() ? { color: color.trim() } : {}),
         }),
       );
       close();
@@ -65,7 +114,12 @@ export function DeckOptions({
           <h2>Deck options</h2>
           <p className="qard-deck-options-name">{name}</p>
         </div>
-        <button className="qard-icon-button" aria-label="Close deck options" onClick={close}>
+        <button
+          className="qard-icon-button"
+          aria-label="Close deck options"
+          disabled={busy}
+          onClick={close}
+        >
           <X size={16} />
         </button>
       </header>
@@ -75,8 +129,7 @@ export function DeckOptions({
           <div className="qard-deck-setting-copy">
             <label htmlFor={`${id}-retention`}>Target retention (%)</label>
             <p className="qard-muted" id={`${id}-retention-help`}>
-              Empty uses {Math.round(inherited.value * 100)}% from{' '}
-              {inherited.from ?? 'your Qard settings'}.
+              Empty uses {inherited.value * 100}% from {inherited.from ?? 'your Qard settings'}.
               {settings.scheduler === 'fsrs' ? '' : ' Only the FSRS scheduler uses this.'}
             </p>
           </div>
@@ -86,11 +139,14 @@ export function DeckOptions({
             type="number"
             min={70}
             max={97}
-            step={1}
+            step="any"
             value={target}
             disabled={busy}
-            placeholder={String(Math.round(inherited.value * 100))}
-            onChange={(e) => setTarget(e.target.value)}
+            placeholder={String(inherited.value * 100)}
+            onChange={(e) => {
+              setTarget(e.target.value);
+              setTargetEdited(true);
+            }}
           />
         </div>
         <div className="qard-deck-setting">
@@ -120,6 +176,136 @@ export function DeckOptions({
           />
         </div>
       </fieldset>
+      <fieldset className="qard-deck-settings-section">
+        <legend>Appearance</legend>
+        <div className="qard-deck-appearance-preview">
+          <DeckBadge name={badge} icon={icon.trim()} color={color} />
+          <span>Appearance for this deck only</span>
+        </div>
+        <div className="qard-deck-setting">
+          <div className="qard-deck-setting-copy">
+            <label id={`${id}-icon`}>Icon</label>
+            <p className="qard-muted">
+              {unavailable
+                ? 'This icon is unavailable on this device; the automatic icon is shown.'
+                : 'Choose an icon or use the automatic subject icon.'}
+            </p>
+          </div>
+          <div className="qard-deck-appearance-control">
+            <button
+              aria-label="Choose deck icon"
+              aria-expanded={pickerOpen}
+              aria-controls={`${id}-picker`}
+              disabled={busy}
+              onClick={() => setPickerOpen(!pickerOpen)}
+            >
+              <DeckBadge name={badge} icon={icon.trim()} color={color} />
+              <span>{icon || 'Automatic'}</span>
+              <ChevronDown size={16} />
+            </button>
+            <button
+              className="qard-icon-button"
+              aria-label="Automatic icon"
+              title="Automatic icon"
+              disabled={busy || !icon}
+              onClick={() => setIcon('')}
+            >
+              <RotateCcw size={16} />
+            </button>
+          </div>
+        </div>
+        {pickerOpen && (
+          <div className="qard-deck-icon-picker" id={`${id}-picker`} aria-labelledby={`${id}-icon`}>
+            <label className="qard-search">
+              <Search size={16} />
+              <input
+                type="search"
+                aria-label="Find icons"
+                placeholder="Find icons…"
+                value={query}
+                disabled={busy}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setVisible(80);
+                }}
+              />
+            </label>
+            <div className="qard-deck-icon-grid">
+              {matches.slice(0, visible).map((choice) => (
+                <button
+                  key={choice}
+                  className="qard-icon-button"
+                  title={choice}
+                  aria-label={`Use ${choice} icon`}
+                  aria-pressed={icon.replace(/^lucide-/, '') === choice}
+                  disabled={busy}
+                  onClick={() => {
+                    setIcon(choice);
+                    setPickerOpen(false);
+                  }}
+                >
+                  <DeckBadge name={badge} icon={choice} />
+                </button>
+              ))}
+            </div>
+            {!matches.length && <p className="qard-muted">No icons found. Try another name.</p>}
+            {matches.length > visible && (
+              <button disabled={busy} onClick={() => setVisible(visible + 80)}>
+                Show more icons
+              </button>
+            )}
+          </div>
+        )}
+        <div className="qard-deck-setting">
+          <div className="qard-deck-setting-copy">
+            <label htmlFor={`${id}-color`}>Color</label>
+            <p className="qard-muted" id={`${id}-color-help`}>
+              Six-digit hex color; empty uses the automatic color.
+            </p>
+          </div>
+          <div className="qard-deck-appearance-control">
+            <input
+              id={`${id}-color`}
+              aria-describedby={`${id}-color-help`}
+              type="text"
+              value={color}
+              placeholder="Automatic"
+              maxLength={7}
+              spellCheck={false}
+              disabled={busy}
+              onChange={(e) => setColor(e.target.value)}
+            />
+            {color.trim() ? (
+              <input
+                type="color"
+                aria-label="Choose a custom deck color"
+                value={readDeckColor(color) ?? '#808080'}
+                disabled={busy}
+                onChange={(e) => setColor(e.target.value)}
+              />
+            ) : (
+              <button
+                className="qard-icon-button"
+                aria-label="Use custom color"
+                title="Use custom color"
+                disabled={busy}
+                onClick={() => setColor('#808080')}
+              >
+                <span className="qard-deck-color-swatch" />
+              </button>
+            )}
+            <button
+              className="qard-icon-button"
+              aria-label="Automatic color"
+              title="Automatic color"
+              disabled={busy || !color}
+              onClick={() => setColor('')}
+            >
+              <RotateCcw size={16} />
+            </button>
+          </div>
+        </div>
+      </fieldset>
       {error && (
         <p className="qard-error" role="alert">
           {error}
@@ -128,8 +314,8 @@ export function DeckOptions({
       <footer className="qard-actions qard-deck-options-footer">
         <span
           className="qard-deck-options-info"
-          title="These apply to this deck and the decks nested under it, unless a nested deck sets its own."
-          aria-label="These apply to this deck and the decks nested under it, unless a nested deck sets its own."
+          title="Scheduling applies to this deck and nested decks unless they set their own options. Appearance applies only to this deck."
+          aria-label="Scheduling applies to this deck and nested decks unless they set their own options. Appearance applies only to this deck."
         >
           <Info size={16} />
         </span>

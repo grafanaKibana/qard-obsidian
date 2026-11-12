@@ -14,6 +14,8 @@ import {
 import type { Deck } from '../cards/card-types';
 import { buildDeckTree, type DeckNode } from '../decks/deck-index';
 import { DeckBadge } from './DeckBadge';
+import { deckAppearance } from '../decks/deck-options';
+import type { QardSettings } from '../settings/settings';
 import { LibraryTabs } from './library/LibraryHeader';
 export function DeckBrowser({
   decks,
@@ -37,11 +39,13 @@ export function DeckBrowser({
   nested = false,
   studyDecks,
   options,
+  deckOptions = {},
 }: {
+  deckOptions?: QardSettings['deckOptions'];
   /** Group decks named `Parent::Child` under their parents. Off while searching or filtering. */
   nested?: boolean;
   studyDecks?: (decks: string[]) => void;
-  options?: (deck: string) => void;
+  options?: (deck: string, badgeName: string) => void;
   repairFilter?: { active: boolean; count: number; toggle: () => void };
   decks: Deck[];
   search: string;
@@ -90,7 +94,7 @@ export function DeckBrowser({
             onClick={() => (deck ? openDeck(deck.name) : toggle(node.name))}
             {...(deck ? {} : { 'aria-expanded': open })}
           >
-            <DeckBadge name={node.label} />
+            <DeckBadge name={node.label} {...deckAppearance({ deckOptions }, node.name)} />
             <span className="qard-deck-name">
               <strong>{nested ? node.label : (deck?.name ?? node.label)}</strong>
               <small>
@@ -104,12 +108,18 @@ export function DeckBrowser({
           <div
             className={`qard-deck-actions${parent && studyDecks ? ' has-study' : ''}${groupMenu ? ' has-group-menu' : ''}`}
           >
-            {groupMenu && <DeckGroupMenu name={node.name} options={options} rename={rename} />}
-            {parent && options && (
+            {groupMenu && (
+              <DeckGroupMenu
+                name={node.name}
+                options={options ? (name) => options(name, node.label) : undefined}
+                rename={rename}
+              />
+            )}
+            {options && (
               <button
                 className="qard-icon-button"
                 aria-label={`Deck options for ${node.name}`}
-                onClick={() => options(node.name)}
+                onClick={() => options(node.name, node.label)}
               >
                 <Settings2 size={16} />
               </button>

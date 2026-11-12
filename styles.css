@@ -8880,7 +8880,7 @@ div.qard-ask-q {
 
 .qard-deck-setting {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(120px, 160px);
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 260px);
   gap: var(--qard-gap-fields);
   align-items: center;
   padding-block: var(--qard-space-4);
@@ -8909,6 +8909,98 @@ div.qard-ask-q {
 
 .qard-deck-options-footer {
   justify-content: flex-end;
+}
+
+.qard-deck-custom-icon {
+  display: grid;
+  place-items: center;
+  line-height: 0;
+}
+
+.qard-deck-custom-icon svg {
+  width: 23px;
+  height: 23px;
+  stroke-width: 1.6px;
+}
+
+.qard-deck-appearance-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--qard-gap-fields);
+  font-size: var(--qard-font-meta);
+  color: var(--qard-muted);
+}
+
+.qard-deck-appearance-control {
+  display: flex;
+  align-items: center;
+  gap: var(--qard-gap-actions);
+  min-width: 0;
+}
+
+.qard-deck-appearance-control > :first-child {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.qard-deck-appearance-control > button:first-child > span:not(.qard-deck-badge) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.qard-deck-appearance-control .qard-deck-badge {
+  width: 20px;
+  height: 20px;
+  background: transparent;
+}
+
+.qard-deck-appearance-control input[type='color'],
+.qard-deck-color-swatch {
+  flex: 0 0 var(--qard-control-height);
+  width: var(--qard-control-height);
+  height: var(--qard-control-height);
+  padding: var(--qard-space-1);
+}
+
+.qard-deck-color-swatch {
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  background: var(--qard-muted);
+  border-radius: var(--qard-radius-badge);
+}
+
+.qard-deck-icon-picker {
+  display: grid;
+  gap: var(--qard-gap-fields);
+  padding-block: 0 var(--qard-space-4);
+}
+
+.qard-deck-icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--qard-control-height), 1fr));
+  gap: var(--qard-gap-actions);
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.qard-app .qard-deck-icon-grid > button {
+  width: 100%;
+  min-height: var(--qard-control-height);
+}
+
+.qard-deck-icon-grid .qard-deck-badge {
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  color: inherit;
+}
+
+.qard-app .qard-deck-icon-grid > button[aria-pressed='true'] {
+  color: var(--qard-blue);
+  background: var(--qard-tint);
 }
 
 .qard-deck-options-info {
