@@ -4,7 +4,7 @@
   "comparisons": 52,
   "deviceScaleFactor": 2,
   "clock": "2026-11-09T12:00Z for browser fixtures; native identical live renderer/settings",
-  "capture": "Upstream main to latest PR #17. All 50 existing browser-after scenes are freshly captured for the shared shadow changes. Learn and desktop-map baselines use the same complete lesson fixtures; other main baselines remain unchanged. The prior native Mermaid and special create-boundary pairs are retained.",
+  "capture": "Upstream main to latest PR #17. 49 browser-after scenes are freshly captured for the shared shadow changes. Learn and desktop-map baselines use complete matching lesson fixtures. The prior unchanged lesson-plan fixture, native Mermaid and special create-boundary pairs are retained.",
   "maximumExamplesPerGroup": 3,
   "scenes": [
     {
@@ -408,7 +408,7 @@
     "after-learn-desktop.png": "1cf7f0e4a681d5922b88004dd583ed5c3ada1e695ec6b086d8368f6c063f011b",
     "after-learn-phone.png": "dcb4f72a65db0726109c25eb16f1c135efb53059ca344f928dd93a85a626a3c3",
     "after-lesson-check-first-phone.png": "50837ae40dad27413544314786bf69f221178a8f318b049daf692ef00e01d609",
-    "after-lesson-plan-phone.png": "187de6bcb1ded112c9d73714d8b0816c913024991a6b7aff09ef4e08f1e4c03d",
+    "after-lesson-plan-phone.png": "b59479f600080cd78f2391abd5cb78ccc044c827a6731a746bdc9367c800b452",
     "after-lesson-resume-phone.png": "83392aca3e38f689b343aae2862f26c54997061e018775c8754cf29d7c04d511",
     "after-lesson-step-desktop.png": "a5d225bf333825b186aca2bd1308845f6d2f8d9de3d8ef60bcb613cbb83db2f1",
     "after-lesson-step-phone.png": "9ef98e5c039ee26d259100b13b5d7da3dee22b4fc2becec396c08628ec70dec1",
