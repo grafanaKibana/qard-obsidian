@@ -2477,7 +2477,6 @@
   justify-content: space-between;
   gap: var(--qard-gap-actions);
   margin-top: calc(-1 * var(--qard-space-1));
-  padding-inline-start: 20%;
   color: var(--qard-muted);
   font-size: calc(var(--qard-font-meta) * 0.875);
 }
