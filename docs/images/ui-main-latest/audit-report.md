@@ -1,3 +1,14 @@
+# Plot direction label correction
+
+Latest source `864416e4ae14ad8d00039c193fde598ab487a220`. Baseline remains upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
+
+- Removed the unintended 20% leading inset. Harder aligns with the left plot edge; Easier stays at the right edge.
+- All 16 browser cases passed in both themes across 320–1440px panes, including a narrow pane in a wide window. They verify both label edges, zero leading padding, five-point/category alignment and overflow.
+- CSS formatting, CSS lint, production build and release verification passed. This is one CSS deletion; runtime code and the preceding 767-test suite are unchanged.
+- Both existing completed-session comparison pairs are refreshed. The isolated Obsidian build is updated and protected files are preserved. Gallery remains 52 pairs.
+
+## Prior verification
+
 # Session outcome alignment and course padding verification
 
 Latest source `0d823c2735d82c4c04a22a05d8248d218deba12a`. Screenshot baseline remains upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.

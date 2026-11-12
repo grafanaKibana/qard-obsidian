@@ -1,10 +1,10 @@
 {
   "before": "70056821914f0dae910b52a20f1fa3329b04d0ac",
-  "after": "0d823c2735d82c4c04a22a05d8248d218deba12a",
+  "after": "864416e4ae14ad8d00039c193fde598ab487a220",
   "comparisons": 52,
   "deviceScaleFactor": 2,
   "clock": "2026-11-09T12:00Z for browser fixtures; native identical live renderer/settings",
-  "capture": "Upstream main to latest PR #17. Four existing completed-session and Learn comparison pairs are refreshed. Other comparisons retain their prior captures.",
+  "capture": "Upstream main to latest PR #17. The two completed-session comparisons are refreshed with direction labels aligned to the plot edges. Other comparisons retain their prior captures.",
   "maximumExamplesPerGroup": 3,
   "scenes": [
     {
@@ -430,8 +430,8 @@
     "after-probe-phone.png": "10d7a2181f71a03c46455508e356412a4d38d95b1008abb10636871382fdf395",
     "after-reading-phone.png": "bbe484e130e2ad8edc13d9c9e9b434865128966aa41c3bd307e3d93f3e4b67b0",
     "after-repair-phone.png": "cd4fe3575d7a884cbac038774dba7c6b9c79842934268c1816253bb688b92c23",
-    "after-session-summary-desktop.png": "8fc822e6954966f2e8c33b932067386eb0772ba8bc78b074ae4b23916c8e2424",
-    "after-session-summary-phone.png": "2d977742f246f23238075d535c471990c0c78f5753e626db19d3ad7b77d735a1",
+    "after-session-summary-desktop.png": "c9459ffe2f582595f11e61b2830b89d1418ea64f56d07e3b180782b016b1b824",
+    "after-session-summary-phone.png": "a7951518055cce5360f7fc4ad309d298fc5990615064e1e4cb0a69e31e803287",
     "after-statistics-phone.png": "da7cb51b2500cfbed4836e78be3ec80c5714f3254a02e08b4bac24f51f1c40de",
     "after-study-desktop.png": "8041922d0ea1f5bedd9f9b3ba73923c4b604e88a589ffbfb7137397f3e5c549a",
     "after-tasks.png": "d065b705ed591abecff065200e2afd7696963cb2929f55593bf724adb3b3a2ad",
