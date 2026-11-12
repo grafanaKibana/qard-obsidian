@@ -1,3 +1,17 @@
+# Deck appearance stack and shared settings controls
+
+Source `e132cacc42c49bc79a341b33e4449af236f5c648` includes deck appearance dependency `23c7c26dbf82773dd1d088150006e65d6d049775` (upstream #10).
+
+- Scheduling and appearance share the same repeatable label/help/control rows, breakpoints, spacing and control geometry. The color swatch and icon picker have independent automatic resets. The footer distinguishes inherited scheduling from appearance that applies only to this deck.
+- Searchable visual icon grid replaces the names datalist. It reads registered Obsidian IDs, supports installed icon packs, renders 80 results at a time with Show more, preserves unavailable saved IDs and aliases, and previews without saving until Save options.
+- Dependency precision and synced-draft behavior retained. Displayed inherited retention no longer rounds fractional targets.
+- Full npm run check passed: 811 tests in 96 files, formatting, typecheck, ESLint, Stylelint, build and release validation. Final display correction rechecked with 29 deck tests and fresh build/release checks. Existing dependency tests adapted; no new UI test files/cases.
+- Twelve browser scenarios passed at 320/390/480/640/1000/1440px in light/dark: shared column alignment, overflow, search/select/reset and empty state. Native isolated Obsidian smoke passed with real registered SVGs, selection and Cancel; all five protected installed/global files unchanged.
+- Existing main-to-latest settings images refreshed. One extra pair isolates PR #10 to UI appearance adaptation: 53 pairs total, max three examples per table.
+- Merge order: upstream #10 then #17. Fork #11 is formally based on feature/deck-appearance. Upstream does not grant branch-write permission, so #17 must remain based on upstream main; its description links the dependency and settings-base comparison. After #10 merges, merge upstream main into UI branch before merging #17 (also handles a squash merge of #10).
+
+## Prior verification
+
 # Shared shadows, resume insets and Recent lessons hover
 
 Latest source `f23227d1a4afd88df0694fe262734ace2441377b`. Baseline remains upstream main `70056821914f0dae910b52a20f1fa3329b04d0ac`.
