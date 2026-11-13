@@ -354,6 +354,9 @@ it('adds and focuses a mask without dragging, supports keyboard placement, and r
   ]);
   expect(document.activeElement).toBe(mask);
   expect(mask.getAttribute('aria-pressed')).toBe('true');
+  expect(
+    [...host.querySelectorAll('.qard-mask-dimension')].map((label) => label.textContent),
+  ).toEqual(['Width%', 'Height%']);
   expect(document.getElementById(mask.getAttribute('aria-describedby')!)?.textContent).toContain(
     'Use arrow keys',
   );

@@ -677,7 +677,7 @@ export function StudyView({
             </div>
           </div>
         </header>
-        <SessionDifficultyChart results={cram ? [] : results} skipped={skipped.length} />
+        {!cram && <SessionDifficultyChart results={results} skipped={skipped.length} />}
         {!!repairCount && (
           <p className="qard-muted">
             {repairCount} {repairCount === 1 ? 'card needs' : 'cards need'} attention. Find them

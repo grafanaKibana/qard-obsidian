@@ -237,7 +237,7 @@ it('previews FSRS intervals after reveal without rating the card and hides them 
   expect(services.reviews.getSnapshot().states.first!.due).toBeUndefined();
 });
 
-it('crams with Space to reveal and Space to advance, without ratings, histories or schedule changes', async () => {
+it('crams with viewed and skipped cards without rating percentages, histories or schedule changes', async () => {
   const many = parseCards(
     '<!-- qard-id: first -->\n> [!qard]- First question\n> First answer\n\n<!-- qard-id: second -->\n> [!qard]- Second question\n> Second answer\n',
     'a.md',
@@ -263,20 +263,19 @@ it('crams with Space to reveal and Space to advance, without ratings, histories 
   expect(host.textContent).toContain('2 / 2');
   expect(host.querySelector('.qard-study-back')?.getAttribute('aria-hidden')).toBe('true');
   await act(async () =>
-    [...host.querySelectorAll('button')]
-      .find((b) => b.textContent?.startsWith('Reveal answer'))!
-      .click(),
-  );
-  await act(async () =>
-    [...host.querySelectorAll('button')]
-      .find((b) => b.textContent?.startsWith('Next card'))!
-      .click(),
+    [...host.querySelectorAll('button')].find((b) => b.textContent?.startsWith('Skip'))!.click(),
   );
   expect(host.textContent).toContain('Cram session complete');
-  expect(host.textContent).toContain('2 / 2');
+  expect(host.querySelector('.qard-summary-stats')?.textContent).toContain('1 / 2');
+  expect(host.querySelector('.qard-difficulty')).toBeNull();
+  expect(host.textContent).not.toContain('100%');
   expect(host.querySelector('.qard-summary-ratings')).toBeNull();
   expect(review).not.toHaveBeenCalled();
   expect(services.reviews.getSnapshot()).toBe(before);
+  await act(async () =>
+    [...host.querySelectorAll('button')].find((b) => b.textContent === 'Review skipped')!.click(),
+  );
+  expect(repeat).toHaveBeenCalledWith([many[1]]);
   await act(async () =>
     [...host.querySelectorAll('button')].find((b) => b.textContent === 'Cram again')!.click(),
   );

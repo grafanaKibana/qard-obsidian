@@ -35,6 +35,7 @@ export function CourseView({
   const [view, setView] = useState<'map' | 'list'>('map'),
     [filter, setFilter] = useState<Set<string>>(new Set()),
     [updating, setUpdating] = useState(false);
+  const [evidence, setEvidence] = useState<string>();
   const [lessons, setLessons] = useState<LessonSummary[]>([]);
   useEffect(() => {
     let live = true;
@@ -258,15 +259,26 @@ export function CourseView({
                     {o.due &&
                       !['new', 'planned'].includes(o.state) &&
                       relativeDay(o.due, day).replace(/^./, (first) => first.toUpperCase())}
-                    <span
-                      className="qard-section-info qard-objective-evidence"
+                    <button
+                      className="qard-icon-button qard-section-info qard-objective-evidence"
                       title={o.evidence.at(-1) ?? 'No evidence yet'}
-                      aria-label={o.evidence.at(-1) ?? 'No evidence yet'}
+                      aria-label={`Evidence for ${o.title}`}
+                      aria-expanded={evidence === o.id}
+                      aria-controls={`${tabsId}-evidence-${o.id}`}
+                      onClick={() => setEvidence(evidence === o.id ? undefined : o.id)}
                     >
                       <Info size={14} aria-hidden="true" />
-                    </span>
+                    </button>
                   </span>
                 </div>
+                {evidence === o.id && (
+                  <p
+                    className="qard-muted qard-objective-evidence-details"
+                    id={`${tabsId}-evidence-${o.id}`}
+                  >
+                    {o.evidence.at(-1) ?? 'No evidence yet'}
+                  </p>
+                )}
                 <div className="qard-objective-main">
                   <strong className="qard-objective-title">
                     <span className="qard-objective-title-text">

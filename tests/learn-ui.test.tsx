@@ -414,7 +414,7 @@ it('recap leaves a suggested card unadded when its writer rejects the save', asy
 it('the course map opens on topics, drills into one, and routes across topics', async () => {
   files.set(
     MASTERY,
-    `---\nqard-mastery: DS346\nqard-mapped: 2026-09-01T10:00\n---\n\n| Objective | Label | ID | Group | State | Due | Needs |\n| --- | --- | --- | --- | --- | --- | --- |\n| Bag of words | Bag of words | bow | Text mining | mastered |  |  |\n| Parameter counts | Parameters | params | Topic models | taught | 2000-01-01 | bow |\n| List the LDA generative process | LDA story | lda | Topic models | misconception |  | bow, params |\n| Hadoop | Hadoop | hadoop | Big data | planned |  |  |\n`,
+    `---\nqard-mastery: DS346\nqard-mapped: 2026-09-01T10:00\n---\n\n| Objective | Label | ID | Group | State | Due | Needs | Evidence |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| Bag of words | Bag of words | bow | Text mining | mastered |  |  |\n| Parameter counts | Parameters | params | Topic models | taught | 2000-01-01 | bow | Practice check: one of two answers correct. |\n| List the LDA generative process | LDA story | lda | Topic models | misconception |  | bow, params |\n| Hadoop | Hadoop | hadoop | Big data | planned |  |  |\n`,
   );
   await act(async () => {
     root.render(<CourseView services={services} nav={nav} path={MASTERY} />);
@@ -483,6 +483,20 @@ it('the course map opens on topics, drills into one, and routes across topics', 
   expect(host.querySelector('.qard-map-layout')?.classList.contains('is-panel-open')).toBe(false);
   await click(buttons('List')[0]);
   expect(host.querySelectorAll('.qard-objective')).toHaveLength(4);
+  const evidence = host.querySelector<HTMLButtonElement>(
+    '[aria-label="Evidence for Parameter counts"]',
+  )!;
+  expect(evidence.title).toBe('Practice check: one of two answers correct.');
+  expect(evidence.getAttribute('aria-expanded')).toBe('false');
+  expect(host.querySelector('.qard-objective-evidence-details')).toBeNull();
+  await click(evidence);
+  expect(evidence.getAttribute('aria-expanded')).toBe('true');
+  expect(document.getElementById(evidence.getAttribute('aria-controls')!)?.textContent).toBe(
+    'Practice check: one of two answers correct.',
+  );
+  await click(evidence);
+  expect(evidence.getAttribute('aria-expanded')).toBe('false');
+  expect(host.querySelector('.qard-objective-evidence-details')).toBeNull();
 });
 
 it('keeps an active objective after following a cross-topic stub with an old selection', async () => {
