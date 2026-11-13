@@ -9634,29 +9634,30 @@ div.qard-ask-q {
 }
 
 .qard-deck-appearance-preview {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: var(--qard-gap-actions, 8px);
+  display: grid;
+  place-items: center;
   min-width: 0;
-  text-align: center;
-}
-
-.qard-deck-appearance-preview > strong {
-  overflow-wrap: anywhere;
-  font-size: var(--qard-font-body, 14px);
-  font-weight: var(--qard-weight-medium, 600);
 }
 
 .qard-deck-appearance-preview .qard-deck-badge {
-  width: 64px;
-  height: 64px;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
 }
 
-.qard-deck-appearance-preview .qard-deck-badge svg {
-  width: 32px;
-  height: 32px;
+.qard-deck-appearance-preview .qard-deck-badge > svg,
+.qard-deck-appearance-preview .qard-deck-custom-icon {
+  width: 50%;
+  height: 50%;
+}
+
+.qard-deck-appearance-preview .qard-deck-custom-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.qard-deck-appearance-preview .qard-deck-badge > span:not(.qard-deck-custom-icon) {
+  font-size: clamp(28px, 10cqw, 48px);
 }
 
 .qard-deck-appearance-control {
@@ -9781,16 +9782,8 @@ div.qard-ask-q {
   }
 
   .qard-deck-appearance-preview {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    text-align: start;
-    justify-items: start;
-    gap: var(--qard-gap-actions, 8px) var(--qard-gap-fields, 12px);
-  }
-
-  .qard-deck-appearance-preview > .qard-deck-badge {
-    width: 48px;
-    height: 48px;
+    width: min(100%, 96px);
+    justify-self: center;
   }
 }
 
