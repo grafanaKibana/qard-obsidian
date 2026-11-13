@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { getIcon, getIconIds } from 'obsidian';
 import { X } from 'lucide-react';
 import { canonicalDeck, deckLineage, deckPath } from '../decks/deck-index';
@@ -9,7 +9,7 @@ import {
   type DeckOptions as Options,
   type QardSettings,
 } from '../settings/settings';
-import { DeckBadge } from './DeckBadge';
+import { DeckAppearance } from './DeckAppearance';
 
 /** Scheduling overrides and independent appearance choices for one deck. */
 export function DeckOptions({
@@ -38,9 +38,7 @@ export function DeckOptions({
     [busy, setBusy] = useState(false);
   const icon = iconDraft ?? own.icon ?? '',
     color = colorDraft ?? own.color ?? '';
-  const iconsId = useId();
   const icons = useMemo(() => getIconIds().sort(), []);
-  const iconOptions = useMemo(() => icons.map((id) => <option key={id} value={id} />), [icons]);
   const availableIcons = useMemo(() => new Set(icons), [icons]);
   const iconId = icon.trim();
   const unavailable = useMemo(
@@ -158,68 +156,15 @@ export function DeckOptions({
             : ''}
         </small>
       </label>
-      <div className="qard-deck-appearance-preview">
-        <DeckBadge
-          name={badgeName ?? deckPath(name).at(-1) ?? name}
-          icon={icon.trim()}
-          color={color}
-        />
-        <span>Appearance for this deck only</span>
-      </div>
-      <div className="qard-deck-appearance-control">
-        <label>
-          <span>Icon</span>
-          <input
-            type="text"
-            value={icon}
-            list={iconsId}
-            placeholder="Automatic"
-            maxLength={100}
-            disabled={busy}
-            onChange={(e) => setIcon(e.target.value)}
-          />
-          <small className="qard-muted">
-            {unavailable && icon.trim() === own.icon
-              ? 'This icon is unavailable on this device; the automatic icon is shown.'
-              : 'Choose a registered icon name, such as terminal or network.'}
-          </small>
-        </label>
-        <datalist id={iconsId}>{iconOptions}</datalist>
-        <button disabled={busy || !icon} onClick={() => setIcon('')}>
-          Automatic icon
-        </button>
-      </div>
-      <div className="qard-deck-appearance-control">
-        <label>
-          <span>Color</span>
-          <input
-            type="text"
-            value={color}
-            placeholder="Automatic"
-            maxLength={7}
-            spellCheck={false}
-            disabled={busy}
-            onChange={(e) => setColor(e.target.value)}
-          />
-          <small className="qard-muted">Six-digit hex color; empty uses the automatic color.</small>
-        </label>
-        {color.trim() ? (
-          <input
-            type="color"
-            aria-label="Choose a custom deck color"
-            value={readDeckColor(color) ?? '#808080'}
-            disabled={busy}
-            onChange={(e) => setColor(e.target.value)}
-          />
-        ) : (
-          <button disabled={busy} onClick={() => setColor('#808080')}>
-            Use custom color
-          </button>
-        )}
-        <button disabled={busy || !color} onClick={() => setColor('')}>
-          Automatic color
-        </button>
-      </div>
+      <DeckAppearance
+        name={badgeName ?? deckPath(name).at(-1) ?? name}
+        icon={icon}
+        color={color}
+        unavailable={unavailable}
+        busy={busy}
+        onIcon={setIcon}
+        onColor={setColor}
+      />
       {error && (
         <p className="qard-error" role="alert">
           {error}

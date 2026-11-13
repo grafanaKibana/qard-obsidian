@@ -162,20 +162,39 @@ it('clears a deck’s own options when both fields are emptied', async () => {
   expect(save).toHaveBeenCalledWith({});
 });
 
-const appearanceField = (name: string) =>
-  [...host.querySelectorAll('label')]
-    .find((label) => label.querySelector('span')?.textContent === name)!
-    .querySelector<HTMLInputElement>('input')!;
-const typeAppearance = (name: string, value: string) =>
-  act(() => {
+const appearanceField = (name: string) => {
+  const label = [...host.querySelectorAll('label')].find(
+    (label) => label.textContent === name || label.querySelector('span')?.textContent === name,
+  )!;
+  return label.htmlFor
+    ? host.querySelector<HTMLInputElement>(`[id="${label.htmlFor}"]`)!
+    : label.querySelector<HTMLInputElement>('input')!;
+};
+const selectedIcon = () =>
+  button('Choose deck icon')
+    .querySelector(':scope > span:not(.qard-deck-badge)')
+    ?.textContent?.replace(/^Automatic$/, '') ?? '';
+const typeAppearance = async (name: string, value: string) => {
+  if (name === 'Icon') {
+    if (!value) return click(button('Automatic icon'));
+    await click(button('Choose deck icon'));
+    const search = host.querySelector<HTMLInputElement>('[aria-label="Find icons"]')!;
+    await act(() => {
+      search.value = value;
+      search.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    return click(button(`Use ${value} icon`));
+  }
+  return act(() => {
     const input = appearanceField(name);
     input.value = value;
     input.dispatchEvent(new Event('input', { bubbles: true }));
   });
+};
 const action = async (text: string) =>
   act(async () => {
     [...host.querySelectorAll('button')]
-      .find((button) => button.textContent === text)!
+      .find((button) => button.textContent === text || button.getAttribute('aria-label') === text)!
       .dispatchEvent(new MouseEvent('click', { bubbles: true }));
   });
 
@@ -260,7 +279,7 @@ it.each([0.855, 0.851234567890123])(
   },
 );
 
-it('rejects new unavailable icons and malformed colors, keeps edits on save failure, and allows retry', async () => {
+it('rejects malformed colors, keeps edits on save failure, and allows retry', async () => {
   const save = vi.fn(async () => {}),
     close = vi.fn();
   act(() =>
@@ -268,10 +287,6 @@ it('rejects new unavailable icons and malformed colors, keeps edits on save fail
       <DeckOptions deck="Biology" settings={readSettings({})} save={save} close={close} />,
     ),
   );
-  await typeAppearance('Icon', 'missing-icon');
-  await action('Save options');
-  expect(host.querySelector('[role=alert]')?.textContent).toContain('available icon');
-  expect(save).not.toHaveBeenCalled();
   await typeAppearance('Icon', 'terminal');
   await typeAppearance('Color', '#12');
   await action('Save options');
@@ -280,7 +295,7 @@ it('rejects new unavailable icons and malformed colors, keeps edits on save fail
   save.mockRejectedValueOnce(new Error('disk full'));
   await action('Save options');
   expect(host.querySelector('[role=alert]')?.textContent).toContain('Could not save');
-  expect(appearanceField('Icon').value).toBe('terminal');
+  expect(selectedIcon()).toBe('terminal');
   expect(appearanceField('Color').value).toBe('#abcdef');
   expect(close).not.toHaveBeenCalled();
   await action('Save options');
@@ -344,9 +359,6 @@ it('suggests, previews and saves registered icon-pack IDs', async () => {
   act(() =>
     root.render(<DeckOptions deck="A" settings={readSettings({})} save={save} close={vi.fn()} />),
   );
-  expect(
-    [...host.querySelectorAll('datalist option')].map((option) => option.getAttribute('value')),
-  ).toContain('ri_terminal');
   await typeAppearance('Icon', 'ri_terminal');
   expect(
     host.querySelector('.qard-deck-appearance-preview [data-icon]')?.getAttribute('data-icon'),
@@ -419,7 +431,7 @@ it.each([
     render({ icon: 'terminal', color: '#123456' });
     await typeAppearance(field, value);
     render(remote);
-    if (field !== 'Icon') expect(appearanceField('Icon').value).toBe(remote.icon ?? '');
+    if (field !== 'Icon') expect(selectedIcon()).toBe(remote.icon ?? '');
     if (field !== 'Color') expect(appearanceField('Color').value).toBe(remote.color ?? '');
     await action('Save options');
     expect(save).toHaveBeenCalledWith({
@@ -483,15 +495,21 @@ it('does not construct availability SVGs while editing unrelated fields', async 
 });
 
 it.each(['terminal', 'network', 'enter'])(
-  'accepts the Obsidian icon alias %s omitted from registry IDs without repeated SVG checks',
+  'preserves the saved Obsidian icon alias %s omitted from registry IDs without repeated SVG checks',
   async (icon) => {
     const save = vi.fn(async () => {}),
       lookup = vi.spyOn(obsidian, 'getIcon');
     expect(obsidian.getIconIds()).not.toContain(icon);
     act(() =>
-      root.render(<DeckOptions deck="A" settings={readSettings({})} save={save} close={vi.fn()} />),
+      root.render(
+        <DeckOptions
+          deck="A"
+          settings={readSettings({ deckOptions: { A: { icon } } })}
+          save={save}
+          close={vi.fn()}
+        />,
+      ),
     );
-    await typeAppearance('Icon', icon);
     expect(
       host.querySelector('.qard-deck-appearance-preview [data-icon]')?.getAttribute('data-icon'),
     ).toBe(icon);
