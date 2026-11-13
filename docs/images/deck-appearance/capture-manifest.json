@@ -1,6 +1,6 @@
 {
   "before": "387ded998211375ee9fefcc707939b8aea7ca8d5",
-  "after": "620550cc6b8c05e561afdeac454f5a72ed661474",
+  "after": "260168d37931247d3975980ad952201fa07368b5",
   "comparisons": 2,
   "widths": [
     390,
@@ -15,5 +15,6 @@
     "after-options-phone.png": "a3a1fc34edad4427842235d81f5a6b1f0d0a900e71286cacdd40fe2f876c9005",
     "before-options-desktop.png": "6667c8686d512e950340682ca418d4c2f5964c348193ceadf0b5a5e06416592d",
     "before-options-phone.png": "1aec7a3a4f29ea3c61ba9c487432116f3df7fbbc3b875e1915066b0cdf01edfa"
-  }
+  },
+  "popoutVerification": "Owner-document Escape/outside listeners, cross-document regression and native smoke pass; unchanged visual rendering."
 }

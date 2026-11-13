@@ -1,6 +1,6 @@
 {
   "before": "387ded998211375ee9fefcc707939b8aea7ca8d5",
-  "after": "489c13507f61acea70ee8f3ce955999f210c1fcf",
+  "after": "8f246a67defb1e1341afbd8fae65819f6fc01f3f",
   "comparisons": 52,
   "deviceScaleFactor": 2,
   "clock": "2026-11-09T12:00Z for browser fixtures; native identical live renderer/settings",
@@ -499,7 +499,7 @@
     "before-waiting-phone.png": "9424786a678c40c2ddc724ec4ee3ff278129cc0b2aa20e9a3cf4a695acd91012",
     "before-wrapping-desktop.png": "594b4dd58cbfe3db533598ebd7881a96c2a5cda787a76341723718a0068de140"
   },
-  "appearanceDependency": "620550cc6b8c05e561afdeac454f5a72ed661474",
+  "appearanceDependency": "260168d37931247d3975980ad952201fa07368b5",
   "freshImages": [
     "after-builder-phone.png",
     "after-checking-phone.png",
@@ -611,5 +611,6 @@
   "latestFreshImages": [
     "after-options-phone.png",
     "after-options-desktop.png"
-  ]
+  ],
+  "popoutVerification": "Owner-document Escape/outside dismissal regression verified failing before and passing after; real isolated Obsidian pop-out smoke passed. Rendering unchanged from hierarchy/preview-order captures."
 }

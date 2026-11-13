@@ -1,3 +1,12 @@
+# Pop-out picker dismissal follow-up
+
+#10 `260168d37931247d3975980ad952201fa07368b5` → #17 `8f246a67defb1e1341afbd8fae65819f6fc01f3f`. The title/section/label hierarchy and preview-first order are preserved.
+
+- Dismissal listens on the anchor ownerDocument and checks the composed event path, avoiding main-document listeners and cross-realm Node checks.
+- Extended the existing icon-pack test in a separate document: Escape and outside pointer dismissal failed before the fix and pass after it. No new test cases/files. Full checks pass811tests for#10 and822for#17.
+- Real isolated Obsidian pop-out verified both Escape and outside click. Only the agent-created pop-out was closed. Protected DevBook/global files unchanged.
+- Related review thread resolved. Rendering unchanged, so the refreshed hierarchy/preview screenshots remain the latest visual result.
+
 # Settings title hierarchy and preview-first order
 
 Latest#17 source `489c13507f61acea70ee8f3ce955999f210c1fcf`; #10 source remains620550c.
