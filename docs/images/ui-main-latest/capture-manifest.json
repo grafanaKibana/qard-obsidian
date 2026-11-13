@@ -1,10 +1,10 @@
 {
   "before": "70056821914f0dae910b52a20f1fa3329b04d0ac",
-  "after": "e132cacc42c49bc79a341b33e4449af236f5c648",
-  "comparisons": 53,
+  "after": "b2dab86fdcd8d0ecb98d5c210b9472cd21ca1348",
+  "comparisons": 52,
   "deviceScaleFactor": 2,
   "clock": "2026-11-09T12:00Z for browser fixtures; native identical live renderer/settings",
-  "capture": "Main-to-latest comparisons retained; deck-settings after screenshots refreshed on the combined branch. One additional appearance comparison uses PR #10 as its explicit baseline to isolate the UI changes above the settings dependency. Browser picker fixtures use SVGs from the installed lucide-react library; native Obsidian registry selection verified separately.",
+  "capture": "Main-to-latest comparisons. Both settings after images refreshed on the current combined UI branch; other unchanged images retained. The incremental appearance comparison was removed. The shared picker ships in upstream PR #10 and is inherited by #17. Separate main-to-latest screenshots for #10 live in ../deck-appearance.",
   "maximumExamplesPerGroup": 3,
   "scenes": [
     {
@@ -391,17 +391,9 @@
       "theme": "dark",
       "deck": true,
       "crop": ".qard-deck-detail"
-    },
-    {
-      "name": "appearance-phone",
-      "width": 390,
-      "touch": true,
-      "before": "23c7c26dbf82773dd1d088150006e65d6d049775",
-      "after": "e132cacc42c49bc79a341b33e4449af236f5c648"
     }
   ],
   "hashes": {
-    "after-appearance-phone.png": "7e734e6352fb9834e2bf27c89ab6db0535ca11163164f009fb0c2e5eb6a8affb",
     "after-builder-phone.png": "772a912f6c62ceae59737d0ac95c34f5a5c8600f7a6bd5170c5ed70a03d5adf6",
     "after-checking-phone.png": "5df1a779ebc61ced1163a92183d55bebdef520dc8f7c8ddefc0c0c954ea7fd55",
     "after-completed-desktop.png": "604295523db7b37d552808cace9c9820554165fe22def90f0beec35f619b6ab8",
@@ -431,8 +423,8 @@
     "after-nested-phone.png": "57e92af342545d190be192637b55ba8a436450a9319a01f1cd74d7656b8531bd",
     "after-objectives-desktop.png": "cad4c6146ecf534ed0d0a8747b7da5ec979ddc96220781e458108370c26e73bd",
     "after-objectives-phone.png": "2344601ee4332dc76d52c8b9c250c1289f9dbed6cac504866373f628c93b606b",
-    "after-options-desktop.png": "28819d663709cd552466b2edba59df7aa892f8383b9b91c82065f8ab43ec0156",
-    "after-options-phone.png": "7e734e6352fb9834e2bf27c89ab6db0535ca11163164f009fb0c2e5eb6a8affb",
+    "after-options-desktop.png": "55c6a912cf8af0425181372ee3e63fe7ca6327249ac5342cfc45f4844cab75c0",
+    "after-options-phone.png": "1deb7a828fd813b941d12331731cf62c7d11e52b5f400bca666d361b055cacfe",
     "after-plans-desktop.png": "8d01ab3de893f52af80354b1b33ca75968447ff39e4cf79baa3aeefb91c3c8e1",
     "after-plans-phone.png": "6e61fef6da753db0ee61e35bc579d1da4862088cd352f1955bb05a7bbaa2cde5",
     "after-probe-phone.png": "10d7a2181f71a03c46455508e356412a4d38d95b1008abb10636871382fdf395",
@@ -454,7 +446,6 @@
     "after-waiting-desktop.png": "4a759bbf7ec06f0d3a26f522bbd796c18f47b604b04f77497fa1c41826869b93",
     "after-waiting-phone.png": "3136038fa142ec1730eb2ebb6c72da8abd11026b63ec39d541fe78b957c9da4a",
     "after-wrapping-desktop.png": "ab53fbb0d32ac9d46e1463fe546010d117a795c231cb564bc10629d10c29fc80",
-    "before-appearance-phone.png": "54360778746e8e2142aad757d02769b6d5324d2c289d2dad6127892e3bd4183b",
     "before-builder-phone.png": "e63b753c0d62615f08a779ef4fa55e7efacbbf8ba2ec14bbeb9d0d33321a5297",
     "before-checking-phone.png": "15682b57b6d01b6f4d054ea51e1313a4682758b000ee12b97c48d5740f529e18",
     "before-completed-desktop.png": "351a3b8aa6fcbcd66a667926e88fe504ee3af813f2f3fec93ebd5d8e849aae86",
@@ -508,5 +499,5 @@
     "before-waiting-phone.png": "9424786a678c40c2ddc724ec4ee3ff278129cc0b2aa20e9a3cf4a695acd91012",
     "before-wrapping-desktop.png": "594b4dd58cbfe3db533598ebd7881a96c2a5cda787a76341723718a0068de140"
   },
-  "appearanceDependency": "23c7c26dbf82773dd1d088150006e65d6d049775"
+  "appearanceDependency": "357627e44614afa63506fdb3ce4f58faaf3ee782"
 }

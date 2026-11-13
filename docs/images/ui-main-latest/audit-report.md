@@ -1,3 +1,17 @@
+# Upstream appearance section and compact icon dropdown
+
+Upstream #10 source `357627e44614afa63506fdb3ce4f58faaf3ee782` → upstream #17 source `b2dab86fdcd8d0ecb98d5c210b9472cd21ca1348`. All fork PRs are retired; no fork PR is part of the dependency workflow.
+
+- One shared DeckAppearance component in both branches: explicit Appearance header, controls on left and live badge/name preview on right; below 480px available section width, preview becomes a compact row below controls.
+- Dropdown is at most 320px wide with a 240px scrolling icon grid, search and every registered icon. Pagination removed. Outside-click and Escape dismiss it; selection returns to the trigger. Installed icon packs, unavailable saved IDs, exact scheduling values and independent automatic resets retain existing behavior.
+- Focus is indicated on the search container, without an extra input outline. Preview retains its deck color. Capture framing includes the dropdown beyond panel bounds.
+- #10 passed full npm run check:800 tests/96 files. #17 passed full check:811 tests/96 files.24 browser cases across both variants, both themes and320/390/480/640/1000/1440px all passed. Tests cover all2110 fixture icons, grid scrolling, dropdown width, responsive preview, selection/reset and empty search. No new test cases or files.
+- Shared picker passed native isolated Obsidian SVG/select/cancel smoke. Protected DevBook/global files remain unchanged.
+- Main-to-latest screenshots refreshed in both upstream descriptions. Removed the obsolete incremental appearance comparison from #17:52 pairs remain, with max3 examples per group. #10 has2 main-to-latest pairs.
+- Commit ancestry and upstream compare link form #10→#17. Both GitHub base refs stay main: no upstream branch-write rights; GitHub requires PR base branches in the destination repository. Upstream maintainers can create a settings base branch if they want literal base retargeting. After #10 merges, integrate upstream main into #17 before merging it, including after a squash merge.
+
+## Prior verification
+
 # Deck appearance stack and shared settings controls
 
 Source `e132cacc42c49bc79a341b33e4449af236f5c648` includes deck appearance dependency `23c7c26dbf82773dd1d088150006e65d6d049775` (upstream #10).

@@ -1,0 +1,19 @@
+{
+  "before": "70056821914f0dae910b52a20f1fa3329b04d0ac",
+  "after": "357627e44614afa63506fdb3ce4f58faaf3ee782",
+  "comparisons": 2,
+  "widths": [
+    390,
+    1000
+  ],
+  "desktop": "Open icon dropdown; capture includes dropdown beyond panel bounds",
+  "mobile": "Compact controls and stacked preview",
+  "icons": "Fixture SVGs from installed lucide-react; native Obsidian registry also verified",
+  "verification": "800 tests, full check;12 responsive/theme cases, real SVG/select/cancel native smoke on combined branch with identical shared component",
+  "hashes": {
+    "after-options-desktop.png": "6565cbc48aeb3ccf33c59588e1fb88bfc68434ba71d8c8d4c479474c7155d5ea",
+    "after-options-phone.png": "74a29e41fa75d809eb682d91dfd8c9354871ed8e87e67aa49999828b96e724cd",
+    "before-options-desktop.png": "6667c8686d512e950340682ca418d4c2f5964c348193ceadf0b5a5e06416592d",
+    "before-options-phone.png": "1aec7a3a4f29ea3c61ba9c487432116f3df7fbbc3b875e1915066b0cdf01edfa"
+  }
+}
