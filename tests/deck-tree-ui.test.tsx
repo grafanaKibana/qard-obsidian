@@ -366,16 +366,16 @@ it('suggests, previews and saves registered icon-pack IDs', async () => {
       root.render(<DeckOptions deck="A" settings={readSettings({})} save={save} close={vi.fn()} />),
     );
     await click(button('Choose deck icon'));
-    await act(() =>
-      owner.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })),
-    );
+    await act(() => {
+      owner.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    });
     expect(host.querySelector('.qard-deck-icon-picker')).toBeNull();
     await click(button('Choose deck icon'));
     const outside = owner.createElement('button');
     owner.body.append(outside);
-    await act(() =>
-      outside.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, composed: true })),
-    );
+    await act(() => {
+      outside.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, composed: true }));
+    });
     expect(host.querySelector('.qard-deck-icon-picker')).toBeNull();
     await typeAppearance('Icon', 'ri_terminal');
     expect(
