@@ -432,6 +432,37 @@
   color: var(--qard-muted);
 }
 
+.qard-app .qard-stats-deck-name button.qard-stats-deck-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--qard-text);
+  font: inherit;
+  text-align: left;
+}
+
+.qard-app .qard-stats-deck-name button.qard-stats-deck-link:hover {
+  color: var(--qard-blue);
+}
+
+.qard-stats-deck-link svg {
+  flex-shrink: 0;
+  color: var(--qard-muted);
+}
+
+.qard-stats-kicker {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--qard-muted);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .qard-stats-deck-track {
   height: 3px;
   max-width: 160px;

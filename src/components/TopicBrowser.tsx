@@ -7,6 +7,7 @@ import { NewSubdeck } from './NewSubdeck';
 import { useId, useState, type ReactNode } from 'react';
 import {
   ArrowLeft,
+  BarChart3,
   ChevronDown,
   ChevronRight,
   Folder,
@@ -42,9 +43,12 @@ export function TopicBrowser({
   studyDecks,
   moveTopics,
   options,
+  statistics,
   resume,
   management,
 }: {
+  /** Open statistics for this deck and its subdecks. */
+  statistics?: () => void;
   deck: Deck;
   /** The last part of a nested deck's name, shown as its title. */
   title?: string;
@@ -165,6 +169,16 @@ export function TopicBrowser({
             <Play size={16} />
             Study
           </button>
+          {statistics && (
+            <button
+              className="qard-icon-button"
+              aria-label="Deck statistics"
+              disabled={busy}
+              onClick={statistics}
+            >
+              <BarChart3 size={16} />
+            </button>
+          )}
           {options && (
             <button
               className="qard-icon-button"

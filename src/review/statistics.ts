@@ -176,6 +176,33 @@ export function yearActivity(stats: StudyStatistics, year: number, today: string
   return { days, total, activeDays, longest, average: activeDays ? total / activeDays : 0 };
 }
 
+/**
+ * Statistics limited to some cards, such as one deck and its subdecks. Per-card totals come from the
+ * saved aggregates; daily activity comes from the review log, matched by card ID so cards keep their
+ * history when they move between decks.
+ */
+export function scopedStatistics(
+  stats: StudyStatistics,
+  history: ReviewEvent[],
+  ids: ReadonlySet<string>,
+): StudyStatistics {
+  const scoped = emptyStatistics();
+  scoped.partialHistory = stats.partialHistory;
+  for (const id of ids) {
+    const counts = stats.cards[id];
+    if (counts) {
+      scoped.cards[id] = counts;
+    }
+  }
+  for (const event of history) {
+    if (ids.has(event.cardId) && Number.isFinite(new Date(event.at).getTime())) {
+      const day = isoDay(event.at);
+      scoped.daily[day] = increment(scoped.daily[day], event.rating);
+    }
+  }
+  return scoped;
+}
+
 /** Observed difficulty: average rating mapped Easy → 0, Good → 33, Hard → 67, Again → 100. */
 export function difficultyScore(counts: RatingCounts): number | undefined {
   const n = countRatings(counts);
@@ -187,6 +214,8 @@ export function cardStatistics(
   stats: StudyStatistics,
   now: number,
   scheduled: boolean,
+  /** The row each card counts towards; its deck unless given. */
+  groupOf: (card: QardCard) => string = (card) => card.deck,
 ) {
   const unique = [...new Map(cards.filter((c) => !c.duplicateId).map((c) => [c.id, c])).values()];
   const scores: number[] = [],
@@ -229,8 +258,9 @@ export function cardStatistics(
         forecast[i] = forecast[i]! + 1;
       }
     }
-    const deck = decks.get(c.deck) ?? {
-      name: c.deck,
+    const group = groupOf(c);
+    const deck = decks.get(group) ?? {
+      name: group,
       total: 0,
       reviewed: 0,
       due: 0,
@@ -244,7 +274,7 @@ export function cardStatistics(
       deck.due++;
     }
     deck.ratings = sumRatings(deck.ratings, counts);
-    decks.set(c.deck, deck);
+    decks.set(group, deck);
   }
   scores.sort((a, b) => a - b);
   const middle = Math.floor(scores.length / 2);
