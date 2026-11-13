@@ -1,3 +1,12 @@
+# Remove duplicate appearance decoration
+
+#10 `f5b656a1f38f5e75a2b988ae08981264d29281bb` → #17 `a16bf0d828524a00c75185d26907e767a0472040`.
+
+- Removed Preview · this deck only from the shared preview and removed the badge from the icon selector. The actual preview badge/name and selector value/chevron remain.
+- Removed caption styles, obsolete small control-badge styles and the mobile two-row span so the remaining preview name centers against its badge in a single row. #17 preserves preview-first order and title hierarchy.
+-57existing deck cases pass(28base,29UI). Typecheck, scoped ESLint, Stylelint, formatting, build and release checks pass on both branches.14responsive/theme cases pass, including absence of caption/duplicate badge and working search/select/reset. No tests added. Previous full suites passed811/822tests.
+- Refreshed2settings after images in each PR plus their in-branch guide image. Main baselines unchanged; counts remain52pairs in#17 and2in#10. Isolated Obsidian build refreshed; protected files unchanged.
+
 # Pop-out picker dismissal follow-up
 
 #10 `260168d37931247d3975980ad952201fa07368b5` → #17 `8f246a67defb1e1341afbd8fae65819f6fc01f3f`. The title/section/label hierarchy and preview-first order are preserved.

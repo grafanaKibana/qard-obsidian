@@ -1,10 +1,10 @@
 {
   "before": "387ded998211375ee9fefcc707939b8aea7ca8d5",
-  "after": "8f246a67defb1e1341afbd8fae65819f6fc01f3f",
+  "after": "a16bf0d828524a00c75185d26907e767a0472040",
   "comparisons": 52,
   "deviceScaleFactor": 2,
   "clock": "2026-11-09T12:00Z for browser fixtures; native identical live renderer/settings",
-  "capture": "Main0.6.6 to latest#17. Settings after images refreshed for panel-title/section/label hierarchy and preview-first order. Other comparisons are unchanged from the preceding main refresh.",
+  "capture": "Main0.6.6 to latest#17; settings after images refreshed to remove preview caption and duplicate icon in the selector. Other comparisons unchanged.",
   "maximumExamplesPerGroup": 3,
   "scenes": [
     {
@@ -423,8 +423,8 @@
     "after-nested-phone.png": "57e92af342545d190be192637b55ba8a436450a9319a01f1cd74d7656b8531bd",
     "after-objectives-desktop.png": "e783c6b64cadde806a134d043fa5b23abfac690b1e6f8bf84fa190543cc3643b",
     "after-objectives-phone.png": "3360d7f94a2ae47e1e2b6eb602f35696188f2266f577f9937f7a2a274bf15100",
-    "after-options-desktop.png": "0056632fbf8ebba9ac111f5e0dd33efaff1a111007c697341b7ae1b03d9df727",
-    "after-options-phone.png": "624fab024fd5bd5c603f96c377b385b082ad3b735eecb3fb9771702280b4ff13",
+    "after-options-desktop.png": "27a08f147513a76a60a09a0823bb2b00b7e4d0035959d801f86b8145e1d5e83f",
+    "after-options-phone.png": "be5edc22e940977d595f45fca58b43a5b4b7da0e3b8fc656669a54d71e80801f",
     "after-plans-desktop.png": "8d01ab3de893f52af80354b1b33ca75968447ff39e4cf79baa3aeefb91c3c8e1",
     "after-plans-phone.png": "6e61fef6da753db0ee61e35bc579d1da4862088cd352f1955bb05a7bbaa2cde5",
     "after-probe-phone.png": "10d7a2181f71a03c46455508e356412a4d38d95b1008abb10636871382fdf395",
@@ -499,7 +499,7 @@
     "before-waiting-phone.png": "9424786a678c40c2ddc724ec4ee3ff278129cc0b2aa20e9a3cf4a695acd91012",
     "before-wrapping-desktop.png": "594b4dd58cbfe3db533598ebd7881a96c2a5cda787a76341723718a0068de140"
   },
-  "appearanceDependency": "260168d37931247d3975980ad952201fa07368b5",
+  "appearanceDependency": "f5b656a1f38f5e75a2b988ae08981264d29281bb",
   "freshImages": [
     "after-builder-phone.png",
     "after-checking-phone.png",
