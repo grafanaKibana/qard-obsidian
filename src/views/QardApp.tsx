@@ -7,11 +7,20 @@ import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 
 import { ChevronRight, AlertCircle, BarChart3 } from 'lucide-react';
 import { QardLogo } from '../components/QardLogo';
 import { LibraryTabs } from '../components/library/LibraryHeader';
-import type { QardCard } from '../cards/card-types';
+import type { Deck, QardCard } from '../cards/card-types';
 import type { CardDraft } from '../cards/card-writer';
 import type { Selection, SessionStyle, StudyMode } from '../review/session';
 import { hasRemainingSession } from '../review/saved-session';
-import { buildDecks, matchesSearch, renamedDeck, topicKey } from '../decks/deck-index';
+import {
+  buildDeckTree,
+  buildDecks,
+  deckLineage,
+  deckPath,
+  findDeckNode,
+  matchesSearch,
+  renamedDeck,
+  topicKey,
+} from '../decks/deck-index';
 import { studySources } from '../vault-access';
 import { DeckBrowser } from '../components/DeckBrowser';
 import { DeckOptions } from '../components/DeckOptions';
@@ -134,7 +143,16 @@ export function QardApp({ services, request }: { services: QardServices; request
   );
   const activeDeck =
     screen.kind === 'deck' ? screen.deck : screen.kind === 'card' ? screen.card.deck : '';
-  const deck = (repairOnly ? filtered : index.decks).find((d) => d.name === activeDeck);
+  const deckList = repairOnly ? filtered : index.decks;
+  const deckTree = useMemo(() => buildDeckTree(deckList), [deckList]);
+  const deckNode = activeDeck ? findDeckNode(deckTree, activeDeck) : undefined;
+  // A parent that only groups subdecks still opens as a page listing them.
+  const deck: Deck | undefined =
+    deckList.find((d) => d.name === activeDeck) ??
+    (deckNode?.children.length
+      ? { name: activeDeck, topics: [], cards: [], files: [] }
+      : undefined);
+  const parentDeck = deckNode ? deckLineage(deckNode.name)[1] : undefined;
   const generateCards = (draft?: Partial<CardDraft>) =>
     setScreen({ kind: 'generate-cards', draft });
   const library = () => {
@@ -630,7 +648,19 @@ export function QardApp({ services, request }: { services: QardServices; request
             (deck ? (
               <>
                 <TopicBrowser
-                  back={library}
+                  back={parentDeck ? () => setScreen({ kind: 'deck', deck: parentDeck }) : library}
+                  backLabel={parentDeck ? deckPath(parentDeck).at(-1) : undefined}
+                  title={deckNode?.label}
+                  subdecks={deckNode?.children}
+                  openDeck={(name) => {
+                    setSearch('');
+                    setScreen({ kind: 'deck', deck: name });
+                  }}
+                  studyDecks={(names) => builder({ decks: names, topics: [], cards: [] })}
+                  moveTopics={async (topics, to) => {
+                    const move = await services.writer.moveTopics(deck.name, topics, to);
+                    await services.reviews.moveTopics(move);
+                  }}
                   resume={<SavedSessions services={services} resume={resume} deck={deck.name} />}
                   states={reviews.states}
                   repairDays={repairDays}
@@ -670,11 +700,15 @@ export function QardApp({ services, request }: { services: QardServices; request
                       );
                     },
                   }}
-                  removeDeck={async () => {
-                    await services.writer.deleteGroup(deck.name);
-                    setSearch('');
-                    library();
-                  }}
+                  removeDeck={
+                    deck.cards.length
+                      ? async () => {
+                          await services.writer.deleteGroup(deck.name);
+                          setSearch('');
+                          library();
+                        }
+                      : undefined
+                  }
                   removeTopic={(topic) => services.writer.deleteGroup(deck.name, topic)}
                   renameDeck={async (to) => {
                     const done = await renameGroup(deck.name, undefined, to);
@@ -692,7 +726,8 @@ export function QardApp({ services, request }: { services: QardServices; request
                     builder(
                       topic
                         ? { decks: [], topics: [topicKey(deck.name, topic)], cards: [] }
-                        : { decks: [deck.name], topics: [], cards: [] },
+                        : // A deck with subdecks studies them together.
+                          { decks: deckNode?.decks ?? [deck.name], topics: [], cards: [] },
                     )
                   }
                   create={(topic) =>

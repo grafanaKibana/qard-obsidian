@@ -1086,6 +1086,42 @@ export class ReviewStore {
       };
     });
   }
+  /**
+   * Exam plans keep covering topics that move into another deck: a plan with the whole old deck, or
+   * with one of the moved topics, now lists each moved topic under its new deck.
+   */
+  moveTopics(move: { deck: string; topics: string[]; to: string }) {
+    const moved = (key: string) => {
+      try {
+        const [deck, topic] = JSON.parse(key) as [string, string];
+        return deck === move.deck && move.topics.includes(topic);
+      } catch {
+        return false;
+      }
+    };
+    return this.change((data) => {
+      const exams = data.exams.map((plan) => {
+        const whole = plan.selection.decks.includes(move.deck);
+        if (!whole && !plan.selection.topics.some(moved)) {
+          return plan;
+        }
+        const topics = [
+          ...new Set([
+            ...plan.selection.topics.filter((key) => !moved(key)),
+            ...move.topics
+              .filter(
+                (topic) => whole || plan.selection.topics.includes(topicKey(move.deck, topic)),
+              )
+              .map((topic) => topicKey(move.to, topic)),
+          ]),
+        ];
+        return sameValue(topics, plan.selection.topics)
+          ? plan
+          : { ...plan, selection: { ...plan.selection, topics } };
+      });
+      return { ...data, exams };
+    });
+  }
   deleteExam(id: string) {
     return this.change((data) => ({ ...data, exams: data.exams.filter((p) => p.id !== id) }));
   }
