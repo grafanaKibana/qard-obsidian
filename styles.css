@@ -9042,7 +9042,8 @@ div.qard-ask-q {
 
 /* Deck settings reuse the label/help/control rhythm of other Qard forms. */
 .qard-deck-options {
-  --qard-settings-heading-size: var(--font-ui-large, 18px);
+  --qard-settings-title-size: var(--qard-font-page);
+  --qard-settings-heading-size: calc(var(--qard-settings-title-size) * 0.75);
   --qard-settings-label-size: var(--qard-font-body, 14px);
 
   container: qard-deck-settings / inline-size;
@@ -9064,6 +9065,11 @@ div.qard-ask-q {
 
 .qard-deck-options > header > div {
   min-width: 0;
+}
+
+.qard-app .qard-deck-options > header h2 {
+  font-size: var(--qard-settings-title-size);
+  line-height: 1.25;
 }
 
 .qard-deck-options h2,
@@ -9597,7 +9603,7 @@ div.qard-ask-q {
 
 .qard-deck-appearance-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 160px;
+  grid-template-columns: 160px minmax(0, 1fr);
   gap: var(--qard-gap-sections, 24px);
   align-items: center;
 }
@@ -9710,7 +9716,7 @@ div.qard-ask-q {
 
 .qard-deck-icon-picker {
   position: absolute;
-  inset-inline-start: 0;
+  inset-inline: auto 0;
   top: calc(100% + var(--qard-gap-actions, 8px));
   z-index: 12;
   box-sizing: border-box;
@@ -9773,6 +9779,10 @@ div.qard-ask-q {
 }
 
 @container qard-appearance (max-width: 480px) {
+  .qard-deck-icon-picker {
+    inset-inline: 0 auto;
+  }
+
   .qard-deck-appearance-layout {
     grid-template-columns: minmax(0, 1fr);
   }

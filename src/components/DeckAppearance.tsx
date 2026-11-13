@@ -59,6 +59,11 @@ export function DeckAppearance({
     <fieldset className="qard-deck-appearance">
       <legend>Appearance</legend>
       <div className="qard-deck-appearance-layout">
+        <div className="qard-deck-appearance-preview">
+          <DeckBadge name={name} icon={icon.trim()} color={color} />
+          <strong>{name}</strong>
+          <span>Preview · this deck only</span>
+        </div>
         <div className="qard-deck-appearance-fields">
           <div className="qard-deck-appearance-field">
             <label htmlFor={`${id}-icon`}>Icon</label>
@@ -177,11 +182,6 @@ export function DeckAppearance({
             </div>
             <p className="qard-muted">Six-digit hex color; empty uses the automatic color.</p>
           </div>
-        </div>
-        <div className="qard-deck-appearance-preview">
-          <DeckBadge name={name} icon={icon.trim()} color={color} />
-          <strong>{name}</strong>
-          <span>Preview · this deck only</span>
         </div>
       </div>
     </fieldset>
