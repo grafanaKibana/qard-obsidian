@@ -8923,86 +8923,6 @@ div.qard-ask-q {
   stroke-width: 1.6px;
 }
 
-.qard-deck-appearance-preview {
-  display: flex;
-  align-items: center;
-  gap: var(--qard-gap-fields);
-  font-size: var(--qard-font-meta);
-  color: var(--qard-muted);
-}
-
-.qard-deck-appearance-control {
-  display: flex;
-  align-items: center;
-  gap: var(--qard-gap-actions);
-  min-width: 0;
-}
-
-.qard-deck-appearance-control > :first-child {
-  flex: 1 1 0;
-  min-width: 0;
-}
-
-.qard-deck-appearance-control > button:first-child > span:not(.qard-deck-badge) {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.qard-deck-appearance-control .qard-deck-badge {
-  width: 20px;
-  height: 20px;
-  background: transparent;
-}
-
-.qard-deck-appearance-control input[type='color'],
-.qard-deck-color-swatch {
-  flex: 0 0 var(--qard-control-height);
-  width: var(--qard-control-height);
-  height: var(--qard-control-height);
-  padding: var(--qard-space-1);
-}
-
-.qard-deck-color-swatch {
-  flex: 0 0 16px;
-  width: 16px;
-  height: 16px;
-  padding: 0;
-  background: var(--qard-muted);
-  border-radius: var(--qard-radius-badge);
-}
-
-.qard-deck-icon-picker {
-  display: grid;
-  gap: var(--qard-gap-fields);
-  padding-block: 0 var(--qard-space-4);
-}
-
-.qard-deck-icon-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--qard-control-height), 1fr));
-  gap: var(--qard-gap-actions);
-  max-height: 240px;
-  overflow-y: auto;
-}
-
-.qard-app .qard-deck-icon-grid > button {
-  width: 100%;
-  min-height: var(--qard-control-height);
-}
-
-.qard-deck-icon-grid .qard-deck-badge {
-  width: 24px;
-  height: 24px;
-  background: transparent;
-  color: inherit;
-}
-
-.qard-app .qard-deck-icon-grid > button[aria-pressed='true'] {
-  color: var(--qard-blue);
-  background: var(--qard-tint);
-}
-
 .qard-deck-options-info {
   display: inline-flex;
   margin-right: auto;
@@ -9445,4 +9365,224 @@ div.qard-ask-q {
   .qard-deck-group-menu {
     display: block;
   }
+}
+
+/* Appearance stays self-contained until the shared UI tokens are available. */
+.qard-deck-appearance {
+  container: qard-appearance / inline-size;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.qard-deck-appearance > legend {
+  padding: 0 0 var(--qard-gap-fields, 12px);
+  font-size: var(--qard-font-section, 16px);
+  font-weight: var(--qard-weight-medium, 600);
+}
+
+.qard-deck-appearance-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 160px;
+  gap: var(--qard-gap-sections, 24px);
+  align-items: center;
+}
+
+.qard-deck-appearance-fields {
+  display: grid;
+  gap: var(--qard-gap-fields, 12px);
+  min-width: 0;
+}
+
+.qard-deck-appearance-field {
+  display: grid;
+  gap: var(--qard-gap-actions, 8px);
+  min-width: 0;
+}
+
+.qard-deck-appearance-field > label {
+  font-size: var(--qard-font-body, 14px);
+  font-weight: var(--qard-weight-medium, 600);
+}
+
+.qard-deck-appearance-field > p,
+.qard-deck-appearance-preview > span:last-child {
+  margin: 0;
+  color: var(--qard-muted);
+  font-size: var(--qard-font-meta, 12px);
+  line-height: 1.5;
+}
+
+.qard-deck-appearance-preview {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--qard-gap-actions, 8px);
+  min-width: 0;
+  text-align: center;
+}
+
+.qard-deck-appearance-preview > strong {
+  overflow-wrap: anywhere;
+  font-size: var(--qard-font-body, 14px);
+  font-weight: var(--qard-weight-medium, 600);
+}
+
+.qard-deck-appearance-preview .qard-deck-badge {
+  width: 64px;
+  height: 64px;
+}
+
+.qard-deck-appearance-preview .qard-deck-badge svg {
+  width: 32px;
+  height: 32px;
+}
+
+.qard-deck-appearance-control {
+  display: flex;
+  align-items: center;
+  gap: var(--qard-gap-actions, 8px);
+  min-width: 0;
+}
+
+.qard-deck-appearance-control > :first-child {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: none;
+}
+
+.qard-deck-icon-anchor {
+  position: relative;
+}
+
+.qard-app .qard-deck-icon-anchor > button {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--qard-gap-actions, 8px);
+  width: 100%;
+}
+
+.qard-deck-icon-anchor > button > span:not(.qard-deck-badge) {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: start;
+}
+
+.qard-deck-appearance-control .qard-deck-badge {
+  width: 20px;
+  height: 20px;
+  background: transparent;
+}
+
+.qard-app .qard-deck-appearance-control input[type='color'] {
+  flex: 0 0 var(--qard-control-height, 34px);
+  width: var(--qard-control-height, 34px);
+  height: var(--qard-control-height, 34px);
+  padding: var(--qard-space-1, 4px);
+}
+
+.qard-deck-color-swatch {
+  display: block;
+  width: 16px;
+  height: 16px;
+  background: var(--qard-muted);
+  border-radius: var(--qard-radius-badge, 6px);
+}
+
+.qard-deck-icon-picker {
+  position: absolute;
+  inset-inline-start: 0;
+  top: calc(100% + var(--qard-gap-actions, 8px));
+  z-index: 12;
+  box-sizing: border-box;
+  width: min(320px, 100cqw);
+  padding: var(--qard-gap-fields, 12px);
+  display: grid;
+  gap: var(--qard-gap-fields, 12px);
+  background: var(--qard-bg);
+  border: 1px solid var(--qard-border);
+  border-radius: var(--qard-radius-floating, 10px);
+  box-shadow: var(--qard-shadow-floating, 0 4px 12px rgb(0 0 0 / 12%));
+}
+
+.qard-deck-options .qard-deck-icon-picker > .qard-search {
+  display: flex;
+  align-items: center;
+  gap: var(--qard-gap-actions, 8px);
+  min-width: 0;
+  padding: 0 var(--qard-space-3, 12px);
+  border: 1px solid var(--qard-border);
+  border-radius: var(--qard-control-radius, 6px);
+}
+
+.qard-app .qard-deck-icon-picker input[type='search'] {
+  min-width: 0;
+  max-width: none;
+  width: 100%;
+  min-height: calc(var(--qard-control-height, 34px) - 2px);
+  padding: var(--qard-space-1, 4px) 0;
+  border: 0;
+  background: transparent;
+}
+
+.qard-deck-icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--qard-control-height, 34px), 1fr));
+  gap: var(--qard-gap-actions, 8px);
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.qard-app .qard-deck-icon-grid > button {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: var(--qard-control-height, 34px);
+  padding: var(--qard-space-1, 4px);
+}
+
+.qard-deck-icon-grid .qard-deck-badge {
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  color: inherit;
+}
+
+.qard-app .qard-deck-icon-grid > button[aria-pressed='true'] {
+  color: var(--qard-blue);
+  background: var(--qard-tint, var(--qard-soft));
+}
+
+@container qard-appearance (max-width: 480px) {
+  .qard-deck-appearance-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .qard-deck-appearance-preview {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    text-align: start;
+    justify-items: start;
+    gap: var(--qard-gap-actions, 8px) var(--qard-gap-fields, 12px);
+  }
+
+  .qard-deck-appearance-preview > .qard-deck-badge {
+    grid-row: span 2;
+    width: 48px;
+    height: 48px;
+  }
+}
+
+.qard-deck-options .qard-deck-icon-picker > .qard-search:focus-within {
+  border-color: var(--qard-blue);
+}
+
+.qard-app .qard-deck-icon-picker input[type='search']:focus {
+  outline: 0;
+  box-shadow: none;
 }
