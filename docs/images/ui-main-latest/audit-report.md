@@ -1,3 +1,14 @@
+# Settings title hierarchy and preview-first order
+
+Latest#17 source `489c13507f61acea70ee8f3ce955999f210c1fcf`; #10 source remains620550c.
+
+- Parent panel h2 uses the settings title role based on the shared page size. Section legends derive at75% of the title size. Labels retain the smaller body role and normal weight: title>section>label, rather than a legend larger than its parent title.
+- Preview precedes fields in the DOM: left preview/right fields on desktop, preview above fields on narrow panes. Right-aligned desktop dropdown avoids the pane edge; narrow panes use the original left alignment.
+-14browser cases across320/390/480/580/640/1000/1440px in both themes pass hierarchy, preview placement, DOM order, dropdown edge fit, full icon registry, selection/reset and empty-state checks. Two screenshots refreshed; total52pairs unchanged.
+- Full npm run check passed822tests/98files plus formatting/typecheck/ESLint/Stylelint/build/release0.6.6. No test cases/files added. Native isolated icon SVG/select/cancel verification passed; protected DevBook/global files unchanged.
+
+## Prior verification
+
 # Current main, settings hierarchy and review fixes
 
 Main `387ded998211375ee9fefcc707939b8aea7ca8d5` (0.6.6) → #10 `620550cc6b8c05e561afdeac454f5a72ed661474` → #17 `8116419e410938140c47a415ba4a6402112569e5`.
