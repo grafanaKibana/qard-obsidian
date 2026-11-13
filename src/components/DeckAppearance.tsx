@@ -33,12 +33,14 @@ export function DeckAppearance({
   );
   const matches = icons.filter((icon) => icon.toLowerCase().includes(query.trim().toLowerCase()));
   useEffect(() => {
-    if (!open) {
+    const element = anchor.current;
+    if (!open || !element) {
       return;
     }
+    const owner = element.ownerDocument;
     search.current?.focus();
     const outside = (event: PointerEvent) => {
-      if (event.target instanceof Node && !anchor.current?.contains(event.target)) {
+      if (!event.composedPath().includes(element)) {
         setOpen(false);
       }
     };
@@ -48,11 +50,11 @@ export function DeckAppearance({
         trigger.current?.focus();
       }
     };
-    document.addEventListener('pointerdown', outside);
-    document.addEventListener('keydown', escape);
+    owner.addEventListener('pointerdown', outside);
+    owner.addEventListener('keydown', escape);
     return () => {
-      document.removeEventListener('pointerdown', outside);
-      document.removeEventListener('keydown', escape);
+      owner.removeEventListener('pointerdown', outside);
+      owner.removeEventListener('keydown', escape);
     };
   }, [open]);
   return (
