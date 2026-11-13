@@ -1,6 +1,6 @@
 {
   "before": "387ded998211375ee9fefcc707939b8aea7ca8d5",
-  "after": "f5b656a1f38f5e75a2b988ae08981264d29281bb",
+  "after": "3fd762093727d3d6be99789c748e8e12de8240ea",
   "comparisons": 2,
   "widths": [
     390,
@@ -11,8 +11,8 @@
   "icons": "Fixture SVGs from installed lucide-react; native Obsidian registry also verified",
   "verification": "811 tests/98 files full check;12 width/theme cases including distinct legend/label sizes and weights; shared native SVG/select/cancel smoke",
   "hashes": {
-    "after-options-desktop.png": "8429d1c1f91db5e0cfd806580768cc869f135da70e67810d2f126a8cd3f12982",
-    "after-options-phone.png": "ef0f1ba2721a215d42819918db92f1c4d493c97c7ff41b5364034c84bbfcbbb4",
+    "after-options-desktop.png": "9566f62adae575161523c85074c28b2d4d469b4aea50217b5312127211e403ac",
+    "after-options-phone.png": "4841dac5787b8fae7690701ed6859e2f1aa55280a8d47a2aaeaf656eeb67c3a0",
     "before-options-desktop.png": "6667c8686d512e950340682ca418d4c2f5964c348193ceadf0b5a5e06416592d",
     "before-options-phone.png": "1aec7a3a4f29ea3c61ba9c487432116f3df7fbbc3b875e1915066b0cdf01edfa"
   },

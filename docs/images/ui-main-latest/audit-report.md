@@ -1,3 +1,12 @@
+# Larger badge-only appearance preview
+
+#10 `3fd762093727d3d6be99789c748e8e12de8240ea` → #17 `f9d711275a2366b5ea9916e31bcc7c6e67878a3c`.
+
+- Preview contains only DeckBadge. The deck name remains in the settings header. Desktop badge fills the160px preview column; mobile uses a centered96px square.
+- Subject SVGs, custom registered SVGs and monogram fallbacks scale with the enlarged badge. Removed obsolete name/row-layout styles.
+-57focused cases pass across both branches(28base/29UI), with typecheck, formatting, source/CSS lint, build and release checks.14responsive/theme cases pass, including badge-only DOM, square badge sizing, preview order, hierarchy, dropdown fit and selection/reset. No tests added.
+- Refreshed settings comparisons and in-branch guide screenshots in both PRs. Main baselines unchanged;52pairs in#17 and2in#10. Isolated test build updated; protected files unchanged.
+
 # Remove duplicate appearance decoration
 
 #10 `f5b656a1f38f5e75a2b988ae08981264d29281bb` → #17 `a16bf0d828524a00c75185d26907e767a0472040`.
