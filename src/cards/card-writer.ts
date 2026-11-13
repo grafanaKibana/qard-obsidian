@@ -10,8 +10,11 @@ import {
   insertIntoTopic,
   locateCard,
   removeReverseInSource,
+  moveTopicsInSource,
+  movedLocation,
   renameGroupInSource,
   renamedLocation,
+  type TopicMove,
   replaceCardInSource,
   serializeCard,
   placeCardInSource,
@@ -472,6 +475,44 @@ export class CardWriter {
       );
     }
     return rename;
+  }
+  /**
+   * Move whole topics of a deck into another deck, usually a subdeck such as `Course::Part A`.
+   * Each note is patched atomically; topic names, card IDs and review history are kept.
+   */
+  async moveTopics(deck: string, topics: string[], to: string): Promise<TopicMove> {
+    const destination = readCardLocation({ deck: to, topic: 'General' }).deck;
+    const move = { deck, topics: [...new Set(topics)], to: destination };
+    if (!move.topics.length) {
+      throw new Error('Choose at least one topic to move.');
+    }
+    if (destination === deck) {
+      throw new Error('These topics are already in this deck.');
+    }
+    const paths = [
+      ...new Set(
+        this.index
+          .getSnapshot()
+          .cards.filter((card) => movedLocation(card, move))
+          .map((card) => card.sourceFile),
+      ),
+    ];
+    let completed = 0;
+    try {
+      for (const path of paths) {
+        const file = this.file(path);
+        await this.app.vault.process(file, (source) => moveTopicsInSource(source, path, move));
+        completed++;
+        await this.index.refresh(file);
+      }
+    } catch (error) {
+      throw new Error(
+        completed
+          ? `${completed} of ${paths.length} notes updated. ${(error as Error).message} Move the remaining topics again to finish.`
+          : (error as Error).message,
+      );
+    }
+    return move;
   }
   /** One atomic note write per generated batch. Stable IDs make retries safe after a save or index failure. */
   async createBatch(

@@ -86,10 +86,10 @@ it('nests decks under their parents, opens real decks and studies a whole subtre
     )!;
   await click(row('Cells'));
   expect(open).toHaveBeenCalledWith('Biology::Cells');
-  // Genetics has no cards of its own: its row folds the branch and does not open a deck.
+  // Genetics has no cards of its own: its row opens a page listing its subdecks.
   await click(row('Genetics'));
-  expect(open).toHaveBeenCalledTimes(1);
-  expect(row('Genetics').getAttribute('aria-expanded')).toBe('false');
+  expect(open).toHaveBeenLastCalledWith('Biology::Genetics');
+  await click(button('Collapse Biology::Genetics'));
   const geneticsChildren = row('Genetics').closest('.qard-deck-node')!.lastElementChild!;
   expect(geneticsChildren.classList.contains('is-collapsed')).toBe(true);
   expect(geneticsChildren.classList.contains('has-deck')).toBe(false);

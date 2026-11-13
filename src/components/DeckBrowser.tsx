@@ -89,11 +89,8 @@ export function DeckBrowser({
               {open ? <Minus size={16} /> : <Plus size={16} />}
             </button>
           )}
-          <button
-            className="qard-deck"
-            onClick={() => (deck ? openDeck(deck.name) : toggle(node.name))}
-            {...(deck ? {} : { 'aria-expanded': open })}
-          >
+          {/* A parent without cards of its own opens as a page listing its subdecks. */}
+          <button className="qard-deck" onClick={() => openDeck(deck?.name ?? node.name)}>
             <DeckBadge name={node.label} {...deckAppearance({ deckOptions }, node.name)} />
             <span className="qard-deck-name">
               <strong>{nested ? node.label : (deck?.name ?? node.label)}</strong>

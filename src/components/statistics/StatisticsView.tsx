@@ -15,9 +15,13 @@ import {
   countRatings,
   currentStreak,
   ratingSummary,
+  scopedStatistics,
   yearActivity,
   type ActivityDay,
 } from '../../review/statistics';
+import { DECK_SEPARATOR, deckPath, isWithinDeck, topicKey } from '../../decks/deck-index';
+import type { QardCard } from '../../cards/card-types';
+import type { Selection } from '../../review/session';
 
 const RANGES = [
   { days: 7, label: '7 days' },
@@ -34,16 +38,33 @@ const dateLabel = (day: string) =>
     year: 'numeric',
   });
 
+/** How a row of the deck table is shown and studied. */
+interface Group {
+  label: string;
+  selection: Selection;
+  /** A deck whose own statistics can be opened. */
+  deck?: string;
+}
+
 export function StatisticsView({
   services,
   back,
   study,
   time,
+  deck: scope,
+  openStatistics,
+  openDeck,
 }: {
   services: QardServices;
   back: () => void;
-  study: (deck?: string) => void;
+  /** Open the study builder, for everything in view when no selection is given. */
+  study: (selection?: Selection) => void;
   time?: () => void;
+  /** Limit the page to this deck and its subdecks. */
+  deck?: string;
+  /** Show statistics for one deck, or for every card. */
+  openStatistics?: (deck?: string) => void;
+  openDeck?: (deck: string) => void;
 }) {
   const data = useSyncExternalStore(services.reviews.subscribe, services.reviews.getSnapshot);
   const index = useSyncExternalStore(services.index.subscribe, services.index.getSnapshot);
@@ -56,7 +77,61 @@ export function StatisticsView({
   }, []);
   const today = isoDay(now),
     thisYear = Number(today.slice(0, 4));
-  const stats = data.statistics;
+  const inScope = useMemo(
+    () =>
+      scope === undefined
+        ? index.cards
+        : index.cards.filter((card) => card.deck === scope || isWithinDeck(card.deck, scope)),
+    [index.cards, scope],
+  );
+  const stats = useMemo(
+    () =>
+      scope === undefined
+        ? data.statistics
+        : scopedStatistics(data.statistics, data.history, new Set(inScope.map((c) => c.id))),
+    [data.statistics, data.history, inScope, scope],
+  );
+  // Within a deck, rows are its subdecks, then the topics of its own cards.
+  const { groupOf, groups } = useMemo(() => {
+    const groups = new Map<string, Group>();
+    if (scope === undefined) {
+      return {
+        groups,
+        groupOf: (card: QardCard) => {
+          groups.set(card.deck, {
+            label: card.deck,
+            deck: card.deck,
+            selection: { decks: [card.deck], topics: [], cards: [] },
+          });
+          return card.deck;
+        },
+      };
+    }
+    const depth = deckPath(scope).length;
+    return {
+      groups,
+      groupOf: (card: QardCard) => {
+        const parts = deckPath(card.deck);
+        if (parts.length > depth && card.deck !== scope) {
+          const name = parts.slice(0, depth + 1).join(DECK_SEPARATOR);
+          const group = groups.get(name) ?? {
+            label: parts[depth]!,
+            deck: name,
+            selection: { decks: [], topics: [], cards: [] },
+          };
+          if (!group.selection.decks.includes(card.deck)) {
+            group.selection.decks.push(card.deck);
+          }
+          groups.set(name, group);
+          return name;
+        }
+        const key = topicKey(card.deck, card.topic);
+        groups.set(key, { label: card.topic, selection: { decks: [], topics: [key], cards: [] } });
+        return key;
+      },
+    };
+  }, [scope]);
+  const scopeDecks = useMemo(() => [...new Set(inScope.map((c) => c.deck))], [inScope]);
   const summary = useMemo(() => ratingSummary(stats, today, days), [stats, today, days]);
   const previous = useMemo(
     () => (days ? ratingSummary(stats, addDays(today, -days), days) : undefined),
@@ -64,19 +139,39 @@ export function StatisticsView({
   );
   const activity = useMemo(() => yearActivity(stats, year, today), [stats, year, today]);
   const cards = useMemo(
-    () => cardStatistics(index.cards, data.states, stats, now, data.settings.scheduling),
-    [index.cards, data.states, stats, now, data.settings.scheduling],
+    () => cardStatistics(inScope, data.states, stats, now, data.settings.scheduling, groupOf),
+    [inScope, data.states, stats, now, data.settings.scheduling, groupOf],
   );
+  // Within a deck, subdecks come first by name, then topics in note order.
+  const rows = useMemo(() => {
+    if (scope === undefined) {
+      return cards.decks;
+    }
+    const order = [...groups.keys()];
+    return [...cards.decks].sort((a, b) => {
+      const x = groups.get(a.name)!,
+        y = groups.get(b.name)!;
+      if (x.deck && y.deck) {
+        return x.label.localeCompare(y.label);
+      }
+      if (x.deck || y.deck) {
+        return x.deck ? -1 : 1;
+      }
+      return order.indexOf(a.name) - order.indexOf(b.name);
+    });
+  }, [cards.decks, groups, scope]);
+  const subdeckRows = cards.decks.filter((row) => groups.get(row.name)?.deck).length,
+    topicRows = cards.decks.length - subdeckRows;
   const memory = useMemo(
     () =>
       memoryStatistics(
-        index.cards,
+        inScope,
         data.states,
         now,
         data.settings.desiredRetention,
         data.settings.fsrsParameters,
       ),
-    [index.cards, data.states, now, data.settings.desiredRetention, data.settings.fsrsParameters],
+    [inScope, data.states, now, data.settings.desiredRetention, data.settings.fsrsParameters],
   );
   const firstDay = Object.keys(stats.daily)
     .filter((day) => day <= today && countRatings(stats.daily[day]!))
@@ -92,24 +187,49 @@ export function StatisticsView({
 
   return (
     <div className="qard-statistics">
-      <button className="qard-text-button qard-small" onClick={back}>
-        <ArrowLeft size={14} /> Back to decks
-      </button>
+      {scope !== undefined && openStatistics ? (
+        <button className="qard-text-button qard-small" onClick={() => openStatistics()}>
+          <ArrowLeft size={14} /> All statistics
+        </button>
+      ) : (
+        <button className="qard-text-button qard-small" onClick={back}>
+          <ArrowLeft size={14} /> Back to decks
+        </button>
+      )}
       <div className="qard-heading qard-stats-heading">
         <div>
-          <h1>Statistics</h1>
+          {scope !== undefined && <span className="qard-stats-kicker">Deck statistics</span>}
+          <h1>{scope === undefined ? 'Statistics' : (deckPath(scope).at(-1) ?? scope)}</h1>
           <p>
-            {number(cards.total)} cards · {number(cards.decks.length)}{' '}
-            {cards.decks.length === 1 ? 'deck' : 'decks'}
+            {number(cards.total)} cards ·{' '}
+            {scope === undefined
+              ? `${number(cards.decks.length)} ${cards.decks.length === 1 ? 'deck' : 'decks'}`
+              : [
+                  subdeckRows && `${subdeckRows} ${subdeckRows === 1 ? 'subdeck' : 'subdecks'}`,
+                  topicRows && `${topicRows} ${topicRows === 1 ? 'topic' : 'topics'}`,
+                ]
+                  .filter(Boolean)
+                  .join(' · ') || 'no cards yet'}
           </p>
         </div>
         <div className="qard-actions">
-          {time && (
+          {scope !== undefined && openDeck && (
+            <button className="qard-text-button" onClick={() => openDeck(scope)}>
+              Open deck
+            </button>
+          )}
+          {scope === undefined && time && (
             <button className="qard-text-button" onClick={time}>
               Study time
             </button>
           )}
-          <button className="qard-primary" onClick={() => study()}>
+          <button
+            className="qard-primary"
+            disabled={scope !== undefined && !scopeDecks.length}
+            onClick={() =>
+              scope === undefined ? study() : study({ decks: scopeDecks, topics: [], cards: [] })
+            }
+          >
             Study cards <ArrowUpRight size={15} />
           </button>
         </div>
@@ -290,24 +410,46 @@ export function StatisticsView({
 
       <section className="qard-stats-decks" aria-label="Deck progress">
         <div className="qard-stats-section-heading">
-          <h2>Your decks</h2>
+          <h2>
+            {scope === undefined
+              ? 'Your decks'
+              : subdeckRows && topicRows
+                ? 'Subdecks and topics'
+                : subdeckRows
+                  ? 'Subdecks'
+                  : 'Topics'}
+          </h2>
           <span className="qard-stats-caption">Recall across saved history</span>
         </div>
         {cards.decks.length ? (
           <div className="qard-stats-deck-list">
             <div className="qard-stats-deck-head" aria-hidden="true">
-              <span>Deck / cards studied</span>
+              <span>{scope === undefined ? 'Deck' : 'Subdeck or topic'} / cards studied</span>
               <span>Recall</span>
               <span>Due now</span>
               <span />
             </div>
-            {cards.decks.map((deck) => {
+            {rows.map((deck) => {
               const reviews = countRatings(deck.ratings),
-                coverage = deck.total ? (deck.reviewed / deck.total) * 100 : 0;
+                coverage = deck.total ? (deck.reviewed / deck.total) * 100 : 0,
+                group = groups.get(deck.name)!;
               return (
                 <div className="qard-stats-deck" key={deck.name}>
                   <div className="qard-stats-deck-name">
-                    <h3>{deck.name}</h3>
+                    <h3>
+                      {group.deck && openStatistics ? (
+                        <button
+                          className="qard-stats-deck-link"
+                          aria-label={`Statistics for ${group.label}`}
+                          onClick={() => openStatistics(group.deck)}
+                        >
+                          {group.label}
+                          <ChevronRight size={14} />
+                        </button>
+                      ) : (
+                        group.label
+                      )}
+                    </h3>
                     <span>
                       {number(deck.reviewed)} of {number(deck.total)} cards studied
                     </span>
@@ -331,8 +473,8 @@ export function StatisticsView({
                   </div>
                   <button
                     className="qard-text-button"
-                    aria-label={`Study ${deck.name}`}
-                    onClick={() => study(deck.name)}
+                    aria-label={`Study ${group.label}`}
+                    onClick={() => study(group.selection)}
                   >
                     Study <ArrowUpRight size={14} />
                   </button>
@@ -341,7 +483,11 @@ export function StatisticsView({
             })}
           </div>
         ) : (
-          <p className="qard-stats-empty">Create a card to see your decks here.</p>
+          <p className="qard-stats-empty">
+            {scope === undefined
+              ? 'Create a card to see your decks here.'
+              : 'This deck has no cards yet.'}
+          </p>
         )}
       </section>
 
@@ -398,6 +544,8 @@ export function StatisticsView({
         <details>
           <summary>About this data</summary>
           <p>
+            {scope !== undefined &&
+              'This page counts the cards now in this deck and its subdecks, with their reviews from before they moved here. '}
             Review periods affect the totals and ratings above. The calendar uses the selected year;
             deck recall uses all saved ratings for current cards. Days follow your device’s local
             time. A streak remains active if you studied today or yesterday. Imported schedules do
