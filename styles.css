@@ -8081,8 +8081,7 @@ div.qard-ask-q {
   font-weight: var(--qard-weight-normal, 400);
 }
 
-.qard-deck-appearance-field > p,
-.qard-deck-appearance-preview > span:last-child {
+.qard-deck-appearance-field > p {
   margin: 0;
   color: var(--qard-muted);
   font-size: var(--qard-font-meta, 12px);
@@ -8140,18 +8139,12 @@ div.qard-ask-q {
   width: 100%;
 }
 
-.qard-deck-icon-anchor > button > span:not(.qard-deck-badge) {
+.qard-deck-icon-anchor > button > span {
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   text-align: start;
-}
-
-.qard-deck-appearance-control .qard-deck-badge {
-  width: 20px;
-  height: 20px;
-  background: transparent;
 }
 
 .qard-app .qard-deck-appearance-control input[type='color'] {
@@ -8247,7 +8240,6 @@ div.qard-ask-q {
   }
 
   .qard-deck-appearance-preview > .qard-deck-badge {
-    grid-row: span 2;
     width: 48px;
     height: 48px;
   }

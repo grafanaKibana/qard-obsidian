@@ -80,7 +80,6 @@ export function DeckAppearance({
                   disabled={busy}
                   onClick={() => setOpen(!open)}
                 >
-                  <DeckBadge name={name} icon={icon.trim()} color={color} />
                   <span>{icon || 'Automatic'}</span>
                   <ChevronDown size={16} />
                 </button>
@@ -183,7 +182,6 @@ export function DeckAppearance({
         <div className="qard-deck-appearance-preview">
           <DeckBadge name={name} icon={icon.trim()} color={color} />
           <strong>{name}</strong>
-          <span>Preview · this deck only</span>
         </div>
       </div>
     </fieldset>
