@@ -181,7 +181,6 @@ export function DeckAppearance({
         </div>
         <div className="qard-deck-appearance-preview">
           <DeckBadge name={name} icon={icon.trim()} color={color} />
-          <strong>{name}</strong>
         </div>
       </div>
     </fieldset>
