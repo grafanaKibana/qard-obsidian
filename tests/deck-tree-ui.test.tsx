@@ -402,19 +402,40 @@ it.each([true, false])(
 );
 
 it('suggests, previews and saves registered icon-pack IDs', async () => {
+  const frame = document.createElement('iframe');
+  document.body.append(frame);
+  const owner = frame.contentDocument!;
+  owner.body.append(host);
   const save = vi.fn(async (_options: unknown) => {});
-  act(() =>
-    root.render(<DeckOptions deck="A" settings={readSettings({})} save={save} close={vi.fn()} />),
-  );
-  await typeAppearance('Icon', 'ri_terminal');
-  expect(
-    host.querySelector('.qard-deck-appearance-preview [data-icon]')?.getAttribute('data-icon'),
-  ).toBe('ri_terminal');
-  await action('Save options');
-  expect(save).toHaveBeenCalledWith({ A: { icon: 'ri_terminal' } });
-  expect(readSettings({ deckOptions: save.mock.calls[0]![0] }).deckOptions).toEqual({
-    A: { icon: 'ri_terminal' },
-  });
+  try {
+    act(() =>
+      root.render(<DeckOptions deck="A" settings={readSettings({})} save={save} close={vi.fn()} />),
+    );
+    await click(button('Choose deck icon'));
+    await act(() =>
+      owner.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })),
+    );
+    expect(host.querySelector('.qard-deck-icon-picker')).toBeNull();
+    await click(button('Choose deck icon'));
+    const outside = owner.createElement('button');
+    owner.body.append(outside);
+    await act(() =>
+      outside.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, composed: true })),
+    );
+    expect(host.querySelector('.qard-deck-icon-picker')).toBeNull();
+    await typeAppearance('Icon', 'ri_terminal');
+    expect(
+      host.querySelector('.qard-deck-appearance-preview [data-icon]')?.getAttribute('data-icon'),
+    ).toBe('ri_terminal');
+    await action('Save options');
+    expect(save).toHaveBeenCalledWith({ A: { icon: 'ri_terminal' } });
+    expect(readSettings({ deckOptions: save.mock.calls[0]![0] }).deckOptions).toEqual({
+      A: { icon: 'ri_terminal' },
+    });
+  } finally {
+    document.body.append(host);
+    frame.remove();
+  }
 });
 
 it.each([
