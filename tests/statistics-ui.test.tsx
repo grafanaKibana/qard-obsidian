@@ -101,10 +101,10 @@ it('updates after a review, filters periods, navigates years and supports keyboa
   );
   expect(host.querySelectorAll('.qard-stats-cell[disabled]')).toHaveLength(0);
   await click(host.querySelector('[aria-label="Study Networks"]'));
-  expect(study).toHaveBeenCalledWith('Networks');
+  expect(study).toHaveBeenCalledWith({ decks: ['Networks'], topics: [], cards: [] });
 });
 
-it('opens from the workspace header and a command request, and returns to the deck study builder', async () => {
+function appServices() {
   const snapshot = { revision: 0, jobs: {} };
   Object.assign(services, {
     tests: {
@@ -121,6 +121,9 @@ it('opens from the workspace header and a command request, and returns to the de
       todayList: async () => ({ checks: [], lessons: [], cards: 0 }),
     },
   });
+}
+it('opens from the workspace header and a command request, and returns to the deck study builder', async () => {
+  appServices();
   await act(async () =>
     root.render(<QardApp services={services} request={{ serial: 1, kind: 'statistics' }} />),
   );
@@ -187,4 +190,88 @@ it('keeps postponed cards in the forecast, excludes paused cards and explains di
   expect(host.querySelector('[aria-label="Upcoming reviews"]')?.textContent).toContain(
     'Scheduling is off',
   );
+});
+
+const card = (id: string, front: string) =>
+  `<!-- qard-id: ${id} -->\n> [!qard]- ${front}\n> Answer\n`;
+function course() {
+  services.index.update(
+    'asd.md',
+    `---\nqard-deck: "AP::ASD"\n---\n# Agile\n${card('asd1', 'Q1')}\n# Scrum\n${card('asd2', 'Q2')}`,
+  );
+  services.index.update('fp.md', `---\nqard-deck: "AP::FP"\n---\n# Haskell\n${card('fp1', 'Q3')}`);
+  services.index.update('ap.md', `---\nqard-deck: AP\n---\n# Admin\n${card('ap1', 'Q4')}`);
+}
+const rows = () =>
+  [...host.querySelectorAll('.qard-stats-deck h3')].map((h) => h.textContent?.trim());
+const metric = () => host.querySelector('.qard-stats-metrics dd')?.textContent;
+
+it('limits statistics to a deck and its subdecks, with a row per subdeck and topic', async () => {
+  course();
+  await services.reviews.review('asd1', 1, Date.now());
+  await services.reviews.review('asd2', 3, Date.now());
+  await services.reviews.review('fp1', 3, Date.now());
+  await services.reviews.review('a', 3, Date.now());
+  const openStatistics = vi.fn(),
+    openDeck = vi.fn();
+  const render = (deck?: string) =>
+    act(async () =>
+      root.render(
+        <StatisticsView
+          key={deck}
+          services={services}
+          back={back}
+          study={study}
+          deck={deck}
+          openStatistics={openStatistics}
+          openDeck={openDeck}
+        />,
+      ),
+    );
+  await render('AP');
+  expect(host.querySelector('h1')?.textContent).toBe('AP');
+  expect(host.textContent).toContain('4 cards · 2 subdecks · 1 topic');
+  // Networks' review is not part of this deck.
+  expect(metric()).toBe('3');
+  expect(host.querySelector('.qard-stats-metrics')?.textContent).toContain('67%');
+  expect(host.querySelector('h2:not(.qard-stats-section-heading h2)')).toBeNull();
+  expect(rows()).toEqual(['ASD', 'FP', 'Admin']);
+  const asd = [...host.querySelectorAll('.qard-stats-deck')][0]!;
+  expect(asd.textContent).toContain('2 of 2 cards studied');
+  expect(asd.textContent).toContain('50%');
+  await click(host.querySelector('[aria-label="Study ASD"]'));
+  expect(study).toHaveBeenLastCalledWith({ decks: ['AP::ASD'], topics: [], cards: [] });
+  await click(host.querySelector('[aria-label="Study Admin"]'));
+  expect(study).toHaveBeenLastCalledWith({ decks: [], topics: ['["AP","Admin"]'], cards: [] });
+  await click(button('Study cards'));
+  expect(study.mock.lastCall![0].decks.sort()).toEqual(['AP', 'AP::ASD', 'AP::FP']);
+  await click(host.querySelector('[aria-label="Statistics for FP"]'));
+  expect(openStatistics).toHaveBeenLastCalledWith('AP::FP');
+  await click(button('Open deck'));
+  expect(openDeck).toHaveBeenCalledWith('AP');
+  await click(button('All statistics'));
+  expect(openStatistics).toHaveBeenLastCalledWith();
+
+  await render('AP::ASD');
+  expect(host.querySelector('h1')?.textContent).toBe('ASD');
+  expect(rows()).toEqual(['Agile', 'Scrum']);
+  expect(metric()).toBe('2');
+  expect(host.querySelector('.qard-stats-deck-link')).toBeNull();
+});
+
+it('opens a deck’s statistics from its page in the app', async () => {
+  course();
+  appServices();
+  await act(async () => root.render(<QardApp services={services} />));
+  const deckRow = [...host.querySelectorAll<HTMLButtonElement>('button.qard-deck')].find(
+    (b) => b.querySelector('strong')?.textContent === 'AP',
+  )!;
+  await click(deckRow);
+  await click(host.querySelector('[aria-label="Deck statistics"]'));
+  expect(host.querySelector('h1')?.textContent).toBe('AP');
+  expect(rows()).toEqual(['ASD', 'FP', 'Admin']);
+  await click(host.querySelector('[aria-label="Statistics for ASD"]'));
+  expect(host.querySelector('h1')?.textContent).toBe('ASD');
+  await click(button('All statistics'));
+  expect(host.querySelector('h1')?.textContent).toBe('Statistics');
 });

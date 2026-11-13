@@ -27,7 +27,9 @@ export type Screen =
   | { kind: 'new-test'; prompt?: string; serial: number }
   | { kind: 'plan' | 'take' | 'results' | 'test-cards'; folder: string }
   | { kind: 'review'; folder: string; question?: string }
-  | { kind: 'exams' | 'today' | 'learn' | 'usage' | 'statistics' | 'source-updates' | 'time' }
+  | { kind: 'exams' | 'today' | 'learn' | 'usage' | 'source-updates' | 'time' }
+  /** Statistics for one deck with its subdecks, or for every card. */
+  | { kind: 'statistics'; deck?: string }
   | { kind: 'map-course'; folder?: string }
   | { kind: 'check' | 'lesson'; path: string }
   | { kind: 'course'; path: string; objective?: string; serial: number };

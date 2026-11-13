@@ -667,6 +667,7 @@ export function QardApp({ services, request }: { services: QardServices; request
                   key={deck.name}
                   deck={deck}
                   options={() => setOptionsFor(deck.name)}
+                  statistics={() => setScreen({ kind: 'statistics', deck: deck.name })}
                   management={{
                     decks: index.decks,
                     move: async (cards, destination) => {
@@ -842,10 +843,14 @@ export function QardApp({ services, request }: { services: QardServices; request
           {screen.kind === 'today' && <TodayView services={services} nav={learnNav} />}
           {screen.kind === 'statistics' && (
             <StatisticsView
+              key={screen.deck ?? ''}
               services={services}
               back={library}
+              deck={screen.deck}
+              openStatistics={(deck) => setScreen({ kind: 'statistics', deck })}
+              openDeck={(deck) => setScreen({ kind: 'deck', deck })}
               time={() => setScreen({ kind: 'time' })}
-              study={(deck) => builder(deck ? { decks: [deck], topics: [], cards: [] } : undefined)}
+              study={(selection) => builder(selection)}
             />
           )}
           {screen.kind === 'usage' && <UsageView services={services} />}
