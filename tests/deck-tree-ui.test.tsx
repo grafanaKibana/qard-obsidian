@@ -86,9 +86,10 @@ it('nests decks under their parents, opens real decks and studies a whole subtre
     )!;
   await click(row('Cells'));
   expect(open).toHaveBeenCalledWith('Biology::Cells');
-  // Genetics has no cards of its own: its row folds the branch and does not open a deck.
+  // Genetics has no cards of its own: its row opens a page listing its subdecks.
   await click(row('Genetics'));
-  expect(open).toHaveBeenCalledTimes(1);
+  expect(open).toHaveBeenLastCalledWith('Biology::Genetics');
+  await click(button('Collapse Biology::Genetics'));
   expect(names()).toEqual(['Biology', 'Cells', 'Genetics', 'Chemistry']);
   await click(button('Collapse Biology'));
   expect(names()).toEqual(['Biology', 'Chemistry']);

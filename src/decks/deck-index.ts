@@ -124,3 +124,17 @@ export function buildDeckTree(decks: Deck[]): DeckNode[] {
   sort(roots);
   return roots;
 }
+
+/** The tree node for a deck name, whether a real deck or a parent that only groups others. */
+export function findDeckNode(nodes: DeckNode[], name: string): DeckNode | undefined {
+  for (const node of nodes) {
+    if (node.deck?.name === name || (!node.deck && node.name === name)) {
+      return node;
+    }
+    const found = findDeckNode(node.children, name);
+    if (found) {
+      return found;
+    }
+  }
+  return undefined;
+}

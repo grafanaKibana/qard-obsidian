@@ -88,11 +88,8 @@ export function DeckBrowser({
               {open ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
             </button>
           )}
-          <button
-            className="qard-deck"
-            onClick={() => (deck ? openDeck(deck.name) : toggle(node.name))}
-            {...(deck ? {} : { 'aria-expanded': open })}
-          >
+          {/* A parent without cards of its own opens as a page listing its subdecks. */}
+          <button className="qard-deck" onClick={() => openDeck(deck?.name ?? node.name)}>
             <DeckBadge name={node.label} {...deckAppearance({ deckOptions }, node.name)} />
             <span className="qard-deck-name">
               <strong>{nested ? node.label : (deck?.name ?? node.label)}</strong>
@@ -103,7 +100,7 @@ export function DeckBrowser({
                 {deck && below > 0 ? ` · ${below} in subdecks` : ''}
               </small>
             </span>
-            {deck && <ChevronRight size={17} />}
+            <ChevronRight size={17} />
           </button>
           {options && (
             <button

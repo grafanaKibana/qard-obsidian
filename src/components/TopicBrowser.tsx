@@ -2,12 +2,16 @@ import { isBuried } from '../review/scheduler';
 import { REPAIR_FAILURE_DAYS } from '../review/card-repair';
 import type { ReviewState } from '../review/scheduler';
 import { BulkCardActions, type CardManagement } from './BulkCardActions';
-import { matchesSearch } from '../decks/deck-index';
+import { matchesSearch, type DeckNode } from '../decks/deck-index';
+import { NewSubdeck } from './NewSubdeck';
 import { useId, useState, type ReactNode } from 'react';
 import {
   ArrowLeft,
+  BarChart3,
   ChevronDown,
   ChevronRight,
+  Folder,
+  FolderPlus,
   Sparkles,
   Plus,
   Play,
@@ -34,13 +38,31 @@ export function TopicBrowser({
   states = {},
   repairDays = new Map<string, number>(),
   back,
+  backLabel = 'All decks',
+  title,
+  subdecks = [],
+  openDeck,
+  studyDecks,
+  moveTopics,
   options,
+  statistics,
   resume,
   management,
   deckOptions = {},
 }: {
   deckOptions?: QardSettings['deckOptions'];
+  /** Open statistics for this deck and its subdecks. */
+  statistics?: () => void;
   deck: Deck;
+  /** The last part of a nested deck's name, shown as its title. */
+  title?: string;
+  backLabel?: string;
+  /** Decks directly beneath this one, such as `Course::Part A` inside `Course`. */
+  subdecks?: DeckNode[];
+  openDeck?: (name: string) => void;
+  studyDecks?: (decks: string[]) => void;
+  /** Move whole topics into another deck, keeping their names. */
+  moveTopics?: (topics: string[], to: string) => Promise<void>;
   management?: CardManagement;
   states?: Record<string, ReviewState>;
   repairDays?: Map<string, number>;
@@ -64,6 +86,7 @@ export function TopicBrowser({
   const [selecting, setSelecting] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
+  const [grouping, setGrouping] = useState(false);
   const [notice, setNotice] = useState<{ text: string; error: boolean }>({
     text: '',
     error: false,
@@ -77,6 +100,22 @@ export function TopicBrowser({
         }))
         .filter((topic) => topic.cards.length)
     : deck.topics;
+  const subtreeCards = (node: DeckNode): QardCard[] => [
+    ...(node.deck?.cards ?? []),
+    ...node.children.flatMap(subtreeCards),
+  ];
+  const folders = subdecks
+    .map((node) => {
+      const cards = subtreeCards(node);
+      return {
+        node,
+        cards: search.trim()
+          ? cards.filter((card) => matchesSearch(card, search)).length
+          : cards.length,
+      };
+    })
+    .filter((entry) => entry.cards || !search.trim());
+  const below = subdecks.reduce((count, node) => count + node.cards, 0);
   const visible = topics.flatMap((topic) => topic.cards).filter((card) => !card.duplicateId);
   const selectedSet = new Set(selected);
   const chosen = deck.cards.filter((card) => selectedSet.has(card.id) && !card.duplicateId);
@@ -101,17 +140,21 @@ export function TopicBrowser({
       {back && (
         <button className="qard-text-button qard-deck-back" disabled={busy} onClick={back}>
           <ArrowLeft size={14} />
-          All decks
+          {backLabel}
         </button>
       )}
       <div className="qard-heading qard-deck-heading">
         <div className="qard-deck-identity">
-          <DeckBadge name={deck.name} {...deckAppearance({ deckOptions }, deck.name)} />
+          <DeckBadge name={title ?? deck.name} {...deckAppearance({ deckOptions }, deck.name)} />
           <div>
-            <h1>{deck.name}</h1>
+            <h1>{title ?? deck.name}</h1>
             <p>
-              {deck.cards.length} cards · {deck.topics.length}{' '}
-              {deck.topics.length === 1 ? 'topic' : 'topics'}
+              {deck.cards.length || !subdecks.length
+                ? `${deck.cards.length} cards · ${deck.topics.length} ${deck.topics.length === 1 ? 'topic' : 'topics'}`
+                : `${below} cards`}
+              {subdecks.length > 0 &&
+                ` · ${subdecks.length} ${subdecks.length === 1 ? 'subdeck' : 'subdecks'}`}
+              {deck.cards.length > 0 && below > 0 && ` (${below} cards)`}
             </p>
           </div>
         </div>
@@ -130,6 +173,16 @@ export function TopicBrowser({
             <Play size={16} />
             Study
           </button>
+          {statistics && (
+            <button
+              className="qard-icon-button"
+              aria-label="Deck statistics"
+              disabled={busy}
+              onClick={statistics}
+            >
+              <BarChart3 size={16} />
+            </button>
+          )}
           {options && (
             <button
               className="qard-icon-button"
@@ -159,7 +212,23 @@ export function TopicBrowser({
       </div>
       {resume}
       <div className="qard-library-toolbar">
-        <span>Topics</span>
+        <span>{subdecks.length ? 'Subdecks and topics' : 'Topics'}</span>
+        {moveTopics && deck.topics.length > 0 && (
+          <button
+            className="qard-text-button"
+            disabled={busy}
+            aria-pressed={grouping}
+            onClick={() => {
+              setGrouping((value) => !value);
+              setSelecting(false);
+              setSelected([]);
+              setNotice({ text: '', error: false });
+            }}
+          >
+            <FolderPlus size={14} />
+            New subdeck
+          </button>
+        )}
         {management && (
           <button
             className="qard-text-button"
@@ -167,6 +236,7 @@ export function TopicBrowser({
             aria-pressed={selecting}
             onClick={() => {
               setSelecting((value) => !value);
+              setGrouping(false);
               setSelected([]);
               setNotice({ text: '', error: false });
             }}
@@ -190,6 +260,17 @@ export function TopicBrowser({
           />
         </label>
       </div>
+      {grouping && moveTopics && (
+        <NewSubdeck
+          deck={deck}
+          subdecks={subdecks.map((node) => node.label)}
+          move={moveTopics}
+          close={() => setGrouping(false)}
+          busy={busy}
+          setBusy={setBusy}
+          report={(text, error = false) => setNotice({ text, error })}
+        />
+      )}
       {selecting && management && (
         <div className="qard-selection-options">
           <button disabled={busy || !visible.length} onClick={() => toggle(visible)}>
@@ -220,6 +301,42 @@ export function TopicBrowser({
         >
           {notice.text}
         </p>
+      )}
+      {folders.length > 0 && (
+        <div className="qard-subdecks" role="list" aria-label="Subdecks">
+          {folders.map(({ node, cards }) => (
+            <div className="qard-subdeck" role="listitem" key={node.name}>
+              <button
+                className="qard-subdeck-open"
+                disabled={busy || !openDeck}
+                onClick={() => openDeck?.(node.name)}
+              >
+                <Folder size={16} />
+                <strong>{node.label}</strong>
+                <span>
+                  {search.trim()
+                    ? `${cards} matching`
+                    : `${cards} ${cards === 1 ? 'card' : 'cards'}`}
+                  {node.deck &&
+                    ` · ${node.deck.topics.length} ${node.deck.topics.length === 1 ? 'topic' : 'topics'}`}
+                  {node.children.length > 0 &&
+                    ` · ${node.children.length} ${node.children.length === 1 ? 'subdeck' : 'subdecks'}`}
+                </span>
+                <ChevronRight size={15} />
+              </button>
+              {studyDecks && (
+                <button
+                  className="qard-icon-button"
+                  aria-label={`Study ${node.label}`}
+                  disabled={busy}
+                  onClick={() => studyDecks(node.decks)}
+                >
+                  <Play size={16} />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
       )}
       <div className="qard-topics">
         {topics.map((topic) => {
@@ -358,7 +475,7 @@ export function TopicBrowser({
           );
         })}
       </div>
-      {!topics.length && (
+      {!topics.length && !folders.length && (
         <div className="qard-empty">
           <p>{search ? 'No matching cards.' : 'No topics in this deck.'}</p>
           {search && <button onClick={() => setSearch('')}>Clear search</button>}

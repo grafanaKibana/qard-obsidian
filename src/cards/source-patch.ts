@@ -473,9 +473,57 @@ export function renameGroupInSource(source: string, path: string, rename: GroupR
       : { deck: rename.deck, topic: rename.to },
   );
   rename = { ...rename, to: rename.topic === undefined ? to.deck : to.topic };
+  return relocateInSource(
+    source,
+    path,
+    (card) => renamedLocation(card, rename),
+    (cards) => renameNoteNames(source, path, rename, cards),
+  );
+}
+
+/** Whole topics of one deck moving into another, such as a subdeck. Topic names stay the same. */
+export type TopicMove = { deck: string; topics: string[]; to: string };
+export function movedLocation(card: QardCard, move: TopicMove): CardLocation | undefined {
+  return card.deck === move.deck && move.topics.includes(card.topic)
+    ? { deck: move.to, topic: card.topic }
+    : undefined;
+}
+/**
+ * Move whole topics of a deck into another deck within one note. When every card that takes the
+ * note's own deck name is moving, `qard-deck` changes; otherwise moving cards get a location
+ * comment. Callouts and IDs stay byte-for-byte intact, and the result is verified.
+ */
+export function moveTopicsInSource(source: string, path: string, move: TopicMove): string {
+  move = { ...move, to: readCardLocation({ deck: move.to, topic: 'General' }).deck };
+  return relocateInSource(
+    source,
+    path,
+    (card) => movedLocation(card, move),
+    (cards) => {
+      const note = topicSections(source, path),
+        natural = cards.filter((card) => !card.location);
+      return note?.deck === move.deck &&
+        natural.length &&
+        natural.every((card) => movedLocation(card, move))
+        ? setFrontmatterValue(source, 'qard-deck', move.to)
+        : source;
+    },
+  );
+}
+
+/**
+ * Give each card the placement `locate` returns. `renameNames` may first change the names the note
+ * itself defines; if that leaves any card in the wrong place, cards get location comments instead.
+ */
+function relocateInSource(
+  source: string,
+  path: string,
+  locate: (card: QardCard) => CardLocation | undefined,
+  renameNames: (cards: QardCard[]) => string,
+): string {
   const before = parseCards(source, path).cards,
-    expected = before.map((card) => renamedLocation(card, rename) ?? card);
-  if (!before.some((card) => renamedLocation(card, rename))) {
+    expected = before.map((card) => locate(card) ?? card);
+  if (!before.some((card) => locate(card))) {
     return source;
   }
   const finish = (start: string) => {
@@ -485,7 +533,7 @@ export function renameGroupInSource(source: string, path: string, rename: GroupR
       parsed.length !== before.length ||
       parsed.some((card, i) => card.id !== before[i]!.id || !sameContent(card, before[i]!))
     ) {
-      throw new Error('The note changed shape while renaming.');
+      throw new Error('The note changed shape while saving.');
     }
     for (let i = parsed.length - 1; i >= 0; i--) {
       const card = parsed[i]!,
@@ -505,12 +553,12 @@ export function renameGroupInSource(source: string, path: string, rename: GroupR
           card.topic !== expected[i]!.topic,
       )
     ) {
-      throw new Error('The cards in this note could not be renamed safely.');
+      throw new Error('The cards in this note could not be updated safely.');
     }
     return next;
   };
   try {
-    return finish(renameNoteNames(source, path, rename, before));
+    return finish(renameNames(before));
   } catch {
     // The note's own names could not be changed cleanly; give each card its own location instead.
     return finish(source);
