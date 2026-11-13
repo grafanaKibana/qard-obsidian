@@ -1,3 +1,17 @@
+# Current main, settings hierarchy and review fixes
+
+Main `387ded998211375ee9fefcc707939b8aea7ca8d5` (0.6.6) → #10 `620550cc6b8c05e561afdeac454f5a72ed661474` → #17 `8116419e410938140c47a415ba4a6402112569e5`.
+
+- Both branches integrate current main with subdeck creation, parent-page navigation, move actions and per-deck statistics preserved. Nested badge previews use the displayed label and full identity lookup. Main merge conflicts resolved and focused integration tests passed.
+- Settings headings use the dedicated heading-size token and semibold weight. Scheduling/Appearance labels use the smaller label-size token and normal weight. Shared roles verified in both themes across320–1440px.
+- All4outstanding inline review findings fixed: library search retains focus on its enclosing border, cram summary omits the ratings-only chart while retaining viewed counts/actions, objective evidence opens on click/tap with full text plus original hover tooltip, mask Width/Height and percent units remain visibly inside the fields when populated.
+- Existing regression cases extended; no new cases/files authored. Full check passed811tests/98files for#10 and822tests/98files for#17, including format/typecheck/ESLint/Stylelint/build/release0.6.6.
+- 24shared-picker/hierarchy cases and6review-UI cases passed. Independent final review found0actionable regressions. Native isolated Obsidian SVG/select/cancel smoke passed; all5protected files unchanged.
+- All53browser scenes captured in both before/current-main and after/latest phases without errors. 100 gallery images refreshed. Retained images: after-create-boundary.png, after-mermaid-native-phone.png, before-create-boundary.png, before-mermaid-native-phone.png; rendering paths unchanged by main update. Gallery remains52pairs in23two-column tables, max3examples per group. #10 retains2main-to-latest pairs.
+- Resolved all4review threads; final live status rechecked after publication. PRs remain open for upstream maintainers, with #10→#17 ancestry intact.
+
+## Prior verification
+
 # Upstream appearance section and compact icon dropdown
 
 Upstream #10 source `357627e44614afa63506fdb3ce4f58faaf3ee782` → upstream #17 source `b2dab86fdcd8d0ecb98d5c210b9472cd21ca1348`. All fork PRs are retired; no fork PR is part of the dependency workflow.
